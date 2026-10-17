@@ -27,7 +27,10 @@ async function starsReady(page: Page) {
 
 /** Puntos vacíos del recuadro de bienvenida (fondo transparente, sin botones). */
 async function emptyHeroPoints(page: Page) {
-  const box = (await page.locator("section.iso-floor").boundingBox())!;
+  // El recuadro llega con los datos, un instante después que el resto de la página.
+  const hero = page.locator("section.iso-floor");
+  await expect(hero).toBeVisible();
+  const box = (await hero.boundingBox())!;
   return [0.95, 0.75, 0.55].map((f) => ({ x: box.x + box.width * f, y: box.y + 20 }));
 }
 
