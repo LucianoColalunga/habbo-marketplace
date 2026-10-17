@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatPct, formatPrice } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 
 /** Moneda propia (no es el ícono de crédito de Habbo). */
 export function CoinGlyph({ className = "h-3.5 w-3.5" }: { className?: string }) {
@@ -13,20 +15,22 @@ export function CoinGlyph({ className = "h-3.5 w-3.5" }: { className?: string })
 }
 
 export function Credits({ value, className = "" }: { value: number | null | undefined; className?: string }) {
+  const { t, f } = useI18n();
   if (value === null || value === undefined || !Number.isFinite(value) || value <= 0) {
     return <span className={`text-muted ${className}`}>—</span>;
   }
   return (
     <span className={`tnum inline-flex items-center gap-1 ${className}`}>
-      {formatPrice(value)}
+      {f.price(value)}
       <CoinGlyph />
-      <span className="sr-only">créditos</span>
+      <span className="sr-only">{t.common.credits}</span>
     </span>
   );
 }
 
 /** Variación con flecha y signo (el color nunca es la única pista). */
 export function Delta({ value, className = "" }: { value: number | null | undefined; className?: string }) {
+  const { f } = useI18n();
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return <span className={`text-muted ${className}`}>—</span>;
   }
@@ -35,7 +39,7 @@ export function Delta({ value, className = "" }: { value: number | null | undefi
   return (
     <span className={`tnum inline-flex items-center gap-0.5 whitespace-nowrap ${flat ? "text-text-2" : up ? "text-up" : "text-down"} ${className}`}>
       <span aria-hidden="true">{flat ? "•" : up ? "▲" : "▼"}</span>
-      {formatPct(value)}
+      {f.pct(value)}
     </span>
   );
 }
@@ -51,6 +55,7 @@ export function StatTile({ label, value, sub, help }: { label: string; value: Re
 }
 
 export function SectionTitle({ title, hint, href, linkLabel }: { title: string; hint?: string; href?: string; linkLabel?: string }) {
+  const { t } = useI18n();
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>
@@ -58,8 +63,8 @@ export function SectionTitle({ title, hint, href, linkLabel }: { title: string; 
         {hint && <p className="text-sm text-text-2">{hint}</p>}
       </div>
       {href && (
-        <Link href={href} className="shrink-0 text-sm text-accent hover:underline">
-          {linkLabel ?? "Ver todo"}
+        <Link prefetch={false} href={href} className="shrink-0 text-sm text-accent hover:underline">
+          {linkLabel ?? t.common.seeAll}
         </Link>
       )}
     </div>
@@ -81,8 +86,9 @@ export function Notice({ children, tone = "info" }: { children: ReactNode; tone?
 
 /** Mini gráfico de 30 días (sin interacción: los valores están en la misma fila). */
 export function Sparkline({ values, width = 96, height = 28 }: { values: (number | null)[]; width?: number; height?: number }) {
+  const { t } = useI18n();
   const points = values.map((v, i) => [i, v] as const).filter((p): p is readonly [number, number] => p[1] !== null);
-  if (points.length < 2) return <span className="inline-block text-xs text-muted" style={{ width }}>pocas ventas</span>;
+  if (points.length < 2) return <span className="inline-block text-xs text-muted" style={{ width }}>{t.common.fewSales}</span>;
   const ys = points.map((p) => p[1]);
   const min = Math.min(...ys);
   const max = Math.max(...ys);

@@ -2,35 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useI18n } from "@/lib/i18n/client";
+import { splitLocale } from "@/lib/i18n/config";
 
 const LINKS = [
-  { href: "/nft", label: "Inicio NFT", exact: true },
-  { href: "/nft/coleccion/furni", label: "Furnis" },
-  { href: "/nft/coleccion/ropa", label: "Ropa" },
-  { href: "/nft/coleccion/mascotas", label: "Mascotas" },
-  { href: "/nft/coleccion/tokens", label: "Tokens" },
-  { href: "/nft/coleccion/addons", label: "Add-ons" },
-  { href: "/nft/rankings", label: "Rankings" },
-  { href: "/nft/acerca", label: "Datos y límites" },
-];
+  { href: "/nft", key: "home", exact: true },
+  { href: "/nft/coleccion/furni", key: "furni" },
+  { href: "/nft/coleccion/ropa", key: "ropa" },
+  { href: "/nft/coleccion/mascotas", key: "mascotas" },
+  { href: "/nft/coleccion/tokens", key: "tokens" },
+  { href: "/nft/coleccion/addons", key: "addons" },
+  { href: "/nft/rankings", key: "rankings" },
+  { href: "/nft/acerca", key: "about" },
+] as const;
 
 export function NftNav() {
-  const pathname = usePathname();
+  const { t, href } = useI18n();
+  const { rest } = splitLocale(usePathname() ?? "/");
   return (
-    <nav aria-label="Secciones NFT" className="mx-auto max-w-6xl overflow-x-auto px-4">
+    <nav aria-label={t.nftNav.aria} className="mx-auto max-w-6xl overflow-x-auto px-4">
       <ul className="flex gap-1 pb-2 text-sm">
         {LINKS.map((link) => {
-          const active = link.exact ? pathname === link.href : pathname.startsWith(link.href);
+          const active = "exact" in link ? rest === link.href : rest.startsWith(link.href);
           return (
             <li key={link.href}>
               <Link
-                href={link.href}
+                prefetch={false}
+                href={href(link.href)}
                 aria-current={active ? "page" : undefined}
                 className={`block whitespace-nowrap rounded-lg px-3 py-1.5 transition-colors ${
                   active ? "bg-[#a78bfa]/20 text-text" : "text-text-2 hover:bg-surface hover:text-text"
                 }`}
               >
-                {link.label}
+                {t.nftNav[link.key]}
               </Link>
             </li>
           );

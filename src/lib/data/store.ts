@@ -38,7 +38,7 @@ export interface CatalogIndex {
 }
 
 export function loadCatalog(hotel: HotelCode): Promise<CatalogIndex | null> {
-  return remember(`catalog:${hotel}`, 10 * 60_000, async () => {
+  return remember(`catalog:${hotel}`, 60 * 60_000, async () => {
     const catalog = await read<Catalog>(keys.catalog(hotel));
     if (!catalog) return null;
     return { catalog, byKey: new Map(catalog.items.map((i) => [i.k, i])) };
@@ -46,11 +46,11 @@ export function loadCatalog(hotel: HotelCode): Promise<CatalogIndex | null> {
 }
 
 export function loadSummary(hotel: HotelCode): Promise<MarketSummary | null> {
-  return remember(`summary:${hotel}`, 60_000, () => read<MarketSummary>(keys.summary(hotel)));
+  return remember(`summary:${hotel}`, 5 * 60_000, () => read<MarketSummary>(keys.summary(hotel)));
 }
 
 export function loadHistory(hotel: HotelCode): Promise<MarketHistory | null> {
-  return remember(`history:${hotel}`, 5 * 60_000, () => read<MarketHistory>(keys.history(hotel)));
+  return remember(`history:${hotel}`, 10 * 60_000, () => read<MarketHistory>(keys.history(hotel)));
 }
 
 /** Solo para tests. */

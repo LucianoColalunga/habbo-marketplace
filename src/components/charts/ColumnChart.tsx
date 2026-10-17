@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 import { niceTicks } from "./scale";
 import { useWidth } from "./useWidth";
 
@@ -21,6 +22,7 @@ const M = { top: 12, right: 16, bottom: 26 };
 /** Columnas por día: ancho máximo 24 px, punta redondeada de 4 px y base recta. */
 export function ColumnChart({ points, ariaLabel, color = "var(--series-1)", height = 180, yFormat, xFormat, valueLabel }: Props) {
   const { ref, width } = useWidth<HTMLDivElement>();
+  const { t } = useI18n();
   const [hover, setHover] = useState<number | null>(null);
 
   const layout = useMemo(() => {
@@ -38,7 +40,7 @@ export function ColumnChart({ points, ariaLabel, color = "var(--series-1)", heig
     return { first, days, byDay, ticks, left, band, barW, sy };
   }, [points, width, height, yFormat]);
 
-  if (!layout) return <div className="flex h-32 items-center justify-center text-sm text-muted">Sin ventas registradas.</div>;
+  if (!layout) return <div className="flex h-32 items-center justify-center text-sm text-muted">{t.chart.noSales}</div>;
   const { first, days, byDay, ticks, left, band, barW, sy } = layout;
   const base = sy(0);
   const labelStep = Math.max(1, Math.ceil(days / Math.max(2, Math.floor((width - left) / 70))));

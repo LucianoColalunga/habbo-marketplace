@@ -39,7 +39,10 @@ export class BlobStorage implements Storage {
       addRandomSuffix: false,
       allowOverwrite: true,
       contentType: "application/gzip",
-      cacheControlMaxAge: 60,
+      // Las lecturas que salen de la caché del CDN no cuentan para el límite gratis de
+      // Blob. Al reescribir un archivo, Vercel actualiza esa caché en menos de 60 s, así
+      // que puede durar mucho sin mostrar datos viejos.
+      cacheControlMaxAge: 7 * 86400,
     });
     this.memo.delete(key);
   }

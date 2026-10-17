@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MarketStats } from "@/lib/habbo/api";
 import { fetchLive, LiveLimitError } from "@/lib/habbo/live-client";
 import type { HotelCode } from "@/lib/hotels";
+import { useI18n } from "@/lib/i18n/client";
 import type { DayPoint, SnapPoint } from "@/lib/market/history";
 import { lastDays, mergeDayRows, snapRows } from "@/lib/market/series";
 import { referencePrice, summarize, weeklyChange, type ItemSummary } from "@/lib/market/stats";
-import { formatCompact, formatInt, formatPrice, formatShortDate } from "@/lib/format";
 import { Credits, Delta, StatTile } from "@/components/ui";
 import { TimeAgo } from "@/components/Freshness";
 import { useNow } from "@/lib/use-now";
@@ -25,26 +25,26 @@ interface Props {
 }
 
 type Status = "loading" | "live" | "limited" | "error";
+type Problem = "limitReached" | "noData" | "throttled" | "failed";
 
 interface Outcome {
   status: Status;
   live?: { stats: MarketStats; at: number };
-  message: string;
+  message: Problem | "";
 }
 
 const RANGES = [
-  { id: 30, label: "30 días" },
-  { id: 90, label: "90 días" },
-  { id: Number.POSITIVE_INFINITY, label: "Todo" },
+  { id: 30, key: "d30" },
+  { id: 90, key: "d90" },
+  { id: Number.POSITIVE_INFINITY, key: "all" },
 ] as const;
 
-const longDate = new Intl.DateTimeFormat("es-AR", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
-const longDateTime = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-
-export function ItemLive({ hotel, k, t, stored, storedAt, days, snaps }: Props) {
+export function ItemLive({ hotel, k, t: type, stored, storedAt, days, snaps }: Props) {
+  const { t: ui, f } = useI18n();
+  const t = ui.item;
   const [live, setLive] = useState<{ stats: MarketStats; at: number } | null>(null);
   const [status, setStatus] = useState<Status>("loading");
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<Problem | "">("");
   const [range, setRange] = useState<number>(30);
   const [showTable, setShowTable] = useState(false);
   // "Ahora" se toma recién en el navegador (no durante el render del servidor).
@@ -54,20 +54,16 @@ export function ItemLive({ hotel, k, t, stored, storedAt, days, snaps }: Props) 
   const query = useCallback(
     async (force: boolean): Promise<Outcome> => {
       try {
-        const res = await fetchLive(hotel, [{ name: k, type: t }], { force });
+        const res = await fetchLive(hotel, [{ name: k, type }], { force });
         const stats = res.stats.get(k);
         if (stats) return { status: "live", live: { stats, at: res.fetchedAt }, message: "" };
-        if (res.skipped.length) {
-          return { status: "limited", message: "Se alcanzó el límite de consultas en vivo. Esperá un minuto y tocá Actualizar." };
-        }
-        return { status: "error", message: "La API no devolvió datos para este furni en este momento." };
+        if (res.skipped.length) return { status: "limited", message: "limitReached" };
+        return { status: "error", message: "noData" };
       } catch (error) {
-        return error instanceof LiveLimitError
-          ? { status: "limited", message: "Habbo limita las consultas seguidas. Mostramos el último dato guardado; probá de nuevo en un minuto." }
-          : { status: "error", message: "No se pudo consultar la API de Habbo desde tu navegador. Mostramos el último dato guardado." };
+        return error instanceof LiveLimitError ? { status: "limited", message: "throttled" } : { status: "error", message: "failed" };
       }
     },
-    [hotel, k, t],
+    [hotel, k, type],
   );
 
   const apply = useCallback((o: Outcome) => {
@@ -105,16 +101,21 @@ export function ItemLive({ hotel, k, t, stored, storedAt, days, snaps }: Props) 
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <div aria-live="polite" className="text-text-2">
-          {status === "loading" && "Consultando la API de Habbo…"}
+          {status === "loading" && t.querying}
           {status === "live" && live && (
             <span className="inline-flex items-center gap-2">
               <span className="inline-block h-2 w-2 rounded-full bg-up" aria-hidden="true" />
-              En vivo · consultado <TimeAgo iso={new Date(live.at).toISOString()} />
+              {ui.common.liveAt} <TimeAgo iso={new Date(live.at).toISOString()} />
             </span>
           )}
           {(status === "limited" || status === "error") && (
             <span>
-              {message} {storedAt && <>Último escaneo: <TimeAgo iso={storedAt} />.</>}
+              {message ? t[message] : ""}{" "}
+              {storedAt && (
+                <>
+                  {ui.common.lastScan} <TimeAgo iso={storedAt} />.
+                </>
+              )}
             </span>
           )}
         </div>
@@ -127,88 +128,85 @@ export function ItemLive({ hotel, k, t, stored, storedAt, days, snaps }: Props) 
           disabled={status === "loading"}
           className="rounded-lg border border-line bg-surface px-3 py-1.5 text-text hover:bg-surface-2 disabled:opacity-50"
         >
-          Actualizar
+          {ui.common.refresh}
         </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <StatTile
-          label="Precio mínimo publicado"
-          value={current && current.oo > 0 ? <Credits value={current.cp} /> : <span className="text-muted">sin ofertas</span>}
-          help="La oferta más barata abierta en este momento."
+          label={t.minPrice}
+          value={current && current.oo > 0 ? <Credits value={current.cp} /> : <span className="text-muted">{ui.common.noOffers}</span>}
+          help={t.minPriceHelp}
         />
-        <StatTile label="Ofertas abiertas" value={<span className="tnum">{formatInt(current?.oo ?? 0)}</span>} />
+        <StatTile label={t.openOffers} value={<span className="tnum">{f.int(current?.oo ?? 0)}</span>} />
         <StatTile
-          label="Promedio 7 días"
+          label={t.avg7}
           value={<Credits value={current?.a7 ?? null} />}
           sub={
             <span className="inline-flex items-center gap-1">
-              <Delta value={change} /> <span className="text-muted">vs. semana anterior</span>
+              <Delta value={change} /> <span className="text-muted">{ui.common.vsPrevWeek}</span>
             </span>
           }
         />
         <StatTile
-          label="Promedio 30 días"
+          label={t.avg30}
           value={<Credits value={current?.a30 ?? (current?.ap || null)} />}
-          sub={current?.ap ? <span>Habbo informa {formatPrice(current.ap)}</span> : undefined}
+          sub={current?.ap ? <span>{t.habboSays(f.price(current.ap))}</span> : undefined}
         />
         <StatTile
-          label="Vendidos en 30 días"
-          value={<span className="tnum">{formatInt(current?.s30 ?? 0)}</span>}
-          sub={current?.ls ? <span>última venta hace {current.ls} día{current.ls === 1 ? "" : "s"}</span> : undefined}
+          label={t.sold30}
+          value={<span className="tnum">{f.int(current?.s30 ?? 0)}</span>}
+          sub={current?.ls ? <span>{t.lastSale(current.ls)}</span> : undefined}
         />
       </div>
 
       {ref !== null && current && current.oo > 0 && current.cp < ref && (
         <p className="text-sm text-text-2">
-          El precio mínimo está <strong className="text-text">{Math.round(((ref - current.cp) / ref) * 100)} %</strong> por
-          debajo del promedio reciente ({formatPrice(ref)} créditos).
+          {t.belowA} <strong className="text-text">{f.pct((ref - current.cp) / ref, false)}</strong> {t.belowB(f.price(ref))}
         </p>
       )}
 
       <section className="card p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="font-display text-lg font-bold text-text">Precio a lo largo del tiempo</h2>
-            <p className="text-sm text-text-2">
-              Promedio de venta por día (Habbo) y precio mínimo publicado en cada escaneo (guardado por este sitio).
-            </p>
+            <h2 className="font-display text-lg font-bold text-text">{t.chartTitle}</h2>
+            <p className="text-sm text-text-2">{t.chartHint}</p>
           </div>
-          <div className="flex gap-1" role="group" aria-label="Rango del gráfico">
+          <div className="flex gap-1" role="group" aria-label={t.rangeAria}>
             {RANGES.map((r) => (
               <button
-                key={r.label}
+                key={r.key}
                 type="button"
                 aria-pressed={range === r.id}
                 onClick={() => setRange(r.id)}
                 className={`rounded-lg px-3 py-1 text-sm ${range === r.id ? "bg-surface-3 text-text" : "text-text-2 hover:bg-surface-2"}`}
               >
-                {r.label}
+                {t[r.key]}
               </button>
             ))}
           </div>
         </div>
         <TimeSeriesChart
-          ariaLabel="Precio promedio de venta por día y precio mínimo publicado"
-          yFormat={(v) => formatCompact(v)}
-          xFormat={formatShortDate}
-          xFormatLong={(ms) => longDateTime.format(ms)}
+          ariaLabel={t.chartAria}
+          yFormat={(v) => f.compact(v)}
+          xFormat={f.shortDate}
+          xFormatLong={f.dayTime}
           series={[
-            { id: "avg", label: "Promedio de venta del día", color: "var(--series-1)", points: visibleRows.map((r) => ({ x: r.x, y: r.avg })) },
-            { id: "min", label: "Precio mínimo publicado", color: "var(--series-2)", points: visibleSnaps.map((s) => ({ x: s.x, y: s.cp })) },
+            { id: "avg", label: t.seriesAvg, color: "var(--series-1)", points: visibleRows.map((r) => ({ x: r.x, y: r.avg })) },
+            { id: "min", label: t.seriesMin, color: "var(--series-2)", points: visibleSnaps.map((s) => ({ x: s.x, y: s.cp })) },
           ]}
         />
       </section>
 
       <section className="card p-4">
-        <h2 className="font-display text-lg font-bold text-text">Unidades vendidas por día</h2>
-        <p className="mb-3 text-sm text-text-2">Solo cuentan las ventas hechas en el Marketplace.</p>
+        <h2 className="font-display text-lg font-bold text-text">{t.soldTitle}</h2>
+        <p className="mb-3 text-sm text-text-2">{t.soldHint}</p>
         <ColumnChart
-          ariaLabel="Unidades vendidas por día"
+          ariaLabel={t.soldTitle}
           points={visibleRows.map((r) => ({ x: r.x, y: r.sold }))}
-          yFormat={(v) => formatCompact(v)}
-          xFormat={formatShortDate}
-          valueLabel="vendidos"
+          yFormat={(v) => f.compact(v)}
+          xFormat={f.shortDate}
+          valueLabel={t.soldUnit}
         />
       </section>
 
@@ -219,33 +217,33 @@ export function ItemLive({ hotel, k, t, stored, storedAt, days, snaps }: Props) 
           aria-expanded={showTable}
           className="text-sm text-accent hover:underline"
         >
-          {showTable ? "Ocultar tabla de datos" : "Ver los datos en una tabla"}
+          {showTable ? t.tableHide : t.tableShow}
         </button>
         {showTable && (
           <div className="card mt-3 overflow-x-auto">
             <table className="w-full text-sm">
-              <caption className="sr-only">Historial diario</caption>
+              <caption className="sr-only">{t.tableCaption}</caption>
               <thead className="text-left text-text-2">
                 <tr className="border-b border-line">
-                  <th className="px-4 py-2 font-medium">Día</th>
-                  <th className="px-4 py-2 text-right font-medium">Promedio</th>
-                  <th className="px-4 py-2 text-right font-medium">Vendidos</th>
-                  <th className="px-4 py-2 text-right font-medium">Ofertas ese día</th>
+                  <th className="px-4 py-2 font-medium">{t.colDay}</th>
+                  <th className="px-4 py-2 text-right font-medium">{t.colAvg}</th>
+                  <th className="px-4 py-2 text-right font-medium">{t.colSold}</th>
+                  <th className="px-4 py-2 text-right font-medium">{t.colOffers}</th>
                 </tr>
               </thead>
               <tbody className="tnum">
                 {[...visibleRows].reverse().map((r) => (
                   <tr key={r.x} className="border-b border-line/60 last:border-0">
-                    <td className="px-4 py-1.5 text-text-2">{longDate.format(r.x)}</td>
-                    <td className="px-4 py-1.5 text-right text-text">{formatPrice(r.avg)}</td>
-                    <td className="px-4 py-1.5 text-right text-text">{formatInt(r.sold)}</td>
-                    <td className="px-4 py-1.5 text-right text-text">{formatInt(r.offers)}</td>
+                    <td className="px-4 py-1.5 text-text-2">{f.day(r.x)}</td>
+                    <td className="px-4 py-1.5 text-right text-text">{f.price(r.avg)}</td>
+                    <td className="px-4 py-1.5 text-right text-text">{f.int(r.sold)}</td>
+                    <td className="px-4 py-1.5 text-right text-text">{f.int(r.offers)}</td>
                   </tr>
                 ))}
                 {visibleRows.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-4 py-4 text-center text-muted">
-                      Sin ventas en este período.
+                      {t.noSalesPeriod}
                     </td>
                   </tr>
                 )}

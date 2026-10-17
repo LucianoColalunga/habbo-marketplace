@@ -1,4 +1,5 @@
 import { communityLinks, type CommunityId } from "@/lib/community";
+import { getI18n } from "@/lib/i18n/server";
 
 const STYLE: Record<CommunityId, string> = {
   // Colores de cada servicio; el texto elegido para que se lea bien sobre cada fondo.
@@ -33,15 +34,14 @@ function Icon({ id }: { id: CommunityId }) {
  * Botones para unirse a los canales donde se publican las ofertas. No muestra
  * nada si no hay ningún canal configurado.
  */
-export function JoinChannels({ title = "Recibí las ofertas en tu celular", note }: { title?: string; note?: string }) {
+export async function JoinChannels({ title, note }: { title?: string; note?: string }) {
   const links = communityLinks();
   if (links.length === 0) return null;
+  const { p } = await getI18n();
   return (
-    <section className="card p-4" aria-label="Canales de avisos">
-      <h2 className="font-display text-lg font-bold text-text">{title}</h2>
-      <p className="mt-1 text-sm text-text-2">
-        {note ?? "Unite con un toque: ahí publicamos las ofertas más fuertes que detecta cada escaneo."}
-      </p>
+    <section className="card p-4" aria-label={p.channels.aria}>
+      <h2 className="font-display text-lg font-bold text-text">{title ?? p.channels.title}</h2>
+      <p className="mt-1 text-sm text-text-2">{note ?? p.channels.note}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {links.map((l) => (
           <a
@@ -52,7 +52,7 @@ export function JoinChannels({ title = "Recibí las ofertas en tu celular", note
             className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold sm:w-auto ${STYLE[l.id]}`}
           >
             <Icon id={l.id} />
-            {l.label}
+            {p.channels[l.id]}
           </a>
         ))}
       </div>

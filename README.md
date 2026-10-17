@@ -20,7 +20,12 @@ aparece por debajo de su precio normal.
 - **Alertas**: lista de furnis a vigilar con un umbral (% bajo el promedio o precio máximo). Avisa con notificaciones
   del navegador, y opcionalmente por **Discord** o **Telegram** desde el servidor.
 - Hoteles **.es**, **.com** y **.com.br** por defecto (se pueden sumar .de, .fr, .it, .nl, .fi y .com.tr).
+- **Tres idiomas:** español, portugués e inglés; cada visitante elige con el selector ES · PT · EN.
+- **Cielo de estrellas** de fondo: titilan, se unen al mouse con líneas y **explotan al tocarlas**. Se puede apagar desde
+  el pie de página y respeta la opción "reducir movimiento" del sistema.
 - Tema oscuro, responsive, identidad propia.
+- **Gratis:** todo entra en los planes gratuitos; ver [docs/COSTOS.md](docs/COSTOS.md) (cuánta gente aguanta y qué pasa
+  si se pasa).
 
 ## Sección NFT (separada)
 
@@ -35,6 +40,24 @@ hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se
   El recolector (`npm run collect:nft`, cron diario `/api/cron/nft`) guarda historial de ventas y del piso.
 - No incluye Immutable X (su API ya no responde) ni los avatares en Ethereum (requieren servicios con clave).
 - No es asesoramiento financiero; los dólares son aproximados.
+
+## Idiomas
+
+| Idioma | Direcciones | Ejemplo |
+| --- | --- | --- |
+| Español | sin prefijo (como siempre) | `/es`, `/com/furni/throne`, `/nft` |
+| Português | `/pt/...` | `/pt/br`, `/pt/nft` |
+| English | `/en/...` | `/en/com`, `/en/nft/rankings` |
+
+- Cada idioma tiene sus propias páginas estáticas, así el CDN las sirve sin ejecutar código (importante para el plan
+  gratis). Internamente las páginas viven en `src/app/[lang]/...`; el español se sirve sin prefijo con una reescritura
+  en `next.config.ts` (`src/lib/i18n/routing.ts`).
+- La portada `/` lleva al idioma elegido antes (cookie `fm_lang`, solo guarda `es`, `pt` o `en`) o, si no hay, al del
+  navegador. Español → hotel .es, português → .com.br, English → .com.
+- Se traduce la interfaz. Los nombres de furnis vienen del furnidata de cada hotel (en el idioma de ese hotel) y los de
+  los NFT, de Immutable (en inglés).
+- Los textos están en `src/lib/i18n/ui/` (los que usa el navegador) y `src/lib/i18n/pages/` (los de cada página). Una
+  prueba verifica que los tres idiomas tengan exactamente las mismas claves.
 
 ## Qué datos son reales (y qué no)
 
@@ -93,7 +116,7 @@ Levantar la web:
 npm run dev
 ```
 
-Abrí <http://localhost:3000> (redirige a `/es`). Los datos quedan en `.data/` (comprimidos). Para otros hoteles:
+Abrí <http://localhost:3000> (redirige según tu idioma: `/es`, `/pt/br` o `/en/com`). Los datos quedan en `.data/` (comprimidos). Para otros hoteles:
 `npm run collect -- com br`.
 
 Si querés que se actualice solo en tu PC, podés programar `npm run collect` en el Programador de tareas de Windows
@@ -188,6 +211,12 @@ guardar las suscripciones en el servidor.
 - **Notificaciones:** el service worker solo abre páginas del propio sitio.
 - **Dependencias:** `npm audit --omit=dev` sin vulnerabilidades (las que marca `npm audit` completo son de ESLint, que
   no se publica).
+- **Enlaces y redirecciones:** las direcciones por idioma se arman siempre como rutas del propio sitio (nunca `//otro`),
+  y las redirecciones tienen destinos fijos: no se pueden usar para mandar a alguien a otro sitio.
+- **Sin secretos filtrados:** revisado el repositorio, todo el historial de git y lo que se compila (lo que baja el
+  navegador y lo del servidor): no aparece ningún token ni clave.
+- **Ataques de tráfico:** Vercel los bloquea solo y no cuenta ese tráfico; si hiciera falta, en *Firewall* se prende
+  **Attack Mode** (gratis). Detalle en [docs/COSTOS.md](docs/COSTOS.md).
 
 Recomendado en tus cuentas: verificación en dos pasos en GitHub y Vercel, y las alertas de Dependabot activadas en el
 repositorio. Si alguna vez sospechás que se filtró un token, rotalo en Vercel (Storage → Blob → token, y la variable
@@ -201,8 +230,10 @@ Todas están explicadas en [.env.example](.env.example).
 
 ```
 src/
-  app/                 páginas (/[hotel], /[hotel]/furni/[classname], rankings, ofertas, alertas, acerca) y rutas API
-  components/          interfaz, gráficos SVG y alertas del navegador
+  app/[lang]/          páginas por idioma: [hotel] (inicio, furni, rankings, ofertas, alertas, acerca) y nft/
+  app/api/             rutas API (búsqueda y cron)
+  components/          interfaz, gráficos SVG, alertas del navegador y fondo de estrellas
+  lib/i18n/            idiomas: textos, direcciones y formatos de números y fechas
   lib/habbo/           cliente de la API (servidor y navegador), furnidata e imágenes
   lib/market/          escaneo rotativo, resúmenes, historial, rankings y ofertas
   lib/alerts/          reglas, avisos del navegador, Discord y Telegram

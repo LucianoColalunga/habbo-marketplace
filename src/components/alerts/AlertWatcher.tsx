@@ -18,7 +18,9 @@ import {
   saveNotifyState,
   type Detection,
 } from "@/lib/alerts/local";
-import { formatPct } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
+
+type I18n = ReturnType<typeof useI18n>;
 
 const LEADER_KEY = "fm:leader";
 let tabIdValue: string | null = null;
@@ -42,7 +44,8 @@ function isLeader(now: number): boolean {
   }
 }
 
-export async function runBrowserCheck(): Promise<{ checked: number; detections: Detection[]; error?: string }> {
+/** Revisa la lista guardada en el navegador y avisa (en el idioma de la página) lo que cumpla. */
+export async function runBrowserCheck({ t, f, href }: I18n): Promise<{ checked: number; detections: Detection[]; error?: string }> {
   const rules = loadRules();
   if (rules.length === 0) return { checked: 0, detections: [] };
   const now = Date.now();
@@ -84,7 +87,7 @@ export async function runBrowserCheck(): Promise<{ checked: number; detections: 
         }
       }
     } catch (e) {
-      error = e instanceof LiveLimitError ? e.message : `No se pudo consultar ${HOTELS[hotel].label}: ${(e as Error).message}`;
+      error = e instanceof LiveLimitError ? t.deals.limit : t.watcher.failed(HOTELS[hotel].label);
     }
   }
   saveNotifyState(state);
@@ -92,11 +95,10 @@ export async function runBrowserCheck(): Promise<{ checked: number; detections: 
   addDetections(found);
   if (loadSettings().notifications) {
     for (const d of found) {
-      const below = d.belowRef !== null ? `, ${formatPct(d.belowRef, false)} bajo el promedio` : "";
       await showNotification(
-        `${d.name}: ${d.price} créditos`,
-        `${HOTELS[d.hotel as HotelCode].label} · ${d.offers} en venta${below}`,
-        `/${d.hotel}/furni/${encodeURIComponent(d.item)}`,
+        t.watcher.notifTitle(d.name, d.price),
+        t.watcher.notifBody(HOTELS[d.hotel as HotelCode].label, d.offers, d.belowRef !== null ? f.pct(d.belowRef, false) : null),
+        href(`/${d.hotel}/furni/${encodeURIComponent(d.item)}`),
       );
     }
   }
@@ -106,6 +108,8 @@ export async function runBrowserCheck(): Promise<{ checked: number; detections: 
 
 /** Vigilante en segundo plano (mientras haya una pestaña abierta) + aviso dentro de la página. */
 export function AlertWatcher() {
+  const i18n = useI18n();
+  const { t, f, href } = i18n;
   const [toast, setToast] = useState<Detection[]>([]);
 
   useEffect(() => {
@@ -119,7 +123,7 @@ export function AlertWatcher() {
       if (loadRules().length === 0) return;
       running = true;
       try {
-        await runBrowserCheck();
+        await runBrowserCheck(i18n);
       } finally {
         running = false;
       }
@@ -139,26 +143,26 @@ export function AlertWatcher() {
       window.removeEventListener("fm:check-now", onNow);
       window.removeEventListener("fm:detections", onDetections);
     };
-  }, []);
+    // El idioma solo cambia al navegar a otra versión de la página (otro árbol).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.lang]);
 
   if (toast.length === 0) return null;
   return (
     <div className="fixed bottom-4 right-4 z-50 w-[min(92vw,360px)] rounded-xl border border-accent/50 bg-surface-2 p-4 shadow-2xl shadow-black/50" role="alert">
       <div className="mb-2 flex items-center justify-between">
-        <strong className="text-text">Oferta detectada</strong>
-        <button type="button" onClick={() => setToast([])} className="text-sm text-text-2 hover:text-text" aria-label="Cerrar aviso">
+        <strong className="text-text">{t.watcher.title}</strong>
+        <button type="button" onClick={() => setToast([])} className="text-sm text-text-2 hover:text-text" aria-label={t.watcher.closeAria}>
           ✕
         </button>
       </div>
       <ul className="space-y-1 text-sm">
         {toast.slice(0, 4).map((d) => (
           <li key={d.id}>
-            <a className="text-accent hover:underline" href={`/${d.hotel}/furni/${encodeURIComponent(d.item)}`}>
+            <a className="text-accent hover:underline" href={href(`/${d.hotel}/furni/${encodeURIComponent(d.item)}`)}>
               {d.name}
             </a>{" "}
-            <span className="text-text-2">
-              a {d.price} créditos{d.belowRef !== null ? ` (${formatPct(d.belowRef, false)} bajo el promedio)` : ""}
-            </span>
+            <span className="text-text-2">{t.watcher.line(d.price, d.belowRef !== null ? f.pct(d.belowRef, false) : null)}</span>
           </li>
         ))}
       </ul>

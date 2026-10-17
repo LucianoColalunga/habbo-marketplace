@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { TimeAgo } from "@/components/Freshness";
 import { NftTable, type NftMetric } from "@/components/nft/NftList";
+import { getI18n } from "@/lib/i18n/server";
+import type { NftCollectionSlug } from "@/lib/nft/collections";
 import { NFT_RANKINGS, type NftRankingKind } from "@/lib/nft/rankings";
 import { getNftMeta, getNftRanking } from "@/lib/nft/views";
-import type { NftCollectionSlug } from "@/lib/nft/collections";
 
 const METRIC: Record<NftRankingKind, NftMetric> = {
   vendidos: "s7",
@@ -26,7 +27,8 @@ export async function NftRankingView({
   basePath: string;
   title: string;
 }) {
-  const [rows, meta] = await Promise.all([getNftRanking(kind, slug, 100), getNftMeta()]);
+  const [rows, meta, { p, href }] = await Promise.all([getNftRanking(kind, slug, 100), getNftMeta(), getI18n()]);
+  const r = p.nft.rankings;
   return (
     <div className="space-y-5">
       <header>
@@ -34,30 +36,32 @@ export async function NftRankingView({
         <p className="mt-1 text-text-2">
           {meta.generatedAt ? (
             <>
-              Último escaneo <TimeAgo iso={meta.generatedAt} />. Precios en dólares (aproximados).
+              {r.lastScan} <TimeAgo iso={meta.generatedAt} />
+              {r.prices}
             </>
           ) : (
-            "Todavía no hay escaneos guardados."
+            r.noScans
           )}
         </p>
       </header>
-      <nav aria-label="Tipo de ranking" className="flex flex-wrap gap-2">
+      <nav aria-label={r.kindAria} className="flex flex-wrap gap-2">
         {(Object.keys(NFT_RANKINGS) as NftRankingKind[]).map((k) => (
           <Link
+            prefetch={false}
             key={k}
-            href={`${basePath}/${k}`}
+            href={href(`${basePath}/${k}`)}
             aria-current={k === kind ? "page" : undefined}
             className={`rounded-full border px-3 py-1.5 text-sm ${
               k === kind ? "border-accent bg-accent/15 text-text" : "border-line text-text-2 hover:bg-surface"
             }`}
           >
-            {NFT_RANKINGS[k].title}
+            {r.kinds[k].title}
           </Link>
         ))}
       </nav>
       <div>
-        <h2 className="font-display text-xl font-bold text-text">{NFT_RANKINGS[kind].title}</h2>
-        <p className="mb-3 text-sm text-text-2">{NFT_RANKINGS[kind].hint}</p>
+        <h2 className="font-display text-xl font-bold text-text">{r.kinds[kind].title}</h2>
+        <p className="mb-3 text-sm text-text-2">{r.kinds[kind].hint}</p>
         <NftTable rows={rows} metric={METRIC[kind]} />
       </div>
     </div>

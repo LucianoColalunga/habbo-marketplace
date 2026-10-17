@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 import { linear, nearestIndex, niceTicks } from "./scale";
 import { useWidth } from "./useWidth";
 
@@ -46,6 +47,7 @@ export function TimeSeriesChart({
   matchWindowMs = 12 * 3600_000,
 }: Props) {
   const { ref, width } = useWidth<HTMLDivElement>();
+  const { t } = useI18n();
   const [hover, setHover] = useState<number | null>(null);
   const visible = series.filter((s) => s.points.length > 0);
 
@@ -70,7 +72,7 @@ export function TimeSeriesChart({
   }, [visible, width, height, includeZero, yFormat]);
 
   if (!layout) {
-    return <div className="flex h-40 items-center justify-center text-sm text-muted">Sin datos para graficar.</div>;
+    return <div className="flex h-40 items-center justify-center text-sm text-muted">{t.chart.noData}</div>;
   }
   const { xs, ticks, left, sx, sy, xTicks } = layout;
   const hoverX = hover !== null ? xs[hover] : null;
@@ -93,7 +95,7 @@ export function TimeSeriesChart({
   return (
     <div>
       {visible.length >= 2 && (
-        <ul className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-2" aria-label="Leyenda">
+        <ul className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-2" aria-label={t.chart.legend}>
           {visible.map((s) => (
             <li key={s.id} className="flex items-center gap-2">
               <span aria-hidden="true" className="inline-block h-0.5 w-4 rounded" style={{ background: s.color }} />

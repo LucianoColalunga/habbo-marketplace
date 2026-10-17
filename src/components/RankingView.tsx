@@ -4,8 +4,8 @@ import { TimeAgo } from "@/components/Freshness";
 import { Notice } from "@/components/ui";
 import { RANKINGS, type RankingKind } from "@/lib/data/rankings";
 import { getMarketMeta, getRankingView } from "@/lib/data/views";
-import type { HotelCode } from "@/lib/hotels";
-import { HOTELS } from "@/lib/hotels";
+import { HOTELS, type HotelCode } from "@/lib/hotels";
+import { getI18n } from "@/lib/i18n/server";
 
 const METRIC: Record<RankingKind, Metric> = {
   vendidos: "s7",
@@ -17,41 +17,44 @@ const METRIC: Record<RankingKind, Metric> = {
 };
 
 export async function RankingView({ hotel, kind }: { hotel: HotelCode; kind: RankingKind }) {
-  const [rows, meta] = await Promise.all([getRankingView(hotel, kind, 100), getMarketMeta(hotel)]);
-  const info = RANKINGS[kind];
+  const [rows, meta, { p, href }] = await Promise.all([getRankingView(hotel, kind, 100), getMarketMeta(hotel), getI18n()]);
+  const r = p.rankings;
+  const info = r.kinds[kind];
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="font-display text-3xl font-bold text-text">Rankings de {HOTELS[hotel].label}</h1>
+        <h1 className="font-display text-3xl font-bold text-text">{r.title(HOTELS[hotel].label)}</h1>
         <p className="mt-1 text-text-2">
           {meta.generatedAt ? (
             <>
-              Calculados con el último escaneo (<TimeAgo iso={meta.generatedAt} />
-              ). Cada furni muestra el dato de su propio último escaneo.
+              {r.computedA}
+              <TimeAgo iso={meta.generatedAt} />
+              {r.computedB}
             </>
           ) : (
-            "Todavía no hay escaneos guardados."
+            r.noScans
           )}
         </p>
       </header>
-      <nav aria-label="Tipo de ranking" className="flex flex-wrap gap-2">
+      <nav aria-label={r.kindAria} className="flex flex-wrap gap-2">
         {(Object.keys(RANKINGS) as RankingKind[]).map((k) => (
           <Link
+            prefetch={false}
             key={k}
-            href={`/${hotel}/rankings/${k}`}
+            href={href(`/${hotel}/rankings/${k}`)}
             aria-current={k === kind ? "page" : undefined}
             className={`rounded-full border px-3 py-1.5 text-sm ${
               k === kind ? "border-accent bg-accent/15 text-text" : "border-line text-text-2 hover:bg-surface"
             }`}
           >
-            {RANKINGS[k].title}
+            {r.kinds[k].title}
           </Link>
         ))}
       </nav>
       <div>
         <h2 className="font-display text-xl font-bold text-text">{info.title}</h2>
         <p className="mb-3 text-sm text-text-2">{info.hint}</p>
-        {!meta.hasData ? <Notice tone="warn">Este hotel todavía no tiene datos del recolector.</Notice> : null}
+        {!meta.hasData ? <Notice tone="warn">{r.noData}</Notice> : null}
         <FurniTable hotel={hotel} rows={rows} metric={METRIC[kind]} />
       </div>
     </div>

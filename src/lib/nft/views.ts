@@ -22,11 +22,11 @@ function remember<T>(key: string, ttl: number, load: () => Promise<T>): Promise<
 }
 
 async function loadSummary(): Promise<NftSummary | null> {
-  return remember("nft:summary", 60_000, async () => (await (await getStorage()).read<NftSummary>(nftKeys.summary()))?.data ?? null);
+  return remember("nft:summary", 5 * 60_000, async () => (await (await getStorage()).read<NftSummary>(nftKeys.summary()))?.data ?? null);
 }
 
 async function loadHistory(): Promise<NftHistory | null> {
-  return remember("nft:history", 5 * 60_000, async () => (await (await getStorage()).read<NftHistory>(nftKeys.history()))?.data ?? null);
+  return remember("nft:history", 10 * 60_000, async () => (await (await getStorage()).read<NftHistory>(nftKeys.history()))?.data ?? null);
 }
 
 export function forgetNft() {

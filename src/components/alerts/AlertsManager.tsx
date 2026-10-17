@@ -17,10 +17,11 @@ import {
   type LastCheck,
   type LocalRule,
 } from "@/lib/alerts/local";
-import { describeRule, newRuleId, type RuleMode } from "@/lib/alerts/rules";
+import { newRuleId, type RuleMode } from "@/lib/alerts/rules";
 import { enableNotifications, notificationPermission, showNotification } from "@/lib/alerts/browser-notify";
 import { HOTELS, type HotelCode } from "@/lib/hotels";
-import { formatPrice } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
+import { describeRuleIn } from "@/lib/i18n/ui";
 import { FurniIcon } from "@/components/FurniIcon";
 import { TimeAgo } from "@/components/Freshness";
 import { Credits } from "@/components/ui";
@@ -38,6 +39,8 @@ interface SearchHit {
 }
 
 export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] }) {
+  const { t: ui, f, href } = useI18n();
+  const t = ui.alerts;
   const rules = useLocal(loadRules, NO_RULES);
   const checks = useLocal(loadLastChecks, NO_CHECKS);
   const settings = useLocal<AlertSettings>(loadSettings, DEFAULT_SETTINGS);
@@ -56,13 +59,13 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
   return (
     <div className="space-y-8">
       <section className="card space-y-4 p-4">
-        <h2 className="font-display text-xl font-bold text-text">Para que te lleguen los avisos</h2>
+        <h2 className="font-display text-xl font-bold text-text">{t.howTitle}</h2>
         <ol className="list-decimal space-y-1 pl-5 text-sm text-text-2">
           <li>
-            Activá las notificaciones. El navegador te va a preguntar si das permiso: elegí <strong className="text-text">Permitir</strong>.
+            {t.step1} <strong className="text-text">{t.allow}</strong>.
           </li>
-          <li>Dejá abierta una pestaña de Furnímetro. Puede estar minimizada; si la cerrás, no llegan avisos.</li>
-          <li>Tu lista se guarda en este navegador. En otro celular o computadora la tenés que armar de nuevo.</li>
+          <li>{t.step2}</li>
+          <li>{t.step3}</li>
         </ol>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {permission === "granted" ? (
@@ -72,15 +75,12 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
                 checked={settings.notifications}
                 onChange={(e) => saveSettings({ ...settings, notifications: e.target.checked })}
               />
-              Mostrar notificaciones del navegador
+              {t.showNotifs}
             </label>
           ) : permission === "unsupported" ? (
-            <span className="text-text-2">Este navegador no muestra notificaciones: los avisos van a aparecer dentro de la página.</span>
+            <span className="text-text-2">{t.unsupported}</span>
           ) : permission === "denied" ? (
-            <span className="text-text-2">
-              Bloqueaste las notificaciones de este sitio. Podés habilitarlas tocando el candado junto a la dirección; mientras
-              tanto, los avisos aparecen dentro de la página.
-            </span>
+            <span className="text-text-2">{t.denied}</span>
           ) : (
             <button
               type="button"
@@ -91,11 +91,11 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
               }}
               className="rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-ink"
             >
-              Activar notificaciones
+              {t.enable}
             </button>
           )}
           <label className="flex items-center gap-2 text-text-2">
-            Revisar cada
+            {t.every}
             <select
               value={settings.intervalMin}
               onChange={(e) => saveSettings({ ...settings, intervalMin: Number(e.target.value) })}
@@ -103,7 +103,7 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
             >
               {[2, 5, 10, 15, 30].map((m) => (
                 <option key={m} value={m}>
-                  {m} minutos
+                  {t.minutes(m)}
                 </option>
               ))}
             </select>
@@ -118,41 +118,39 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
             }}
             className="rounded-lg border border-line px-3 py-1.5 text-text hover:bg-surface-2 disabled:opacity-50"
           >
-            {checking ? "Revisando…" : "Revisar ahora"}
+            {checking ? t.checking : t.checkNow}
           </button>
           {permission === "granted" && settings.notifications && (
             <button
               type="button"
-              onClick={() => void showNotification("Furnímetro", "Así se ven los avisos de ofertas.", `/${hotel}/alertas`)}
+              onClick={() => void showNotification("Furnímetro", t.testBody, href(`/${hotel}/alertas`))}
               className="text-text-2 underline hover:text-text"
             >
-              Probar aviso
+              {t.test}
             </button>
           )}
         </div>
         <p className="text-sm text-muted">
-          Último chequeo: {lastRun ? <TimeAgo iso={new Date(lastRun).toISOString()} /> : "todavía ninguno"}.
+          {t.lastCheck} {lastRun ? <TimeAgo iso={new Date(lastRun).toISOString()} /> : t.noneYet}.
         </p>
       </section>
 
       <AddRuleForm hotel={hotel} hotels={hotels} />
 
       <section>
-        <h2 className="mb-3 font-display text-xl font-bold text-text">Mi lista ({rules.length})</h2>
+        <h2 className="mb-3 font-display text-xl font-bold text-text">{t.myList(rules.length)}</h2>
         {rules.length === 0 ? (
-          <p className="card p-6 text-sm text-muted">
-            Todavía no vigilás ningún furni. Agregalo arriba o desde su ficha con el botón «Vigilar precio».
-          </p>
+          <p className="card p-6 text-sm text-muted">{t.emptyList}</p>
         ) : (
           <div className="card overflow-x-auto">
             <table className="w-full min-w-[640px] text-sm">
               <thead className="text-left text-text-2">
                 <tr className="border-b border-line">
-                  <th className="px-3 py-2 font-medium">Furni</th>
-                  <th className="px-3 py-2 font-medium">Condición</th>
-                  <th className="px-3 py-2 text-right font-medium">Precio mínimo</th>
-                  <th className="px-3 py-2 text-right font-medium">Promedio</th>
-                  <th className="px-3 py-2 font-medium">Estado</th>
+                  <th className="px-3 py-2 font-medium">{t.colFurni}</th>
+                  <th className="px-3 py-2 font-medium">{t.colCondition}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t.colMin}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t.colAvg}</th>
+                  <th className="px-3 py-2 font-medium">{t.colStatus}</th>
                   <th className="px-3 py-2" />
                 </tr>
               </thead>
@@ -162,7 +160,7 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
                   return (
                     <tr key={r.id} className="border-b border-line/60 last:border-0">
                       <td className="px-3 py-2">
-                        <Link href={`/${r.hotel}/furni/${encodeURIComponent(r.item)}`} className="flex items-center gap-3">
+                        <Link prefetch={false} href={href(`/${r.hotel}/furni/${encodeURIComponent(r.item)}`)} className="flex items-center gap-3">
                           <FurniIcon k={r.item} r={r.r} size={32} />
                           <span>
                             <span className="block text-text hover:underline">{r.name}</span>
@@ -170,16 +168,16 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
                           </span>
                         </Link>
                       </td>
-                      <td className="px-3 py-2 text-text-2">{describeRule(r)}</td>
-                      <td className="px-3 py-2 text-right">{c ? c.oo > 0 ? <Credits value={c.cp} /> : "sin ofertas" : "—"}</td>
-                      <td className="px-3 py-2 text-right text-text-2">{c?.ref ? formatPrice(c.ref) : "—"}</td>
+                      <td className="px-3 py-2 text-text-2">{describeRuleIn(ui, r)}</td>
+                      <td className="px-3 py-2 text-right">{c ? c.oo > 0 ? <Credits value={c.cp} /> : ui.common.noOffers : "—"}</td>
+                      <td className="px-3 py-2 text-right text-text-2">{c?.ref ? f.price(c.ref) : "—"}</td>
                       <td className="px-3 py-2">
                         {!c ? (
-                          <span className="text-muted">sin revisar</span>
+                          <span className="text-muted">{t.unchecked}</span>
                         ) : c.triggered ? (
-                          <span className="text-up">✓ cumple</span>
+                          <span className="text-up">{t.meets}</span>
                         ) : (
-                          <span className="text-text-2">• no cumple</span>
+                          <span className="text-text-2">{t.notMeets}</span>
                         )}
                         {c && (
                           <span className="block text-xs text-muted">
@@ -192,9 +190,9 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
                           type="button"
                           onClick={() => removeRule(r.id)}
                           className="text-text-2 hover:text-down"
-                          aria-label={`Quitar alerta de ${r.name}`}
+                          aria-label={t.removeAria(r.name)}
                         >
-                          Quitar
+                          {t.remove}
                         </button>
                       </td>
                     </tr>
@@ -207,15 +205,16 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
       </section>
 
       <section className="card p-4">
-        <h2 className="mb-2 font-display text-xl font-bold text-text">Ofertas detectadas para tu lista</h2>
+        <h2 className="mb-2 font-display text-xl font-bold text-text">{t.detectedTitle}</h2>
         <DetectionsList />
       </section>
-
     </div>
   );
 }
 
 function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] }) {
+  const { t: ui } = useI18n();
+  const t = ui.alerts;
   const [target, setTarget] = useState<HotelCode>(hotel);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
@@ -244,10 +243,10 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
   }, [query, target, picked]);
 
   const save = () => {
-    if (!picked) return setError("Elegí un furni de la lista.");
+    if (!picked) return setError(t.errPick);
     const n = Number(value.replace(",", "."));
     if (!Number.isFinite(n) || n <= 0 || (mode === "below_avg" && n >= 100)) {
-      return setError(mode === "below_avg" ? "Poné un porcentaje entre 1 y 99." : "Poné un precio mayor a 0.");
+      return setError(mode === "below_avg" ? t.errPct : t.errPrice);
     }
     addRule({ id: newRuleId(), hotel: target, item: picked.k, mode, value: n, name: picked.n, t: picked.t, r: picked.r, createdAt: Date.now() });
     setPicked(null);
@@ -257,10 +256,10 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
 
   return (
     <section className="card space-y-3 p-4">
-      <h2 className="font-display text-xl font-bold text-text">Agregar un furni a vigilar</h2>
+      <h2 className="font-display text-xl font-bold text-text">{t.addTitle}</h2>
       <div className="flex flex-wrap items-end gap-3 text-sm">
         <label className="flex flex-col gap-1 text-text-2">
-          Hotel
+          {ui.hotel.label}
           <select
             value={target}
             onChange={(e) => (setTarget(e.target.value as HotelCode), setPicked(null))}
@@ -275,11 +274,11 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
         </label>
         <div className="relative min-w-60 flex-1">
           <label className="flex flex-col gap-1 text-text-2">
-            Furni
+            {t.colFurni}
             <input
               value={picked ? picked.n : query}
               onChange={(e) => (setPicked(null), setQuery(e.target.value))}
-              placeholder="Escribí el nombre…"
+              placeholder={t.typeName}
               className="rounded-lg border border-line bg-surface px-3 py-1.5 text-text"
             />
           </label>
@@ -301,7 +300,7 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
           )}
         </div>
         <label className="flex flex-col gap-1 text-text-2">
-          Condición
+          {t.colCondition}
           <select
             value={mode}
             onChange={(e) => {
@@ -311,12 +310,12 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
             }}
             className="rounded-lg border border-line bg-surface px-2 py-1.5 text-text"
           >
-            <option value="below_avg">% por debajo del promedio</option>
-            <option value="below_price">precio máximo (créditos)</option>
+            <option value="below_avg">{t.modeAvg}</option>
+            <option value="below_price">{t.modePrice}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1 text-text-2">
-          {mode === "below_avg" ? "Porcentaje" : "Créditos"}
+          {mode === "below_avg" ? t.percent : t.creditsLabel}
           <input
             inputMode="decimal"
             value={value}
@@ -325,7 +324,7 @@ function AddRuleForm({ hotel, hotels }: { hotel: HotelCode; hotels: HotelCode[] 
           />
         </label>
         <button type="button" onClick={save} className="rounded-lg bg-accent px-4 py-1.5 font-medium text-accent-ink">
-          Agregar
+          {t.add}
         </button>
       </div>
       {error && <p className="text-sm text-down">{error}</p>}

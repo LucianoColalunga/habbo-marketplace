@@ -1,24 +1,16 @@
 import Link from "next/link";
 import type { FurniRow } from "@/lib/data/rankings";
-import { formatInt, formatPct } from "@/lib/format";
+import type { Format } from "@/lib/format";
+import { getI18n } from "@/lib/i18n/server";
 import { FurniIcon } from "./FurniIcon";
 import { Credits, Delta, Sparkline } from "./ui";
 
 export type Metric = "s7" | "c7" | "change" | "ref" | "oo" | "pct";
 
-const METRIC_LABEL: Record<Metric, string> = {
-  s7: "Vendidos 7 d",
-  c7: "Créditos 7 d",
-  change: "Variación",
-  ref: "Promedio",
-  oo: "En venta",
-  pct: "Bajo el promedio",
-};
-
-function MetricValue({ row, metric }: { row: FurniRow; metric: Metric }) {
+function MetricValue({ row, metric, f }: { row: FurniRow; metric: Metric; f: Format }) {
   switch (metric) {
     case "s7":
-      return <span className="tnum">{formatInt(row.s7)}</span>;
+      return <span className="tnum">{f.int(row.s7)}</span>;
     case "c7":
       return <Credits value={row.c7} />;
     case "change":
@@ -26,20 +18,25 @@ function MetricValue({ row, metric }: { row: FurniRow; metric: Metric }) {
     case "ref":
       return <Credits value={row.ref} />;
     case "oo":
-      return <span className="tnum">{formatInt(row.oo)}</span>;
+      return <span className="tnum">{f.int(row.oo)}</span>;
     case "pct":
-      return <span className="tnum font-medium text-up">−{formatPct(row.pct ?? null, false)}</span>;
+      return <span className="tnum font-medium text-up">−{f.pct(row.pct ?? null, false)}</span>;
   }
 }
 
 /** Lista compacta para las tarjetas del inicio. */
-export function FurniMiniList({ hotel, rows, metric, empty }: { hotel: string; rows: FurniRow[]; metric: Metric; empty: string }) {
+export async function FurniMiniList({ hotel, rows, metric, empty }: { hotel: string; rows: FurniRow[]; metric: Metric; empty: string }) {
+  const { t, f, href } = await getI18n();
   if (rows.length === 0) return <p className="py-6 text-center text-sm text-muted">{empty}</p>;
   return (
     <ol className="divide-y divide-line/70">
       {rows.map((row, i) => (
         <li key={row.k}>
-          <Link href={`/${hotel}/furni/${encodeURIComponent(row.k)}`} className="flex items-center gap-3 py-2 hover:bg-surface-2/60">
+          <Link
+            prefetch={false}
+            href={href(`/${hotel}/furni/${encodeURIComponent(row.k)}`)}
+            className="flex items-center gap-3 py-2 hover:bg-surface-2/60"
+          >
             <span className="tnum w-5 text-right text-xs text-muted">{i + 1}</span>
             <FurniIcon k={row.k} r={row.r} size={36} />
             <span className="min-w-0 flex-1">
@@ -47,15 +44,15 @@ export function FurniMiniList({ hotel, rows, metric, empty }: { hotel: string; r
               <span className="block text-xs text-text-2">
                 {row.oo > 0 ? (
                   <>
-                    desde <Credits value={row.cp} />
+                    {t.common.from} <Credits value={row.cp} />
                   </>
                 ) : (
-                  "sin ofertas"
+                  t.common.noOffers
                 )}
               </span>
             </span>
             <span className="shrink-0 text-right text-sm">
-              <MetricValue row={row} metric={metric} />
+              <MetricValue row={row} metric={metric} f={f} />
             </span>
           </Link>
         </li>
@@ -65,9 +62,11 @@ export function FurniMiniList({ hotel, rows, metric, empty }: { hotel: string; r
 }
 
 /** Tabla completa para la página de rankings. */
-export function FurniTable({ hotel, rows, metric }: { hotel: string; rows: FurniRow[]; metric: Metric }) {
+export async function FurniTable({ hotel, rows, metric }: { hotel: string; rows: FurniRow[]; metric: Metric }) {
+  const { p, f, href } = await getI18n();
+  const l = p.list;
   if (rows.length === 0) {
-    return <p className="card p-8 text-center text-sm text-muted">Todavía no hay datos suficientes para esta lista.</p>;
+    return <p className="card p-8 text-center text-sm text-muted">{l.empty}</p>;
   }
   return (
     <div className="card overflow-x-auto">
@@ -75,12 +74,12 @@ export function FurniTable({ hotel, rows, metric }: { hotel: string; rows: Furni
         <thead className="text-left text-text-2">
           <tr className="border-b border-line">
             <th className="w-10 px-3 py-2 text-right font-medium">#</th>
-            <th className="px-3 py-2 font-medium">Furni</th>
-            <th className="px-3 py-2 text-right font-medium">{METRIC_LABEL[metric]}</th>
-            <th className="px-3 py-2 text-right font-medium">Precio mínimo</th>
-            <th className="px-3 py-2 text-right font-medium">En venta</th>
-            <th className="px-3 py-2 text-right font-medium">Promedio 7 d</th>
-            <th className="hidden px-3 py-2 font-medium md:table-cell">30 días</th>
+            <th className="px-3 py-2 font-medium">{l.colFurni}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.metric[metric]}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colMin}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colForSale}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colAvg7}</th>
+            <th className="hidden px-3 py-2 font-medium md:table-cell">{l.col30}</th>
           </tr>
         </thead>
         <tbody>
@@ -88,7 +87,7 @@ export function FurniTable({ hotel, rows, metric }: { hotel: string; rows: Furni
             <tr key={row.k} className="border-b border-line/60 last:border-0 hover:bg-surface-2/60">
               <td className="tnum px-3 py-2 text-right text-muted">{i + 1}</td>
               <td className="px-3 py-2">
-                <Link href={`/${hotel}/furni/${encodeURIComponent(row.k)}`} className="flex items-center gap-3">
+                <Link prefetch={false} href={href(`/${hotel}/furni/${encodeURIComponent(row.k)}`)} className="flex items-center gap-3">
                   <FurniIcon k={row.k} r={row.r} size={36} />
                   <span className="min-w-0">
                     <span className="block truncate text-text hover:underline">{row.n}</span>
@@ -97,10 +96,10 @@ export function FurniTable({ hotel, rows, metric }: { hotel: string; rows: Furni
                 </Link>
               </td>
               <td className="px-3 py-2 text-right">
-                <MetricValue row={row} metric={metric} />
+                <MetricValue row={row} metric={metric} f={f} />
               </td>
               <td className="px-3 py-2 text-right">{row.oo > 0 ? <Credits value={row.cp} /> : <span className="text-muted">—</span>}</td>
-              <td className="tnum px-3 py-2 text-right text-text-2">{formatInt(row.oo)}</td>
+              <td className="tnum px-3 py-2 text-right text-text-2">{f.int(row.oo)}</td>
               <td className="px-3 py-2 text-right text-text-2">
                 <Credits value={row.a7} />
               </td>

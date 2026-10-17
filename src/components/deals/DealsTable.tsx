@@ -5,17 +5,20 @@ import { useMemo, useState } from "react";
 import type { FurniRow } from "@/lib/data/rankings";
 import { fetchLive, LiveLimitError } from "@/lib/habbo/live-client";
 import type { HotelCode } from "@/lib/hotels";
-import { formatInt, formatPct } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
 import { FurniIcon } from "@/components/FurniIcon";
 import { Credits } from "@/components/ui";
 
 type LiveState = { cp: number; oo: number } | "missing";
+type Note = "" | "someSkipped" | "limit" | "failed";
 
 export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[] }) {
+  const { t: ui, f, href } = useI18n();
+  const t = ui.deals;
   const [sort, setSort] = useState<"pct" | "saving">("pct");
   const [live, setLive] = useState<Record<string, LiveState>>({});
   const [checking, setChecking] = useState(false);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState<Note>("");
 
   const sorted = useMemo(
     () =>
@@ -44,26 +47,26 @@ export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[]
         else if (!res.skipped.includes(r.k)) next[r.k] = "missing";
       }
       setLive(next);
-      setNote(res.skipped.length ? "Algunos no se pudieron verificar por el límite de consultas; probá en un minuto." : "");
+      setNote(res.skipped.length ? "someSkipped" : "");
     } catch (error) {
-      setNote(error instanceof LiveLimitError ? error.message : "No se pudo consultar la API de Habbo desde tu navegador.");
+      setNote(error instanceof LiveLimitError ? "limit" : "failed");
     } finally {
       setChecking(false);
     }
   };
 
   if (rows.length === 0) {
-    return <p className="card p-8 text-center text-sm text-muted">No hay ofertas fuertes en el último escaneo.</p>;
+    return <p className="card p-8 text-center text-sm text-muted">{t.empty}</p>;
   }
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex gap-1" role="group" aria-label="Ordenar">
+        <div className="flex gap-1" role="group" aria-label={t.sortAria}>
           {(
             [
-              ["pct", "Mayor % de descuento"],
-              ["saving", "Mayor ahorro en créditos"],
+              ["pct", t.sortPct],
+              ["saving", t.sortSaving],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -83,20 +86,20 @@ export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[]
           disabled={checking}
           className="ml-auto rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-ink disabled:opacity-60"
         >
-          {checking ? "Verificando…" : "Verificar en vivo los primeros 50"}
+          {checking ? t.verifying : t.verify}
         </button>
       </div>
-      {note && <p className="text-sm text-text-2">{note}</p>}
+      {note && <p className="text-sm text-text-2">{t[note]}</p>}
       <div className="card overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="text-left text-text-2">
             <tr className="border-b border-line">
-              <th className="px-3 py-2 font-medium">Furni</th>
-              <th className="px-3 py-2 text-right font-medium">Precio mínimo</th>
-              <th className="px-3 py-2 text-right font-medium">Promedio reciente</th>
-              <th className="px-3 py-2 text-right font-medium">Bajo el promedio</th>
-              <th className="px-3 py-2 text-right font-medium">Vendidos 30 d</th>
-              <th className="px-3 py-2 font-medium">Ahora</th>
+              <th className="px-3 py-2 font-medium">{t.colFurni}</th>
+              <th className="px-3 py-2 text-right font-medium">{t.colMin}</th>
+              <th className="px-3 py-2 text-right font-medium">{t.colRecent}</th>
+              <th className="px-3 py-2 text-right font-medium">{t.colBelow}</th>
+              <th className="px-3 py-2 text-right font-medium">{t.colSold30}</th>
+              <th className="px-3 py-2 font-medium">{t.colNow}</th>
             </tr>
           </thead>
           <tbody>
@@ -105,7 +108,7 @@ export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[]
               return (
                 <tr key={row.k} className="border-b border-line/60 last:border-0 hover:bg-surface-2/60">
                   <td className="px-3 py-2">
-                    <Link href={`/${hotel}/furni/${encodeURIComponent(row.k)}`} className="flex items-center gap-3">
+                    <Link prefetch={false} href={href(`/${hotel}/furni/${encodeURIComponent(row.k)}`)} className="flex items-center gap-3">
                       <FurniIcon k={row.k} r={row.r} size={36} />
                       <span className="truncate text-text hover:underline">{row.n}</span>
                     </Link>
@@ -116,16 +119,14 @@ export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[]
                   <td className="px-3 py-2 text-right text-text-2">
                     <Credits value={row.ref} />
                   </td>
-                  <td className="tnum px-3 py-2 text-right font-medium text-up">−{formatPct(row.pct ?? null, false)}</td>
-                  <td className="tnum px-3 py-2 text-right text-text-2">{formatInt(row.s30)}</td>
+                  <td className="tnum px-3 py-2 text-right font-medium text-up">−{f.pct(row.pct ?? null, false)}</td>
+                  <td className="tnum px-3 py-2 text-right text-text-2">{f.int(row.s30)}</td>
                   <td className="px-3 py-2 text-text-2">
                     {l === undefined && <span className="text-muted">—</span>}
-                    {l === "missing" && <span>sin datos</span>}
-                    {l && l !== "missing" && l.oo === 0 && <span>✕ ya no hay ofertas</span>}
-                    {l && l !== "missing" && l.oo > 0 && l.cp <= row.cp && (
-                      <span className="text-up">✓ sigue a {formatInt(l.cp)}</span>
-                    )}
-                    {l && l !== "missing" && l.oo > 0 && l.cp > row.cp && <span>▲ ahora a {formatInt(l.cp)}</span>}
+                    {l === "missing" && <span>{t.noData}</span>}
+                    {l && l !== "missing" && l.oo === 0 && <span>{t.gone}</span>}
+                    {l && l !== "missing" && l.oo > 0 && l.cp <= row.cp && <span className="text-up">{t.still(f.int(l.cp))}</span>}
+                    {l && l !== "missing" && l.oo > 0 && l.cp > row.cp && <span>{t.up(f.int(l.cp))}</span>}
                   </td>
                 </tr>
               );

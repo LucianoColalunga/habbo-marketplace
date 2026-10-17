@@ -48,8 +48,8 @@ html {
   background: var(--bg);
 }
 
+/* Sin fondo propio: así se ve el cielo de estrellas (canvas fijo detrás del contenido). */
 body {
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

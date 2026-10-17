@@ -26,6 +26,6 @@ export async function GET(request: Request) {
   }));
   return Response.json(
     { results },
-    { headers: { "Cache-Control": "public, max-age=60, s-maxage=600, stale-while-revalidate=3600" } },
+    { headers: { "Cache-Control": "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400" } },
   );
 }

@@ -1,3 +1,6 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n/client";
 import { Logo } from "./Logo";
 
 export function HeaderSkeleton() {
@@ -14,8 +17,9 @@ export function HeaderSkeleton() {
 }
 
 export function PageSkeleton({ title = true }: { title?: boolean }) {
+  const { t } = useI18n();
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Cargando">
+    <div className="space-y-6" aria-busy="true" aria-label={t.common.loading}>
       {title && <div className="skeleton h-9 w-2/3 max-w-lg" />}
       <div className="skeleton h-4 w-full max-w-2xl" />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { formatUsd } from "@/lib/format";
+import type { Format } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/client";
+import type { Ui } from "@/lib/i18n/ui";
 import { FurniIcon } from "./FurniIcon";
 import { NftImage } from "./nft/NftImage";
 
@@ -33,24 +35,24 @@ interface Result {
   img?: string;
 }
 
-function fromMarket(r: MarketResult): Result {
+function fromMarket(r: MarketResult, t: Ui, f: Format): Result {
   return {
     key: r.k,
     title: r.n,
     subtitle: r.k,
-    price: r.oo > 0 ? `${r.cp.toLocaleString("es-AR")} c` : null,
-    priceSub: r.oo > 0 ? `${r.oo} en venta` : "sin ofertas",
+    price: r.oo > 0 ? `${f.int(r.cp)} ${t.common.creditsShort}` : null,
+    priceSub: r.oo > 0 ? t.common.forSale(f.int(r.oo)) : t.common.noOffers,
     r: r.r,
   };
 }
 
-function fromNft(r: NftResult): Result {
+function fromNft(r: NftResult, t: Ui, f: Format): Result {
   return {
     key: r.id,
     title: r.n,
     subtitle: r.rarity || "NFT",
-    price: r.floorUsd !== null ? formatUsd(r.floorUsd) : null,
-    priceSub: r.floorUsd !== null ? "precio piso" : "sin publicaciones",
+    price: r.floorUsd !== null ? f.usd(r.floorUsd) : null,
+    priceSub: r.floorUsd !== null ? t.search.floor : t.search.noListings,
     img: r.img,
   };
 }
@@ -71,6 +73,7 @@ export function SearchBox({
   size?: "md" | "lg";
 }) {
   const router = useRouter();
+  const { t, f, href } = useI18n();
   const listId = useId();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -112,7 +115,7 @@ export function SearchBox({
         const res = await fetch(url, { signal: controller.signal });
         const body = (await res.json()) as { results?: (MarketResult | NftResult)[] };
         setResults(
-          (body.results ?? []).map((r) => (nft ? fromNft(r as NftResult) : fromMarket(r as MarketResult))),
+          (body.results ?? []).map((r) => (nft ? fromNft(r as NftResult, t, f) : fromMarket(r as MarketResult, t, f))),
         );
         setActive(-1);
         setOpen(true);
@@ -135,7 +138,7 @@ export function SearchBox({
   const go = (key: string) => {
     setOpen(false);
     onType("");
-    router.push(nft ? `/nft/item/${encodeURIComponent(key)}` : `/${hotel}/furni/${encodeURIComponent(key)}`);
+    router.push(href(nft ? `/nft/item/${encodeURIComponent(key)}` : `/${hotel}/furni/${encodeURIComponent(key)}`));
   };
 
   const big = size === "lg";
@@ -149,12 +152,12 @@ export function SearchBox({
           const q = query.trim();
           if (q) {
             setOpen(false);
-            router.push(nft ? `/nft/buscar?q=${encodeURIComponent(q)}` : `/${hotel}/buscar?q=${encodeURIComponent(q)}`);
+            router.push(href(nft ? `/nft/buscar?q=${encodeURIComponent(q)}` : `/${hotel}/buscar?q=${encodeURIComponent(q)}`));
           }
         }}
       >
         <label className="sr-only" htmlFor={`${listId}-input`}>
-          {nft ? "Buscar NFT" : "Buscar furni"}
+          {nft ? t.search.nftLabel : t.search.furniLabel}
         </label>
         <div className="relative">
           <svg
@@ -171,7 +174,7 @@ export function SearchBox({
             autoComplete="off"
             autoFocus={autoFocus}
             value={query}
-            placeholder={nft ? "Buscá un NFT: placa, alas, mochila…" : "Buscá un furni: trono, dragón, sofá…"}
+            placeholder={nft ? t.search.nftPlaceholder : t.search.furniPlaceholder}
             onChange={(e) => onType(e.target.value)}
             onFocus={() => results.length && setOpen(true)}
             onKeyDown={(e) => {
@@ -196,7 +199,7 @@ export function SearchBox({
           />
           {loading && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted" aria-live="polite">
-              buscando…
+              {t.search.searching}
             </span>
           )}
         </div>

@@ -1,56 +1,49 @@
 import Link from "next/link";
+import type { Format } from "@/lib/format";
+import { getI18n } from "@/lib/i18n/server";
 import type { NftRow } from "@/lib/nft/model";
 import { nftDiscount, nftWeeklyChange } from "@/lib/nft/rankings";
-import { formatInt, formatPct, formatUsd } from "@/lib/format";
 import { Delta, Sparkline } from "@/components/ui";
 import { NftImage } from "./NftImage";
 
 export type NftMetric = "s7" | "v7" | "change" | "floor" | "discount" | "a30";
 
-const LABEL: Record<NftMetric, string> = {
-  s7: "Vendidos 7 d",
-  v7: "USD 7 d",
-  change: "Variación",
-  floor: "Precio piso",
-  discount: "Bajo el promedio",
-  a30: "Promedio 30 d",
-};
-
-function Metric({ row, metric }: { row: NftRow; metric: NftMetric }) {
+function Metric({ row, metric, f }: { row: NftRow; metric: NftMetric; f: Format }) {
   switch (metric) {
     case "s7":
-      return <span className="tnum">{formatInt(row.s7)}</span>;
+      return <span className="tnum">{f.int(row.s7)}</span>;
     case "v7":
-      return <span className="tnum">{formatUsd(row.v7, true)}</span>;
+      return <span className="tnum">{f.usd(row.v7, true)}</span>;
     case "change":
       return <Delta value={nftWeeklyChange(row)} />;
     case "floor":
-      return <span className="tnum">{formatUsd(row.floorUsd)}</span>;
+      return <span className="tnum">{f.usd(row.floorUsd)}</span>;
     case "discount":
-      return <span className="tnum font-medium text-up">−{formatPct(nftDiscount(row), false)}</span>;
+      return <span className="tnum font-medium text-up">−{f.pct(nftDiscount(row), false)}</span>;
     case "a30":
-      return <span className="tnum">{formatUsd(row.a30)}</span>;
+      return <span className="tnum">{f.usd(row.a30)}</span>;
   }
 }
 
-export function NftMiniList({ rows, metric, empty }: { rows: NftRow[]; metric: NftMetric; empty: string }) {
+export async function NftMiniList({ rows, metric, empty }: { rows: NftRow[]; metric: NftMetric; empty: string }) {
+  const { p, f, href } = await getI18n();
   if (rows.length === 0) return <p className="py-6 text-center text-sm text-muted">{empty}</p>;
   return (
     <ol className="divide-y divide-line/70">
       {rows.map((r, i) => (
         <li key={r.id}>
-          <Link href={`/nft/item/${r.id}`} className="flex items-center gap-3 py-2 hover:bg-surface-2/60">
+          <Link prefetch={false} href={href(`/nft/item/${r.id}`)} className="flex items-center gap-3 py-2 hover:bg-surface-2/60">
             <span className="tnum w-5 text-right text-xs text-muted">{i + 1}</span>
             <NftImage src={r.img} size={36} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm text-text">{r.n}</span>
               <span className="block text-xs text-text-2">
-                {r.floorUsd !== null ? <>piso {formatUsd(r.floorUsd)}</> : "sin publicaciones"}
+                {r.floorUsd !== null ? p.nft.list.floor(f.usd(r.floorUsd)) : p.nft.list.noListings}
                 {r.rarity ? ` · ${r.rarity}` : ""}
               </span>
             </span>
             <span className="shrink-0 text-right text-sm">
-              <Metric row={r} metric={metric} />
+              <Metric row={r} metric={metric} f={f} />
             </span>
           </Link>
         </li>
@@ -59,9 +52,11 @@ export function NftMiniList({ rows, metric, empty }: { rows: NftRow[]; metric: N
   );
 }
 
-export function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMetric }) {
+export async function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMetric }) {
+  const { p, f, href } = await getI18n();
+  const l = p.nft.list;
   if (rows.length === 0) {
-    return <p className="card p-8 text-center text-sm text-muted">Todavía no hay datos suficientes para esta lista.</p>;
+    return <p className="card p-8 text-center text-sm text-muted">{l.empty}</p>;
   }
   return (
     <div className="card overflow-x-auto">
@@ -70,11 +65,11 @@ export function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMetric }
           <tr className="border-b border-line">
             <th className="w-10 px-3 py-2 text-right font-medium">#</th>
             <th className="px-3 py-2 font-medium">NFT</th>
-            <th className="px-3 py-2 text-right font-medium">{LABEL[metric]}</th>
-            <th className="px-3 py-2 text-right font-medium">Precio piso</th>
-            <th className="px-3 py-2 text-right font-medium">Promedio 7 d</th>
-            <th className="px-3 py-2 text-right font-medium">Vendidos 7 d</th>
-            <th className="hidden px-3 py-2 font-medium md:table-cell">30 días</th>
+            <th className="px-3 py-2 text-right font-medium">{l.metric[metric]}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colFloor}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colAvg7}</th>
+            <th className="px-3 py-2 text-right font-medium">{l.colSold7}</th>
+            <th className="hidden px-3 py-2 font-medium md:table-cell">{l.col30}</th>
           </tr>
         </thead>
         <tbody>
@@ -82,7 +77,7 @@ export function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMetric }
             <tr key={r.id} className="border-b border-line/60 last:border-0 hover:bg-surface-2/60">
               <td className="tnum px-3 py-2 text-right text-muted">{i + 1}</td>
               <td className="px-3 py-2">
-                <Link href={`/nft/item/${r.id}`} className="flex items-center gap-3">
+                <Link prefetch={false} href={href(`/nft/item/${r.id}`)} className="flex items-center gap-3">
                   <NftImage src={r.img} size={36} />
                   <span className="min-w-0">
                     <span className="block truncate text-text hover:underline">{r.n}</span>
@@ -91,11 +86,11 @@ export function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMetric }
                 </Link>
               </td>
               <td className="px-3 py-2 text-right">
-                <Metric row={r} metric={metric} />
+                <Metric row={r} metric={metric} f={f} />
               </td>
-              <td className="tnum px-3 py-2 text-right">{formatUsd(r.floorUsd)}</td>
-              <td className="tnum px-3 py-2 text-right text-text-2">{formatUsd(r.a7)}</td>
-              <td className="tnum px-3 py-2 text-right text-text-2">{formatInt(r.s7)}</td>
+              <td className="tnum px-3 py-2 text-right">{f.usd(r.floorUsd)}</td>
+              <td className="tnum px-3 py-2 text-right text-text-2">{f.usd(r.a7)}</td>
+              <td className="tnum px-3 py-2 text-right text-text-2">{f.int(r.s7)}</td>
               <td className="hidden px-3 py-2 md:table-cell">
                 <Sparkline values={r.sp} />
               </td>
