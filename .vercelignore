@@ -1,0 +1,6 @@
+# Archivos que no se suben a Vercel al desplegar con el CLI.
+.env*
+!.env.example
+.data
+test-results
+playwright-report

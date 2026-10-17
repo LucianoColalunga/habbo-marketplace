@@ -4,6 +4,8 @@ Web para seguir el **Marketplace de furnis de Habbo**: precio mínimo publicado,
 evolución del precio, rankings (más vendidos, mayores subas y bajas, más publicados) y **alertas** cuando un furni
 aparece por debajo de su precio normal.
 
+**Sitio publicado:** <https://habbo-marketplace-three.vercel.app>
+
 > Sitio de fans, gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por
 > Sulake Oy ni Azerion. Habbo es una marca registrada de Sulake Oy.
 
@@ -109,6 +111,10 @@ Para `test:e2e` hace falta el navegador de Playwright una vez: `npx playwright i
    `NEXT_PUBLIC_HOTELS`, ajustá también esos cron.
 5. Para no esperar días a que se llene, juntá los datos en tu PC (`npm run collect -- es --full`, etc.) y subilos al
    Blob: `vercel env pull .env.vercel` y después `npm run push-data`. (`.env.vercel` queda fuera de git.)
+
+Si desplegás con el CLI (`vercel deploy --prod`), `.vercelignore` evita que se suban `.env*` y `.data/`: el CLI de
+Vercel **no** respeta `.gitignore`. Para que cada push a GitHub se despliegue solo, conectá el repositorio en
+*Settings → Git* del proyecto (la app de Vercel en GitHub tiene que tener acceso al repo).
 
 Cada corrida escribe 2 archivos por hotel; con un cron por día y por hotel se usan ~200 de las 2.000 escrituras
 mensuales gratuitas de Vercel Blob. Si sumás más cron jobs o un cron externo, tenelo en cuenta.
