@@ -48,7 +48,9 @@ export function discordChannel(webhookUrl: string, fetchImpl: typeof fetch = fet
   return {
     name: "discord",
     async send(text) {
-      for (const content of chunkText(text, DISCORD_LIMIT)) {
+      // <url> evita que Discord arme una vista previa enorme por cada enlace.
+      const withoutEmbeds = text.replace(/(https?:\/\/[^\s<>]+)/g, "<$1>");
+      for (const content of chunkText(withoutEmbeds, DISCORD_LIMIT)) {
         const res = await fetchImpl(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -90,3 +90,24 @@ describe("límite de pedidos por IP", () => {
     expect(clientIp(new Request("https://x", { headers: { "x-real-ip": "5.6.7.8" } }))).toBe("5.6.7.8");
   });
 });
+
+describe("enlaces a los canales", () => {
+  it("acepta solo invitaciones https de cada servicio", async () => {
+    const { safeCommunityUrl, communityLinks } = await import("@/lib/community");
+    expect(safeCommunityUrl("discord", "https://discord.gg/abcDEF12")).toBe("https://discord.gg/abcDEF12");
+    expect(safeCommunityUrl("discord", "https://discord.com/invite/abc123")).toBe("https://discord.com/invite/abc123");
+    expect(safeCommunityUrl("telegram", "https://t.me/FurnimetroOfertas")).toBe("https://t.me/FurnimetroOfertas");
+    expect(safeCommunityUrl("whatsapp", "https://whatsapp.com/channel/0029VaAbCdEfGh123")).toBe("https://whatsapp.com/channel/0029VaAbCdEfGh123");
+    for (const [id, bad] of [
+      ["discord", "http://discord.gg/abc"],
+      ["discord", "https://evil.example/discord.gg/abc"],
+      ["telegram", "https://t.me.evil.example/x"],
+      ["telegram", "javascript:alert(1)"],
+      ["whatsapp", "https://whatsapp.com.evil.example/channel/0029Va"],
+    ] as const) {
+      expect(safeCommunityUrl(id, bad)).toBeNull();
+    }
+    expect(communityLinks({ telegram: "https://t.me/FurnimetroOfertas", discord: "malo" }).map((l) => l.id)).toEqual(["telegram"]);
+    expect(communityLinks({})).toEqual([]);
+  });
+});

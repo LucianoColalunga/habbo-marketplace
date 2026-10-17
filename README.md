@@ -128,24 +128,28 @@ cada 2 a 30 minutos (elegís vos), directo contra la API de Habbo, y avisa con u
 aviso en la página. La lista y las detecciones quedan solo en tu navegador. Funciona mientras haya una pestaña del
 sitio abierta (puede estar en segundo plano).
 
-### Desde el servidor: Discord o Telegram (opcional)
+### Canales públicos: Discord, Telegram y WhatsApp
 
-Sirve para recibir avisos con el navegador cerrado, en tu propia copia del sitio:
+Los visitantes ven botones para unirse con un toque. Después de cada escaneo, el servidor publica en Discord y Telegram
+las ofertas más fuertes (por defecto, 30 % o más por debajo de lo que se pagó esa semana; hasta 10 por vez y sin
+repetir). Los pasos están en `/es/alertas/servidor` (página sin enlaces desde el sitio):
 
-1. Armá tu lista en **Alertas** y después abrí `/es/alertas/servidor` (página sin enlaces desde el sitio, pensada
-   solo para quien lo administra). Tocá **Copiar mi lista** y guardala en la variable `ALERTS_RULES`.
-2. Elegí un canal:
-   - **Discord** (el más simple): en tu servidor, *Editar canal → Integraciones → Webhooks → Nuevo webhook*, copiá la
-     URL y guardala en `DISCORD_WEBHOOK_URL`.
-   - **Telegram**: creá un bot con [@BotFather](https://t.me/BotFather), guardá el token en `TELEGRAM_BOT_TOKEN`,
-     escribile al bot y poné tu `chat_id` en `TELEGRAM_CHAT_ID`.
-3. Opcional: `ALERTS_DEALS_MIN_DISCOUNT=40` avisa también de cualquier oferta 40 % o más por debajo del promedio que
-   aparezca en un escaneo.
+1. **Telegram:** canal público + bot creado con [@BotFather](https://t.me/BotFather), agregado al canal como
+   administrador. Variables: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (ej. `@FurnimetroOfertas`) y
+   `NEXT_PUBLIC_TELEGRAM_URL` (ej. `https://t.me/FurnimetroOfertas`).
+2. **Discord:** webhook del canal de ofertas (`DISCORD_WEBHOOK_URL`) e invitación que no venza (`NEXT_PUBLIC_DISCORD_URL`).
+3. **WhatsApp:** enlace del canal (`NEXT_PUBLIC_WHATSAPP_URL`). WhatsApp no ofrece una forma oficial de publicar en canales
+   automáticamente (los servicios que lo hacen usan sesiones no oficiales y pueden bloquear el número), así que ahí se
+   publica a mano.
+4. Volvé a desplegar y probá con `/api/cron/alerts?prueba=1` (encabezado `Authorization: Bearer <CRON_SECRET>`).
 
-Las alertas del servidor se revisan después de cada corrida del recolector y en `/api/cron/alerts` (consulta solo los
-furnis de tus reglas: 1 o 2 pedidos). En el plan gratuito ese cron corre una vez por día; para revisarlas más seguido
-podés llamar a `/api/cron/alerts` desde un servicio de cron externo con el encabezado
-`Authorization: Bearer <CRON_SECRET>`, o correr `npm run alerts` en tu PC.
+`ALERTS_DEALS_MIN_DISCOUNT` cambia el umbral (0 desactiva la publicación). Con el plan gratuito de Vercel los escaneos, y por
+lo tanto las publicaciones, son una vez por día por hotel.
+
+**Tu lista personal (opcional):** armá tu lista en **Alertas**, abrí `/es/alertas/servidor`, tocá **Copiar mi lista** y
+guardala en `ALERTS_RULES`. Esos avisos salen por los mismos canales. `/api/cron/alerts` revisa solo esos furnis (1 o 2
+pedidos); para que corra más seguido que una vez por día podés llamarlo desde un servicio de cron externo con el
+encabezado `Authorization: Bearer <CRON_SECRET>`, o correr `npm run alerts` en tu PC.
 
 El service worker (`public/sw.js`) ya maneja mensajes **Web Push**; para usarlos con la pestaña cerrada faltaría
 guardar las suscripciones en el servidor.

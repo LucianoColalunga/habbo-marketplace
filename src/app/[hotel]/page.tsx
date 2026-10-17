@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TimeAgo } from "@/components/Freshness";
 import { FurniMiniList } from "@/components/FurniList";
+import { JoinChannels } from "@/components/JoinChannels";
 import { SearchBox } from "@/components/SearchBox";
 import { CoinGlyph, Notice, SectionTitle, StatTile } from "@/components/ui";
 import { getHomeView } from "@/lib/data/views";
@@ -70,6 +71,8 @@ async function HotelHomeContent({ params }: Pick<PageProps<"/[hotel]">, "params"
           />
         </section>
       )}
+
+      <JoinChannels />
 
       {view.meta.hasData && (
         <div className="grid gap-6 md:grid-cols-2">

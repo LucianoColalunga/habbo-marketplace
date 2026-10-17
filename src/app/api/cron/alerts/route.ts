@@ -1,4 +1,4 @@
-import { runServerAlerts } from "@/lib/alerts/server";
+import { runServerAlerts, sendTestMessage } from "@/lib/alerts/server";
 import { isAuthorizedCron } from "@/lib/server/cron-auth";
 
 export const maxDuration = 60;
@@ -10,6 +10,10 @@ export const maxDuration = 60;
  */
 export async function GET(request: Request) {
   if (!isAuthorizedCron(request)) return Response.json({ error: "no autorizado" }, { status: 401 });
+  // ?prueba=1 manda un mensaje de prueba a los canales configurados (para verificar la configuración).
+  if (new URL(request.url).searchParams.get("prueba") === "1") {
+    return Response.json({ status: "prueba", ...(await sendTestMessage()) });
+  }
   try {
     const result = await runServerAlerts();
     return Response.json({ status: "done", ...result });

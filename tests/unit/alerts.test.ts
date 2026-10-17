@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { chunkText, configuredChannels, discordChannel, isDiscordWebhook, telegramChannel, type Channel } from "@/lib/alerts/notifiers";
 import { evaluateRule, parseRule, parseRules, shouldNotify, type WatchRule } from "@/lib/alerts/rules";
-import { rulesFromEnv, runServerAlerts } from "@/lib/alerts/server";
+import { dealsThreshold, rulesFromEnv, runServerAlerts, sendTestMessage } from "@/lib/alerts/server";
 import { normalizeItem } from "@/lib/habbo/api";
 import { summarize } from "@/lib/market/stats";
 import type { MarketSummary } from "@/lib/market/summary";
@@ -96,6 +96,30 @@ describe("notificadores", () => {
     expect(JSON.parse(String(init.body)).chat_id).toBe("-100123");
   });
 
+  it("Discord: los enlaces van sin vista previa", async () => {
+    const fetchImpl = vi.fn(async () => new Response(null, { status: 204 }));
+    await discordChannel("https://discord.com/api/webhooks/1/abc", fetchImpl).send("Mirá https://x.vercel.app/es/furni/throne");
+    const body = JSON.parse(String((fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1].body));
+    expect(body.content).toBe("Mirá <https://x.vercel.app/es/furni/throne>");
+  });
+
+  it("umbral de ofertas: 30 % por defecto, 0 lo apaga", () => {
+    expect(dealsThreshold({} as never)).toBe(30);
+    expect(dealsThreshold({ ALERTS_DEALS_MIN_DISCOUNT: "45" } as never)).toBe(45);
+    expect(dealsThreshold({ ALERTS_DEALS_MIN_DISCOUNT: "0" } as never)).toBe(0);
+    expect(dealsThreshold({ ALERTS_DEALS_MIN_DISCOUNT: "abc" } as never)).toBe(0);
+  });
+
+  it("mensaje de prueba a todos los canales", async () => {
+    const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));
+    const res = await sendTestMessage(
+      { DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1/abc", TELEGRAM_BOT_TOKEN: "123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ", TELEGRAM_CHAT_ID: "@furnimetro" } as never,
+      fetchImpl,
+    );
+    expect(res).toEqual({ channels: ["discord", "telegram"], errors: [] });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
   it("activa canales solo si hay configuración", () => {
     expect(configuredChannels({} as never)).toEqual([]);
     expect(
@@ -128,7 +152,11 @@ describe("runServerAlerts", () => {
     return { sent, channel };
   }
 
-  const env = { ALERTS_RULES: JSON.stringify([rule()]), SITE_URL: "https://ejemplo.vercel.app" } as never;
+  const env = {
+    ALERTS_RULES: JSON.stringify([rule()]),
+    SITE_URL: "https://ejemplo.vercel.app",
+    ALERTS_DEALS_MIN_DISCOUNT: "0",
+  } as never;
 
   it("avisa una vez, no repite y vuelve a avisar si baja más", async () => {
     const storage = new MemoryStorage();
@@ -166,6 +194,6 @@ describe("runServerAlerts", () => {
       channels: [channel],
     });
     expect(res.sent).toBe(1);
-    expect(sent[0]).toContain("50 % bajo su promedio");
+    expect(sent[0]).toContain("50 % menos que lo que se pagó esta semana");
   });
 });

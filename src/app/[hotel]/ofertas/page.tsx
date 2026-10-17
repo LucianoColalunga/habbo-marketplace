@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DetectionsList } from "@/components/alerts/DetectionsList";
 import { DealsTable } from "@/components/deals/DealsTable";
+import { JoinChannels } from "@/components/JoinChannels";
 import { TimeAgo } from "@/components/Freshness";
 import { Notice } from "@/components/ui";
 import { DEFAULT_DEAL_OPTIONS } from "@/lib/market/deals";
@@ -41,6 +42,8 @@ async function OfertasPageContent({ params }: Pick<PageProps<"/[hotel]/ofertas">
         separado. Una oferta de esta lista puede haberse vendido después del escaneo: usá <strong>Verificar en vivo</strong>{" "}
         antes de entrar al juego.
       </Notice>
+
+      <JoinChannels title="Que te lleguen estas ofertas" />
 
       <section>
         <DealsTable hotel={hotel} rows={rows} />

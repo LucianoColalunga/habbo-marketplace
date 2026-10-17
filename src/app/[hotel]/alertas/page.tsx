@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AlertsManager } from "@/components/alerts/AlertsManager";
+import { JoinChannels } from "@/components/JoinChannels";
 import { Notice } from "@/components/ui";
 import { enabledHotels, isEnabledHotel } from "@/lib/hotels";
 import { Suspense } from "react";
@@ -25,6 +26,10 @@ async function AlertasPageContent({ params }: Pick<PageProps<"/[hotel]/alertas">
         cada furni de tu lista. Si cumple tu condición, te avisamos. Si alguien lo publica barato y otro lo compra antes de que
         volvamos a mirar, ese aviso no llega.
       </Notice>
+      <JoinChannels
+        title="¿Preferís Discord, Telegram o WhatsApp?"
+        note="Unite con un toque. Ahí publicamos para todos las ofertas más fuertes de cada escaneo (no tu lista personal)."
+      />
       <AlertsManager hotel={hotel} hotels={enabledHotels()} />
     </div>
   );

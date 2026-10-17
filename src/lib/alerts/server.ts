@@ -6,7 +6,7 @@ import { referencePrice, summarize, type ItemSummary } from "@/lib/market/stats"
 import type { MarketSummary } from "@/lib/market/summary";
 import { getStorage, keys, type Storage } from "@/lib/storage";
 import { configuredChannels, type Channel } from "./notifiers";
-import { describeRule, evaluateRule, parseRules, shouldNotify, type NotifyState, type RuleCheck, type WatchRule } from "./rules";
+import { evaluateRule, parseRules, shouldNotify, type NotifyState, type RuleCheck, type WatchRule } from "./rules";
 
 /**
  * Alertas del lado del servidor (Discord / Telegram). Se ejecutan:
@@ -48,6 +48,20 @@ export function rulesFromEnv(env: NodeJS.ProcessEnv = process.env): WatchRule[] 
   }
 }
 
+/**
+ * % mínimo por debajo del promedio para publicar una oferta en los canales.
+ * Por defecto 30; ALERTS_DEALS_MIN_DISCOUNT=0 desactiva la publicación de ofertas.
+ */
+export function dealsThreshold(env: NodeJS.ProcessEnv = process.env): number {
+  const raw = env.ALERTS_DEALS_MIN_DISCOUNT;
+  if (raw === undefined || raw.trim() === "") return 30;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 && n < 100 ? n : 0;
+}
+
+/** Cuántas ofertas nuevas se publican como máximo por escaneo (para no saturar el canal). */
+export const MAX_DEALS_PER_POST = 10;
+
 export function siteUrl(env: NodeJS.ProcessEnv = process.env): string {
   const raw = env.SITE_URL || (env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : "");
   return raw.replace(/\/+$/, "");
@@ -77,8 +91,8 @@ export async function runServerAlerts(options: AlertRunOptions = {}): Promise<Al
   const allRules = rulesFromEnv(env);
   const rules = options.hotel ? allRules.filter((r) => r.hotel === options.hotel) : allRules;
   result.rules = rules.length;
-  const dealMin = Number(env.ALERTS_DEALS_MIN_DISCOUNT);
-  const dealsEnabled = Boolean(options.summary) && Number.isFinite(dealMin) && dealMin > 0 && dealMin < 100;
+  const dealMin = dealsThreshold(env);
+  const dealsEnabled = Boolean(options.summary) && dealMin > 0;
   if (channels.length === 0 || (rules.length === 0 && !dealsEnabled)) return result;
 
   const storage = options.storage ?? (await getStorage());
@@ -109,8 +123,9 @@ export async function runServerAlerts(options: AlertRunOptions = {}): Promise<Al
       const name = names.get(`${rule.hotel}:${rule.item}`) ?? rule.item;
       const below = check.belowRef !== null ? ` (${Math.round(check.belowRef * 100)} % bajo el promedio)` : "";
       lines.push(
-        `🔔 ${name} en ${HOTELS[rule.hotel].label}: ${check.price} créditos${below}. ` +
-          `Regla: ${describeRule(rule)}. ${check.offers} ofertas. ${itemUrl(base, rule.hotel, rule.item)}`.trim(),
+        `🔔 ${name} (${HOTELS[rule.hotel].label}): ${check.price} créditos${below} · ${check.offers} en venta` +
+          (base ? `
+${itemUrl(base, rule.hotel, rule.item)}` : ""),
       );
     }
   }
@@ -118,7 +133,7 @@ export async function runServerAlerts(options: AlertRunOptions = {}): Promise<Al
   // 2) Ofertas generales detectadas en el escaneo (opcional).
   if (dealsEnabled && options.summary) {
     const hotel = options.summary.hotel;
-    const deals = findDeals(hotel, options.summary.items, { minDiscount: dealMin / 100 }).slice(0, 15);
+    const deals = findDeals(hotel, options.summary.items, { minDiscount: dealMin / 100 }).slice(0, MAX_DEALS_PER_POST);
     const dealNames = await catalogNames([hotel], storage);
     const current = new Set(deals.map((d) => `deal:${hotel}:${d.k}`));
     for (const [key, entry] of Object.entries(state)) {
@@ -138,8 +153,10 @@ export async function runServerAlerts(options: AlertRunOptions = {}): Promise<Al
       result.matched++;
       if (decision.notify) {
         lines.push(
-          `💸 ${dealNames.get(`${hotel}:${d.k}`) ?? d.k} en ${HOTELS[hotel].label}: ${d.cp} créditos, ` +
-            `${Math.round(d.pct * 100)} % bajo su promedio (${Math.round(d.ref)}). ${itemUrl(base, hotel, d.k)}`.trim(),
+          `💸 ${dealNames.get(`${hotel}:${d.k}`) ?? d.k} (${HOTELS[hotel].label}): ${d.cp} créditos, ` +
+            `${Math.round(d.pct * 100)} % menos que lo que se pagó esta semana (${Math.round(d.ref)})` +
+            (base ? `
+${itemUrl(base, hotel, d.k)}` : ""),
         );
       }
     }
@@ -209,4 +226,31 @@ async function currentValues(
     for (const stats of res.results) out.set(`${hotel}:${stats.item}`, summarize(stats));
   }
   return out;
+}
+
+/** Mensaje de prueba para comprobar que los canales están bien configurados. */
+export async function sendTestMessage(
+  env: NodeJS.ProcessEnv = process.env,
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ channels: string[]; errors: string[] }> {
+  const errors: string[] = [];
+  let channels: Channel[] = [];
+  try {
+    channels = configuredChannels(env, fetchImpl);
+  } catch (error) {
+    return { channels: [], errors: [(error as Error).message] };
+  }
+  const base = siteUrl(env);
+  const text =
+    "✅ Furnímetro quedó conectado a este canal. Acá se publican las ofertas más fuertes que detecta cada escaneo." +
+    (base ? `
+${base}` : "");
+  for (const channel of channels) {
+    try {
+      await channel.send(text);
+    } catch (error) {
+      errors.push(`${channel.name}: ${(error as Error).message}`);
+    }
+  }
+  return { channels: channels.map((c) => c.name), errors };
 }
