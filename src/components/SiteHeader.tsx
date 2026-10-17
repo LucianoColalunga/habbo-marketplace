@@ -4,6 +4,7 @@ import { Logo } from "./Logo";
 import { HotelSwitcher } from "./HotelSwitcher";
 import { NavLinks } from "./NavLinks";
 import { SearchBox } from "./SearchBox";
+import { SectionSwitch } from "./SectionSwitch";
 
 export function SiteHeader({ hotel }: { hotel: HotelCode }) {
   const hotels = enabledHotels().map((code) => ({ code, label: HOTELS[code].label, region: HOTELS[code].region }));
@@ -13,6 +14,7 @@ export function SiteHeader({ hotel }: { hotel: HotelCode }) {
         <Link href={`/${hotel}`} className="shrink-0" aria-label="Furnímetro, inicio">
           <Logo />
         </Link>
+        <SectionSwitch active="market" hotel={hotel} />
         <div className="order-3 w-full md:order-2 md:w-auto md:flex-1">
           <SearchBox key={hotel} hotel={hotel} />
         </div>

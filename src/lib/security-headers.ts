@@ -3,9 +3,9 @@ import { HOTELS } from "./hotels";
 /**
  * Encabezados de seguridad para todas las respuestas.
  *
- * La CSP solo permite cargar código y estilos del propio sitio, imágenes del CDN
- * de Habbo y conexiones a la API pública de los hoteles (las consultas en vivo
- * salen del navegador). 'unsafe-inline' en scripts hace falta porque las páginas
+ * La CSP solo permite cargar código y estilos del propio sitio, imágenes de los
+ * CDN de Habbo (furnis y NFT) y conexiones a la API pública de los hoteles y a
+ * la de Immutable (las consultas en vivo salen del navegador). 'unsafe-inline' en scripts hace falta porque las páginas
  * se prerenderizan estáticas y Next.js inserta scripts en línea para hidratar;
  * usar nonces obligaría a renderizar cada página en cada pedido. Igual no hay
  * HTML sin escapar en el sitio, y el resto de las directivas limita a dónde
@@ -17,9 +17,9 @@ export function contentSecurityPolicy(dev: boolean): string {
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://images.habbo.com",
+    "img-src 'self' data: blob: https://images.habbo.com https://nft-tokens.habbo.com",
     "font-src 'self'",
-    `connect-src 'self' ${hotelOrigins.join(" ")}${dev ? " ws: wss:" : ""}`,
+    `connect-src 'self' ${hotelOrigins.join(" ")} https://api.immutable.com${dev ? " ws: wss:" : ""}`,
     "worker-src 'self'",
     "manifest-src 'self'",
     "frame-src 'none'",

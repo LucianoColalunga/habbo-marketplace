@@ -33,7 +33,7 @@ export function Delta({ value, className = "" }: { value: number | null | undefi
   const up = value > 0;
   const flat = Math.abs(value) < 0.0005;
   return (
-    <span className={`tnum inline-flex items-center gap-0.5 ${flat ? "text-text-2" : up ? "text-up" : "text-down"} ${className}`}>
+    <span className={`tnum inline-flex items-center gap-0.5 whitespace-nowrap ${flat ? "text-text-2" : up ? "text-up" : "text-down"} ${className}`}>
       <span aria-hidden="true">{flat ? "•" : up ? "▲" : "▼"}</span>
       {formatPct(value)}
     </span>

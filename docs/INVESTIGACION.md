@@ -153,3 +153,38 @@ pedidos por recorrido completo.
 - Los pósters (`poster`) comparten un classname y se distinguen por `extraData`; la API devuelve `extraData: null` y no
   documenta cómo pedir un póster en particular, así que se muestran agrupados.
 - Si el límite de frecuencia es por IP, por endpoint o global (todo indica que es por IP).
+
+## Sección NFT (agregada el 17/10/2026)
+
+Inspirada en securehabbo.com (un marketplace de NFT de Habbo que usa Immutable Passport). Revisando su código público se
+ve que toma datos de las APIs públicas de Immutable; acá se usan las mismas fuentes, **solo para leer**:
+
+| Qué | Endpoint (verificado) |
+| --- | --- |
+| Colección | `GET https://api.immutable.com/v1/chains/imtbl-zkevm-mainnet/collections/{contrato}` |
+| Modelos a la venta con piso, mejor oferta y última venta (en USD/ETH/IMX) | `GET .../search/stacks?contract_address=…&only_if_has_active_listings=true&page_size=200` |
+| Un modelo puntual (ficha en vivo) | `GET .../stacks?stack_id=…` (varios ids por pedido) |
+| Ventas | `GET .../activities?contract_address=…&activity_type=sale&page_size=200` (de la más nueva a la más vieja; el filtro por fecha se ignora) |
+| A qué modelo pertenece cada token | `GET .../collections/{contrato}/nfts?token_id=…` (máximo 30 por pedido; `metadata_id` = id del modelo) |
+| Cotizaciones | `GET https://checkout-api.immutable.com/v1/fiat/conversion?ids=ethereum,immutable-x,usd-coin,tether&currencies=usd` |
+
+Colecciones oficiales (sus imágenes están en `nft-tokens.habbo.com`):
+
+| Colección | Contrato | Modelos | A la venta (17/10/2026) |
+| --- | --- | --- | --- |
+| Habbo Furni | `0x33976ee1477c75171b2b34814d75ebc37413e589` | más de 8.000 | 2.161 |
+| Habbo Clothes | `0xdbf185750d135ea5581f9853db9f9657fb843a62` | 1.168 | 592 |
+| Habbo Pets | `0xb7727da90019d072a5f8fdd58ff4522f796a20c5` | 5 | 5 |
+| Habbo Tokens | `0xe06f06a4128373ecc5444881a6a26fc18723487a` | 22 | 21 |
+| Habbo Addons | `0x2da5094f8c6cd42f5b3b24803f998a28b40a398f` | 48 | 44 |
+
+- **Límite:** la API informa `x-ratelimit-limit: 5;w=1` (5 pedidos por segundo). El recolector usa 4.
+- **CORS:** `Access-Control-Allow-Origin: *`, así que la ficha consulta en vivo desde el navegador.
+- **Volumen real:** en 14 días hubo 19.518 ventas (11.309 de furnis y 7.113 de ropa); la primera carga tardó 3 minutos y
+  674 pedidos. Casi todas las ventas se pagan en ETH (WETH); algunas en IMX.
+- **Immutable X** (red anterior): las 5 colecciones que referencia SecureHabbo responden 404 en `api.x.immutable.com`;
+  no se incluyen.
+- **Avatares de Habbo en Ethereum:** sus datos de mercado requieren APIs con clave (OpenSea, Alchemy, etc.); no se
+  incluyen para no depender de cuentas.
+- Hay publicaciones a precios absurdos (por ejemplo, US$ 239.218 por un trofeo que nadie compra): por eso los rankings de
+  precio usan ventas reales.

@@ -105,3 +105,15 @@ body {
     linear-gradient(150deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 34px 20px;
 }
+
+/* Sección NFT: mismo diseño base, acento violeta para que nunca se confunda con el Marketplace. */
+.theme-nft {
+  --accent: #a78bfa;
+  --accent-ink: #140d2b;
+}
+
+.nft-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(167, 139, 250, 0.12) 1px, transparent 0);
+  background-size: 22px 22px;
+}

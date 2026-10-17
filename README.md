@@ -22,6 +22,20 @@ aparece por debajo de su precio normal.
 - Hoteles **.es**, **.com** y **.com.br** por defecto (se pueden sumar .de, .fr, .it, .nl, .fi y .com.tr).
 - Tema oscuro, responsive, identidad propia.
 
+## Sección NFT (separada)
+
+En `/nft` hay una sección aparte para los **coleccionables NFT oficiales de Habbo** (Furni, Clothes, Pets, Tokens y
+Add-ons en la blockchain Immutable zkEVM). Tiene su propio color (violeta), su propio menú y un aviso fijo; arriba de todo
+hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se mezclen.
+
+- Precio piso, mejor oferta de compra, última venta y publicaciones más baratas **en vivo** (desde el navegador).
+- Ventas por día y promedio en USD, rankings (más vendidos, dólares movidos, subas, bajas, ofertas, más caros) por
+  colección o en total, y buscador.
+- Datos: API pública de Immutable (sin clave, máx. 5 pedidos por segundo) y cotizaciones de su servicio de conversión.
+  El recolector (`npm run collect:nft`, cron diario `/api/cron/nft`) guarda historial de ventas y del piso.
+- No incluye Immutable X (su API ya no responde) ni los avatares en Ethereum (requieren servicios con clave).
+- No es asesoramiento financiero; los dólares son aproximados.
+
 ## Qué datos son reales (y qué no)
 
 Todo sale de la **API pública y documentada de Habbo** y del **furnidata** público. No se usan cuentas, contraseñas ni
@@ -110,7 +124,8 @@ Para `test:e2e` hace falta el navegador de Playwright una vez: `npx playwright i
 4. Desplegá. `vercel.json` ya trae un cron diario por hotel (`/api/cron/scan?hotel=...`) y uno de alertas. Si cambiás
    `NEXT_PUBLIC_HOTELS`, ajustá también esos cron.
 5. Para no esperar días a que se llene, juntá los datos en tu PC (`npm run collect -- es --full`, etc.) y subilos al
-   Blob: `vercel env pull .env.vercel` y después `npm run push-data`. (`.env.vercel` queda fuera de git.)
+   Blob: `vercel env pull .env.vercel` y después `npm run push-data`. (`.env.vercel` queda fuera de git.) Para la sección NFT: `npm run collect:nft -- --dias 14` y
+   `npm run push-data -- nft`.
 
 Si desplegás con el CLI (`vercel deploy --prod`), `.vercelignore` evita que se suban `.env*` y `.data/`: el CLI de
 Vercel **no** respeta `.gitignore`. Para que cada push a GitHub se despliegue solo, conectá el repositorio en

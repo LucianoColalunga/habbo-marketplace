@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { formatUsd } from "@/lib/format";
 import { FurniIcon } from "./FurniIcon";
+import { NftImage } from "./nft/NftImage";
 
-interface Result {
+interface MarketResult {
   k: string;
   n: string;
   r: number;
@@ -12,7 +14,62 @@ interface Result {
   oo: number;
 }
 
-export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: string; autoFocus?: boolean; size?: "md" | "lg" }) {
+interface NftResult {
+  id: string;
+  n: string;
+  img: string;
+  rarity: string;
+  floorUsd: number | null;
+}
+
+/** Resultado normalizado para mostrar igual furnis del Marketplace y NFT. */
+interface Result {
+  key: string;
+  title: string;
+  subtitle: string;
+  price: string | null;
+  priceSub: string;
+  r?: number;
+  img?: string;
+}
+
+function fromMarket(r: MarketResult): Result {
+  return {
+    key: r.k,
+    title: r.n,
+    subtitle: r.k,
+    price: r.oo > 0 ? `${r.cp.toLocaleString("es-AR")} c` : null,
+    priceSub: r.oo > 0 ? `${r.oo} en venta` : "sin ofertas",
+    r: r.r,
+  };
+}
+
+function fromNft(r: NftResult): Result {
+  return {
+    key: r.id,
+    title: r.n,
+    subtitle: r.rarity || "NFT",
+    price: r.floorUsd !== null ? formatUsd(r.floorUsd) : null,
+    priceSub: r.floorUsd !== null ? "precio piso" : "sin publicaciones",
+    img: r.img,
+  };
+}
+
+/**
+ * Buscador con sugerencias. Sin `nft` busca furnis del Marketplace del hotel;
+ * con `nft` busca en la sección NFT (que es independiente).
+ */
+export function SearchBox({
+  hotel = "es",
+  nft = false,
+  autoFocus = false,
+  size = "md",
+}: {
+  hotel?: string;
+  nft?: boolean;
+  autoFocus?: boolean;
+  size?: "md" | "lg";
+}) {
   const router = useRouter();
   const listId = useId();
   const [query, setQuery] = useState("");
@@ -49,9 +106,14 @@ export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: st
       const controller = new AbortController();
       request.current = controller;
       try {
-        const res = await fetch(`/api/search?hotel=${hotel}&q=${encodeURIComponent(q)}&limit=8`, { signal: controller.signal });
-        const body = (await res.json()) as { results?: Result[] };
-        setResults(body.results ?? []);
+        const url = nft
+          ? `/api/nft/search?q=${encodeURIComponent(q)}&limit=8`
+          : `/api/search?hotel=${hotel}&q=${encodeURIComponent(q)}&limit=8`;
+        const res = await fetch(url, { signal: controller.signal });
+        const body = (await res.json()) as { results?: (MarketResult | NftResult)[] };
+        setResults(
+          (body.results ?? []).map((r) => (nft ? fromNft(r as NftResult) : fromMarket(r as MarketResult))),
+        );
         setActive(-1);
         setOpen(true);
       } catch {
@@ -70,10 +132,10 @@ export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: st
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const go = (k: string) => {
+  const go = (key: string) => {
     setOpen(false);
     onType("");
-    router.push(`/${hotel}/furni/${encodeURIComponent(k)}`);
+    router.push(nft ? `/nft/item/${encodeURIComponent(key)}` : `/${hotel}/furni/${encodeURIComponent(key)}`);
   };
 
   const big = size === "lg";
@@ -83,16 +145,16 @@ export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: st
         role="search"
         onSubmit={(e) => {
           e.preventDefault();
-          if (active >= 0 && results[active]) return go(results[active].k);
+          if (active >= 0 && results[active]) return go(results[active].key);
           const q = query.trim();
           if (q) {
             setOpen(false);
-            router.push(`/${hotel}/buscar?q=${encodeURIComponent(q)}`);
+            router.push(nft ? `/nft/buscar?q=${encodeURIComponent(q)}` : `/${hotel}/buscar?q=${encodeURIComponent(q)}`);
           }
         }}
       >
         <label className="sr-only" htmlFor={`${listId}-input`}>
-          Buscar furni
+          {nft ? "Buscar NFT" : "Buscar furni"}
         </label>
         <div className="relative">
           <svg
@@ -109,7 +171,7 @@ export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: st
             autoComplete="off"
             autoFocus={autoFocus}
             value={query}
-            placeholder="Buscá un furni: trono, dragón, sofá…"
+            placeholder={nft ? "Buscá un NFT: placa, alas, mochila…" : "Buscá un furni: trono, dragón, sofá…"}
             onChange={(e) => onType(e.target.value)}
             onFocus={() => results.length && setOpen(true)}
             onKeyDown={(e) => {
@@ -147,31 +209,25 @@ export function SearchBox({ hotel, autoFocus = false, size = "md" }: { hotel: st
         >
           {results.map((r, i) => (
             <li
-              key={r.k}
+              key={r.key}
               id={`${listId}-${i}`}
               role="option"
               aria-selected={i === active}
               onMouseDown={(e) => {
                 e.preventDefault();
-                go(r.k);
+                go(r.key);
               }}
               onMouseEnter={() => setActive(i)}
               className={`flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 ${i === active ? "bg-surface-3" : ""}`}
             >
-              <FurniIcon k={r.k} r={r.r} size={32} />
+              {nft ? <NftImage src={r.img ?? ""} size={32} /> : <FurniIcon k={r.key} r={r.r ?? 0} size={32} />}
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm text-text">{r.n}</span>
-                <span className="block truncate text-xs text-muted">{r.k}</span>
+                <span className="block truncate text-sm text-text">{r.title}</span>
+                <span className="block truncate text-xs text-muted">{r.subtitle}</span>
               </span>
               <span className="tnum shrink-0 text-right text-sm">
-                {r.oo > 0 ? (
-                  <>
-                    <span className="text-text">{r.cp.toLocaleString("es-AR")} c</span>
-                    <span className="block text-xs text-muted">{r.oo} en venta</span>
-                  </>
-                ) : (
-                  <span className="text-xs text-muted">sin ofertas</span>
-                )}
+                {r.price ? <span className="text-text">{r.price}</span> : null}
+                <span className="block text-xs text-muted">{r.priceSub}</span>
               </span>
             </li>
           ))}

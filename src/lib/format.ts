@@ -53,3 +53,19 @@ export function formatShortDate(ms: number): string {
 export function formatDateTime(iso: string): string {
   return dateTime.format(new Date(iso));
 }
+
+const usdFmt = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usdCompact = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
+
+/** Dólares: "US$ 0,29"; montos grandes compactos ("US$ 12,3 mil"). */
+export function formatUsd(n: number | null | undefined, compact = false): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  if (n > 0 && n < 0.01) return "< US$ 0,01";
+  return compact && Math.abs(n) >= 10000 ? usdCompact.format(n) : usdFmt.format(n);
+}
+
+/** Cantidad de cripto con decimales significativos ("0,000122 ETH"). */
+export function formatCrypto(amount: number, symbol: string): string {
+  const digits = amount >= 1 ? 2 : amount >= 0.01 ? 4 : 6;
+  return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: digits }).format(amount)} ${symbol}`;
+}

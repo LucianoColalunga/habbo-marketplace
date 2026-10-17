@@ -1,9 +1,25 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
-    { "path": "/api/cron/scan?hotel=es", "schedule": "0 5 * * *" },
-    { "path": "/api/cron/scan?hotel=com", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/scan?hotel=br", "schedule": "0 7 * * *" },
-    { "path": "/api/cron/alerts", "schedule": "30 12 * * *" }
+    {
+      "path": "/api/cron/scan?hotel=es",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=com",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=br",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/alerts",
+      "schedule": "30 12 * * *"
+    },
+    {
+      "path": "/api/cron/nft",
+      "schedule": "0 8 * * *"
+    }
   ]
 }
