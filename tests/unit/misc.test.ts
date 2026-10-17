@@ -77,3 +77,16 @@ describe("almacenamiento local", () => {
     await expect(fs.write("../afuera.json.gz", {})).rejects.toThrow(/inválida/);
   });
 });
+
+describe("límite de pedidos por IP", () => {
+  it("deja pasar hasta el límite, frena el resto y se reinicia con la ventana", async () => {
+    const { rateLimit, resetRateLimits, clientIp } = await import("@/lib/server/rate-limit");
+    resetRateLimits();
+    for (let i = 0; i < 3; i++) expect(rateLimit("ip1", 3, 1000, 0).ok).toBe(true);
+    expect(rateLimit("ip1", 3, 1000, 10)).toEqual({ ok: false, retryAfter: 1 });
+    expect(rateLimit("ip2", 3, 1000, 10).ok).toBe(true);
+    expect(rateLimit("ip1", 3, 1000, 1001).ok).toBe(true);
+    expect(clientIp(new Request("https://x", { headers: { "x-forwarded-for": "1.2.3.4, 10.0.0.1" } }))).toBe("1.2.3.4");
+    expect(clientIp(new Request("https://x", { headers: { "x-real-ip": "5.6.7.8" } }))).toBe("5.6.7.8");
+  });
+});

@@ -55,6 +55,8 @@ describe("parseRule", () => {
     expect(parseRule({ hotel: "es", item: "", mode: "below_avg", value: 25 })).toBeNull();
     expect(parseRule({ hotel: "es", item: "a", mode: "below_avg", value: 150 })).toBeNull();
     expect(parseRule({ hotel: "es", item: "a", mode: "otro", value: 5 })).toBeNull();
+    expect(parseRule({ hotel: "es", item: "__proto__", mode: "below_avg", value: 5 })).toBeNull();
+    expect(parseRule({ hotel: "es", item: "<img src=x>", mode: "below_avg", value: 5 })).toBeNull();
     expect(parseRules([rule(), rule(), "basura"])).toHaveLength(1);
   });
 

@@ -2,9 +2,19 @@
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
+// Solo se abren páginas del propio sitio: nunca un enlace externo que venga en la notificación.
+function safeUrl(raw) {
+  try {
+    const url = new URL(typeof raw === "string" ? raw : "/", self.location.origin);
+    return url.origin === self.location.origin ? url.pathname + url.search : "/";
+  } catch {
+    return "/";
+  }
+}
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || "/";
+  const url = safeUrl(event.notification.data && event.notification.data.url);
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       for (const client of list) {
@@ -26,13 +36,10 @@ self.addEventListener("push", (event) => {
   } catch {
     data = { body: event.data ? event.data.text() : "" };
   }
-  const title = data.title || "Furnímetro";
+  const url = safeUrl(data.url);
+  const title = typeof data.title === "string" ? data.title.slice(0, 120) : "Furnímetro";
+  const body = typeof data.body === "string" ? data.body.slice(0, 300) : "";
   event.waitUntil(
-    self.registration.showNotification(title, {
-      body: data.body || "",
-      icon: "/icon.svg",
-      tag: data.url || "push",
-      data: { url: data.url || "/" },
-    }),
+    self.registration.showNotification(title, { body, icon: "/icon.svg", tag: url, data: { url } }),
   );
 });

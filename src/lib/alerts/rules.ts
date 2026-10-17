@@ -1,3 +1,4 @@
+import { isSafeClassname } from "@/lib/habbo/api";
 import { isHotelCode, type HotelCode } from "@/lib/hotels";
 
 /**
@@ -95,7 +96,7 @@ export function parseRule(raw: unknown): WatchRule | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
   if (!isHotelCode(r.hotel)) return null;
-  if (typeof r.item !== "string" || r.item.length === 0 || r.item.length > 100) return null;
+  if (!isSafeClassname(r.item)) return null;
   if (r.mode !== "below_avg" && r.mode !== "below_price") return null;
   const value = Number(r.value);
   if (!Number.isFinite(value) || value <= 0) return null;

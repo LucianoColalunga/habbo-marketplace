@@ -1,5 +1,5 @@
 import { hotelBaseUrl, type HotelCode } from "@/lib/hotels";
-import { USER_AGENT, type FurniType } from "@/lib/habbo/api";
+import { isSafeClassname, USER_AGENT, type FurniType } from "@/lib/habbo/api";
 
 /**
  * Catálogo de furnis a partir del "furnidata" público de cada hotel:
@@ -57,7 +57,7 @@ export function compactFurnidata(raw: RawFurnidata, hotel: HotelCode, hash: stri
   const seen = new Set<string>();
   const add = (list: RawFurni[] | undefined, t: FurniType) => {
     for (const f of list ?? []) {
-      if (!f || f.tradeable !== true || typeof f.classname !== "string" || !f.classname) continue;
+      if (!f || f.tradeable !== true || !isSafeClassname(f.classname)) continue;
       const key = `${t}:${f.classname}`;
       if (seen.has(key)) continue;
       seen.add(key);

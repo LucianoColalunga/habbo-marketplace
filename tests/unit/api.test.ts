@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  isSafeClassname,
   fetchBatch,
   fetchMany,
   HabboApiError,
@@ -28,6 +29,21 @@ describe("normalizeItem", () => {
     expect(n.currentPrice).toBe(0);
     expect(n.history).toEqual([]); // offset 0 no es un día del historial
     expect(n.type).toBe("w");
+  });
+});
+
+describe("isSafeClassname", () => {
+  it("acepta los classnames de Habbo y rechaza claves peligrosas o raras", () => {
+    expect(isSafeClassname("rare_dragonlamp*1")).toBe(true);
+    expect(isSafeClassname("post.it")).toBe(true);
+    for (const bad of ["__proto__", "constructor", "prototype", "", "a b", "<script>", "../x", "x".repeat(101), 5]) {
+      expect(isSafeClassname(bad)).toBe(false);
+    }
+  });
+
+  it("descarta respuestas de la API con nombres peligrosos", () => {
+    const out = parseBatchResponse({ status: "OK", roomItemData: [rawItem("__proto__"), rawItem("ok")], wallItemData: [] } as never);
+    expect(out.map((o) => o.item)).toEqual(["ok"]);
   });
 });
 

@@ -150,6 +150,30 @@ podés llamar a `/api/cron/alerts` desde un servicio de cron externo con el enca
 El service worker (`public/sw.js`) ya maneja mensajes **Web Push**; para usarlos con la pestaña cerrada faltaría
 guardar las suscripciones en el servidor.
 
+## Seguridad
+
+- **Sin cuentas ni contraseñas:** el sitio no tiene login ni guarda datos personales; las alertas viven en el navegador.
+- **Secretos solo en el servidor:** `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET` y los de Discord/Telegram nunca llegan al
+  navegador (solo las variables `NEXT_PUBLIC_*` se publican). `.env*` está fuera de git y de los despliegues
+  (`.gitignore` y `.vercelignore`).
+- **Rutas del recolector protegidas:** `/api/cron/*` exigen `Authorization: Bearer <CRON_SECRET>` (comparación en
+  tiempo constante); en producción, sin secreto configurado, responden 401.
+- **Encabezados:** CSP que solo permite el propio sitio, la API de Habbo y su CDN de imágenes; `frame-ancestors 'none'`
+  y `X-Frame-Options: DENY` (no se puede embeber en otro sitio), `nosniff`, `Referrer-Policy`, `Permissions-Policy` y
+  HTTPS forzado (HSTS de Vercel). No se anuncia el framework (`X-Powered-By`).
+- **Entradas validadas:** hoteles contra una lista fija, búsquedas recortadas a 60 caracteres, classnames con formato
+  estricto (sin `__proto__` ni caracteres raros), reglas de alerta validadas. React escapa todo el texto; no hay HTML
+  sin escapar.
+- **Sin SSRF:** el servidor solo se conecta a los dominios de Habbo, Discord (webhook validado) y Telegram.
+- **Límite de búsquedas:** 60 por minuto por IP en `/api/search`; las repetidas las sirve la caché del CDN.
+- **Notificaciones:** el service worker solo abre páginas del propio sitio.
+- **Dependencias:** `npm audit --omit=dev` sin vulnerabilidades (las que marca `npm audit` completo son de ESLint, que
+  no se publica).
+
+Recomendado en tus cuentas: verificación en dos pasos en GitHub y Vercel, y las alertas de Dependabot activadas en el
+repositorio. Si alguna vez sospechás que se filtró un token, rotalo en Vercel (Storage → Blob → token, y la variable
+`CRON_SECRET`) y volvé a desplegar.
+
 ## Variables de entorno
 
 Todas están explicadas en [.env.example](.env.example).

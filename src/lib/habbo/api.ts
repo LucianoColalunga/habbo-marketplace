@@ -20,6 +20,17 @@ export const USER_AGENT =
 
 export type FurniType = "r" | "w"; // r = suelo (roomItem), w = pared (wallItem)
 
+const RESERVED_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+/**
+ * Los classnames se usan como claves de objetos y en URLs: solo se aceptan los
+ * caracteres que usa Habbo (letras, números, _ * . -) y nunca nombres especiales
+ * de JavaScript como __proto__.
+ */
+export function isSafeClassname(name: unknown): name is string {
+  return typeof name === "string" && /^[A-Za-z0-9_.*-]{1,100}$/.test(name) && !RESERVED_KEYS.has(name);
+}
+
 export interface ItemRef {
   name: string;
   type: FurniType;
@@ -82,7 +93,7 @@ function toInt(value: unknown): number {
 }
 
 export function normalizeItem(raw: RawItemData, type: FurniType): MarketStats | null {
-  if (!raw || typeof raw.item !== "string" || raw.item.length === 0) return null;
+  if (!raw || !isSafeClassname(raw.item)) return null;
   const history: DayStat[] = (Array.isArray(raw.history) ? raw.history : [])
     .map((h) => ({
       offset: toInt(h.dayOffset),
