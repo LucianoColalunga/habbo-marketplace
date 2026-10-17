@@ -16,15 +16,14 @@ async function AlertasPageContent({ params }: Pick<PageProps<"/[hotel]/alertas">
       <header>
         <h1 className="font-display text-3xl font-bold text-text">Alertas de precio</h1>
         <p className="mt-2 max-w-3xl text-text-2">
-          Armá tu lista de furnis y elegí cuándo avisarte: cuando el precio mínimo publicado quede un cierto porcentaje por
-          debajo de su promedio reciente, o cuando baje a un precio que vos elijas.
+          Elegí los furnis que te interesan y te avisamos cuando alguien los publique barato: por debajo de lo que se suele
+          pagar, o al precio que vos digas.
         </p>
       </header>
       <Notice>
-        <strong className="text-text">Qué se puede detectar y qué no.</strong> La API de Habbo informa el precio más bajo
-        publicado y cuántas ofertas hay en el momento de la consulta, no cada publicación individual ni quién la hizo. La
-        alerta compara ese precio mínimo cada pocos minutos: si alguien publica barato y otro lo compra entre dos chequeos, no
-        se va a ver. No es un aviso instantáneo.
+        <strong className="text-text">Cómo funciona.</strong> Cada pocos minutos miramos el precio más barato publicado de
+        cada furni de tu lista. Si cumple tu condición, te avisamos. Si alguien lo publica barato y otro lo compra antes de que
+        volvamos a mirar, ese aviso no llega.
       </Notice>
       <AlertsManager hotel={hotel} hotels={enabledHotels()} />
     </div>

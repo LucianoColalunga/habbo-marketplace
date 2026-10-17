@@ -53,14 +53,17 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
     return () => window.removeEventListener("fm:detections", done);
   }, []);
 
-  const exportJson = JSON.stringify(
-    rules.map(({ id, hotel: h, item, mode, value }) => ({ id, hotel: h, item, mode, value })),
-  );
-
   return (
     <div className="space-y-8">
       <section className="card space-y-4 p-4">
-        <h2 className="font-display text-xl font-bold text-text">Avisos en este navegador</h2>
+        <h2 className="font-display text-xl font-bold text-text">Para que te lleguen los avisos</h2>
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-text-2">
+          <li>
+            Activá las notificaciones. El navegador te va a preguntar si das permiso: elegí <strong className="text-text">Permitir</strong>.
+          </li>
+          <li>Dejá abierta una pestaña de Furnímetro. Puede estar minimizada; si la cerrás, no llegan avisos.</li>
+          <li>Tu lista se guarda en este navegador. En otro celular o computadora la tenés que armar de nuevo.</li>
+        </ol>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {permission === "granted" ? (
             <label className="flex items-center gap-2 text-text">
@@ -72,11 +75,11 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
               Mostrar notificaciones del navegador
             </label>
           ) : permission === "unsupported" ? (
-            <span className="text-text-2">Este navegador no soporta notificaciones; los avisos aparecen dentro de la página.</span>
+            <span className="text-text-2">Este navegador no muestra notificaciones: los avisos van a aparecer dentro de la página.</span>
           ) : permission === "denied" ? (
             <span className="text-text-2">
-              Las notificaciones están bloqueadas para este sitio en la configuración del navegador; los avisos aparecen dentro
-              de la página.
+              Bloqueaste las notificaciones de este sitio. Podés habilitarlas tocando el candado junto a la dirección; mientras
+              tanto, los avisos aparecen dentro de la página.
             </span>
           ) : (
             <button
@@ -128,8 +131,7 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
           )}
         </div>
         <p className="text-sm text-muted">
-          Último chequeo: {lastRun ? <TimeAgo iso={new Date(lastRun).toISOString()} /> : "todavía ninguno"}. Funciona mientras
-          haya una pestaña de este sitio abierta (puede estar en segundo plano). La lista se guarda solo en este navegador.
+          Último chequeo: {lastRun ? <TimeAgo iso={new Date(lastRun).toISOString()} /> : "todavía ninguno"}.
         </p>
       </section>
 
@@ -209,22 +211,6 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
         <DetectionsList />
       </section>
 
-      <section className="card space-y-3 p-4">
-        <h2 className="font-display text-xl font-bold text-text">Avisos con la pestaña cerrada (Discord o Telegram)</h2>
-        <p className="text-sm text-text-2">
-          Si publicás tu propia copia del sitio, el servidor puede avisarte por un webhook de Discord o un bot de Telegram
-          cada vez que corre el recolector. Copiá esta lista en la variable <code className="text-text">ALERTS_RULES</code>{" "}
-          de tu proyecto. Los pasos están en el README.
-        </p>
-        <textarea
-          readOnly
-          value={exportJson}
-          rows={3}
-          className="w-full rounded-lg border border-line bg-bg p-2 font-mono text-xs text-text-2"
-          aria-label="Reglas en formato JSON"
-          onFocus={(e) => e.currentTarget.select()}
-        />
-      </section>
     </div>
   );
 }

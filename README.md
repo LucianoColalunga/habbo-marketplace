@@ -132,8 +132,8 @@ sitio abierta (puede estar en segundo plano).
 
 Sirve para recibir avisos con el navegador cerrado, en tu propia copia del sitio:
 
-1. En la página **Alertas**, copiá el JSON de la sección "Avisos con la pestaña cerrada" y guardalo en la variable
-   `ALERTS_RULES`.
+1. Armá tu lista en **Alertas** y después abrí `/es/alertas/servidor` (página sin enlaces desde el sitio, pensada
+   solo para quien lo administra). Tocá **Copiar mi lista** y guardala en la variable `ALERTS_RULES`.
 2. Elegí un canal:
    - **Discord** (el más simple): en tu servidor, *Editar canal → Integraciones → Webhooks → Nuevo webhook*, copiá la
      URL y guardala en `DISCORD_WEBHOOK_URL`.

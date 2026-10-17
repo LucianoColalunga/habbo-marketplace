@@ -68,6 +68,16 @@ test("alertas: detecta en vivo cuando el precio cumple la condición", async ({ 
   await expect(page.getByText(/créditos en \.es/).first()).toBeVisible();
 });
 
+test("alertas: la página pública no muestra la configuración del servidor", async ({ page }) => {
+  await page.goto("/es/alertas");
+  await expect(page.getByRole("heading", { name: "Para que te lleguen los avisos" })).toBeVisible();
+  await expect(page.getByText("ALERTS_RULES")).toHaveCount(0);
+  await page.goto("/es/alertas/servidor");
+  await expect(page.getByRole("heading", { name: "Avisos por Discord o Telegram" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Copiar mi lista" })).toBeDisabled();
+  expect(await page.locator('meta[name="robots"][content*="noindex"]').count()).toBeGreaterThan(0);
+});
+
 test("cambiar de hotel mantiene la sección", async ({ page }) => {
   await page.goto("/es/ofertas");
   await page.getByLabel("Elegir hotel").selectOption("com");
