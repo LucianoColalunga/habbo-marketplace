@@ -14,6 +14,9 @@ export default defineConfig({
   timeout: 60_000,
   fullyParallel: false,
   workers: 1,
+  // Algunas pruebas consultan la API real de Habbo, que limita los pedidos por IP:
+  // un reintento evita falsos negativos por un 429 ocasional.
+  retries: 1,
   reporter: [["list"]],
   use: {
     baseURL: REMOTE ?? `http://localhost:${PORT}`,
