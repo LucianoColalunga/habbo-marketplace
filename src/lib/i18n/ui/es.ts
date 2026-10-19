@@ -51,6 +51,14 @@ export const es = {
   },
   lang: { label: "Idioma", aria: "Elegir idioma" },
   stars: { off: "Apagar estrellas", on: "Encender estrellas" },
+  cookies: {
+    aria: "Aviso de cookies",
+    text: "Usamos cookies y el almacenamiento del navegador solo para que el sitio funcione: tus alertas y tu sesión si creás una cuenta. Si aceptás, también recordamos tu idioma y tus preferencias. No usamos publicidad ni seguimiento.",
+    accept: "Aceptar todas",
+    necessary: "Solo las necesarias",
+    more: "Más información",
+    settings: "Cookies",
+  },
   search: {
     furniLabel: "Buscar furni",
     nftLabel: "Buscar NFT",

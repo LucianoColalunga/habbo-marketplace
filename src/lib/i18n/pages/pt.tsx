@@ -52,6 +52,7 @@ export const pt: Pages = {
     linkAbout: "Quais dados são reais e seus limites",
     linkAlerts: "Alertas de preço",
     linkSource: "Código-fonte",
+    linkPrivacy: "Privacidade e cookies",
   },
   notFound: {
     title: "Não encontramos essa página",
@@ -289,10 +290,51 @@ export const pt: Pages = {
     ),
     privacyTitle: "Privacidade",
     privacy:
-      "Sua lista de alertas e as ofertas detectadas ficam salvas só no seu navegador. O site não usa contas nem cookies de rastreamento (só lembra o idioma que você escolheu). As consultas ao vivo vão do seu navegador direto para a API do Habbo, sem enviar cookies.",
+      "Sua lista de alertas fica salva no seu navegador e, se você criar uma conta, também na conta. Não usamos publicidade nem cookies de rastreamento. As consultas ao vivo vão do seu navegador direto para a API do Habbo, sem enviar cookies. Os detalhes estão em «Privacidade e cookies».",
     legalTitle: "Aviso legal",
     legal:
       "Bomhams Market é um site de fãs, gratuito e sem fins comerciais. Não é oficial e não é afiliado, patrocinado nem aprovado pela Sulake Oy nem pela Azerion. Habbo e os nomes e imagens dos mobis são propriedade da Sulake Oy. Se a Sulake pedir para retirar algum conteúdo, ele será retirado.",
+  },
+  privacy: {
+    metaTitle: "Privacidade e cookies",
+    metaDesc: "O que o Bomhams Market guarda, onde e como apagar. Sem publicidade nem rastreamento.",
+    title: "Privacidade e cookies",
+    intro: "O Bomhams Market não tem publicidade nem rastreamento, não vende dados e não pede seu e-mail. Isto é tudo o que fica salvo e onde.",
+    sections: [
+      {
+        title: "No seu navegador (necessário)",
+        items: [
+          "Sua lista de alertas, as ofertas detectadas e os ajustes. Continuam salvos mesmo se você fechar a aba ou desligar o computador, e são apagados se você apagar os dados deste site no navegador.",
+          "Um registro das consultas ao vivo ao Habbo dos últimos minutos, para não passar do limite do Habbo.",
+          "Sua escolha sobre os cookies.",
+        ],
+      },
+      {
+        title: "Preferências (só se você aceitar)",
+        items: [
+          "O cookie fm_lang, com o idioma que você escolheu, para abrir a página inicial nesse idioma. Dura 1 ano.",
+          "Se você desligar o fundo de estrelas, isso fica lembrado para a próxima visita.",
+        ],
+      },
+      {
+        title: "Se você criar uma conta",
+        items: [
+          "Guardamos seu nome de usuário, sua senha criptografada (ninguém consegue lê-la, nem quem administra o site), sua lista de alertas e a data de criação. Nada mais.",
+          "O cookie de sessão bm_session, necessário para você continuar conectado. Não pode ser lido pela página e dura 30 dias ou até você sair.",
+          "Você pode apagar sua conta e todos os dados quando quiser em «Minha conta».",
+          "Não use a mesma senha do Habbo nem de outro site. Como não pedimos e-mail, se você esquecer a senha ela não pode ser recuperada: será preciso criar outra conta.",
+        ],
+      },
+      {
+        title: "Serviços envolvidos",
+        items: [
+          "A Vercel hospeda o site: como qualquer servidor, recebe seu endereço IP e registra os pedidos por segurança durante pouco tempo.",
+          "A Upstash guarda as contas (banco de dados conectado pela Vercel).",
+          "Seu navegador consulta os preços ao vivo direto no Habbo e na Immutable, sem enviar cookies. As imagens dos mobis vêm dos servidores do Habbo.",
+        ],
+      },
+    ],
+    change: "Para mudar sua escolha sobre os cookies, toque em «Cookies» no rodapé.",
   },
   nft: {
     banner: (marketLink) => (

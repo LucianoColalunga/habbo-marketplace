@@ -49,6 +49,14 @@ export const pt: Ui = {
   },
   lang: { label: "Idioma", aria: "Escolher idioma" },
   stars: { off: "Desligar estrelas", on: "Ligar estrelas" },
+  cookies: {
+    aria: "Aviso de cookies",
+    text: "Usamos cookies e o armazenamento do navegador só para o site funcionar: seus alertas e sua sessão se você criar uma conta. Se você aceitar, também lembramos seu idioma e suas preferências. Não usamos publicidade nem rastreamento.",
+    accept: "Aceitar todos",
+    necessary: "Só os necessários",
+    more: "Mais informações",
+    settings: "Cookies",
+  },
   search: {
     furniLabel: "Buscar mobi",
     nftLabel: "Buscar NFT",

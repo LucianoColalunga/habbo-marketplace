@@ -50,6 +50,7 @@ export const en: Pages = {
     linkAbout: "Which data is real and its limits",
     linkAlerts: "Price alerts",
     linkSource: "Source code",
+    linkPrivacy: "Privacy & cookies",
   },
   notFound: {
     title: "We couldn't find that page",
@@ -283,10 +284,51 @@ export const en: Pages = {
     ),
     privacyTitle: "Privacy",
     privacy:
-      "Your alert list and the deals found are saved only in your browser. The site has no accounts and no tracking cookies (it only remembers the language you picked). Live lookups go from your browser straight to the Habbo API, without sending cookies.",
+      "Your alert list is saved in your browser and, if you create an account, in your account too. No ads and no tracking cookies. Live lookups go from your browser straight to the Habbo API, without sending cookies. Details in «Privacy & cookies».",
     legalTitle: "Legal notice",
     legal:
       "Bomhams Market is a free, non-commercial fan site. It is not official and is not affiliated with, sponsored or endorsed by Sulake Oy or Azerion. Habbo and the furni names and images are property of Sulake Oy. If Sulake asks for any content to be removed, it will be removed.",
+  },
+  privacy: {
+    metaTitle: "Privacy & cookies",
+    metaDesc: "What Bomhams Market stores, where, and how to delete it. No ads, no tracking.",
+    title: "Privacy & cookies",
+    intro: "Bomhams Market has no ads or tracking, doesn't sell data and doesn't ask for your email. This is everything that gets stored and where.",
+    sections: [
+      {
+        title: "In your browser (necessary)",
+        items: [
+          "Your alert list, the deals found and their settings. They stay saved even if you close the tab or turn off your computer, and they're deleted if you clear this site's data in your browser.",
+          "A log of the last few minutes of live lookups to Habbo, so we stay under Habbo's limit.",
+          "Your cookie choice.",
+        ],
+      },
+      {
+        title: "Preferences (only if you accept)",
+        items: [
+          "The fm_lang cookie, with the language you picked, so the home page opens in that language. It lasts 1 year.",
+          "If you turn off the star background, it's remembered for your next visit.",
+        ],
+      },
+      {
+        title: "If you create an account",
+        items: [
+          "We store your username, your encrypted password (nobody can read it, not even the site admin), your alert list and the creation date. Nothing else.",
+          "The bm_session session cookie, needed to keep you signed in. The page can't read it, and it lasts 30 days or until you sign out.",
+          "You can delete your account and all its data at any time from «My account».",
+          "Don't reuse your Habbo password or any other site's password. Since we don't ask for an email, a forgotten password can't be recovered: you'll need to create a new account.",
+        ],
+      },
+      {
+        title: "Services involved",
+        items: [
+          "Vercel hosts the site: like any server, it receives your IP address and logs requests for security for a short time.",
+          "Upstash stores the accounts (a database connected through Vercel).",
+          "Your browser checks live prices directly with Habbo and Immutable, without sending them cookies. Furni images come from Habbo's servers.",
+        ],
+      },
+    ],
+    change: "To change your cookie choice, tap «Cookies» in the footer.",
   },
   nft: {
     banner: (marketLink) => (

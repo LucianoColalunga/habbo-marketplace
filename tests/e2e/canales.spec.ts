@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Necesita un build con NEXT_PUBLIC_DISCORD_URL, NEXT_PUBLIC_TELEGRAM_URL y NEXT_PUBLIC_WHATSAPP_URL.
 test.skip(!process.env.E2E_CANALES, "Solo con un build que tenga los enlaces de los canales configurados");

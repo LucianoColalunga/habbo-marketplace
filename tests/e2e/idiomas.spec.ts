@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 /** Junta errores de la consola (hidratación, política de contenido) mientras dura la prueba. */
 function watchConsole(page: Page) {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n/server";
+import { CookieSettingsButton } from "./CookieBanner";
 import { StarsToggle } from "./StarsToggle";
 
 export async function SiteFooter({ hotel }: { hotel: string }) {
@@ -28,6 +29,12 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
             </a>
           </li>
           <li>
+            <Link prefetch={false} className="hover:text-text" href={href(`/${hotel}/privacidad`)}>
+              {p.footer.linkPrivacy}
+            </Link>
+          </li>
+          <li className="flex flex-wrap gap-x-4 md:justify-end">
+            <CookieSettingsButton />
             <StarsToggle />
           </li>
         </ul>

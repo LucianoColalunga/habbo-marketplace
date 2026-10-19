@@ -49,6 +49,14 @@ export const en: Ui = {
   },
   lang: { label: "Language", aria: "Choose language" },
   stars: { off: "Turn stars off", on: "Turn stars on" },
+  cookies: {
+    aria: "Cookie notice",
+    text: "We use cookies and browser storage only to make the site work: your alerts and your session if you create an account. If you accept, we also remember your language and preferences. No ads, no tracking.",
+    accept: "Accept all",
+    necessary: "Necessary only",
+    more: "Learn more",
+    settings: "Cookies",
+  },
   search: {
     furniLabel: "Search furni",
     nftLabel: "Search NFTs",

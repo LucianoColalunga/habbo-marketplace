@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("la raíz lleva al hotel por defecto y muestra rankings con datos", async ({ page }) => {
   await page.goto("/");

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { canRememberPrefs } from "@/lib/consent";
 import { useI18n } from "@/lib/i18n/client";
 import { LANG_COOKIE, LANG_INFO, LANGS, localePath, splitLocale, type Lang } from "@/lib/i18n/config";
 
-/** Recuerda el idioma elegido para la próxima vez que se entre por la portada. */
+/** Recuerda el idioma elegido para la próxima vez que se entre por la portada (solo con permiso). */
 function remember(lang: Lang) {
+  if (!canRememberPrefs()) return;
   const secure = location.protocol === "https:" ? "; secure" : "";
   document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax${secure}`;
 }

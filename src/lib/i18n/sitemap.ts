@@ -40,6 +40,7 @@ export function sitemapPages({ hotels, furni, nft, categories = {} }: SitemapInp
     pages.push({ path: `/${h}/ofertas`, lastModified: at, changeFrequency: "daily", priority: 0.8 });
     pages.push({ path: `/${h}/alertas`, changeFrequency: "monthly", priority: 0.4 });
     pages.push({ path: `/${h}/acerca`, changeFrequency: "monthly", priority: 0.3 });
+    pages.push({ path: `/${h}/privacidad`, changeFrequency: "monthly", priority: 0.2 });
     const cats = categories[h] ?? [];
     if (cats.length > 0) pages.push({ path: `/${h}/categorias`, lastModified: at, changeFrequency: "daily", priority: 0.7 });
     for (const c of cats) {

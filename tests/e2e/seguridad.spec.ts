@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("las respuestas traen los encabezados de seguridad", async ({ request }) => {
   for (const path of ["/es", "/es/furni/throne", "/api/search?hotel=es&q=trono"]) {

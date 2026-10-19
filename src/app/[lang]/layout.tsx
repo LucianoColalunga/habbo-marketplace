@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { notFound } from "next/navigation";
 import { lang as rootLang } from "next/root-params";
 import { AlertWatcher } from "@/components/alerts/AlertWatcher";
+import { CookieBanner } from "@/components/CookieBanner";
 import { Starfield } from "@/components/Starfield";
 import { LangProvider } from "@/lib/i18n/client";
 import { isLang, LANG_INFO, LANGS, localePath, type Lang } from "@/lib/i18n/config";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
         <LangProvider lang={lang}>
           {children}
           <AlertWatcher />
+          <CookieBanner />
         </LangProvider>
       </body>
     </html>

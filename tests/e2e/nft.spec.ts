@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("las dos secciones están separadas y se puede ir y volver", async ({ page }) => {
   await page.goto("/es");

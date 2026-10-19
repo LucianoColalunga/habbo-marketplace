@@ -56,6 +56,7 @@ export const es = {
     linkAbout: "Qué datos son reales y sus límites",
     linkAlerts: "Alertas de precio",
     linkSource: "Código fuente",
+    linkPrivacy: "Privacidad y cookies",
   },
   notFound: {
     title: "No encontramos esa página",
@@ -298,10 +299,52 @@ export const es = {
     ),
     privacyTitle: "Privacidad",
     privacy:
-      "Tu lista de alertas y las ofertas detectadas se guardan solo en tu navegador. El sitio no usa cuentas ni cookies de seguimiento (solo recuerda el idioma que elegiste). Las consultas en vivo van desde tu navegador directo a la API de Habbo, sin enviar cookies.",
+      "Tu lista de alertas se guarda en tu navegador y, si creás una cuenta, también en tu cuenta. No usamos publicidad ni cookies de seguimiento. Las consultas en vivo van desde tu navegador directo a la API de Habbo, sin enviar cookies. El detalle está en «Privacidad y cookies».",
     legalTitle: "Aviso legal",
     legal:
       "Bomhams Market es un sitio de fans, gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por Sulake Oy ni por Azerion. Habbo y los nombres e imágenes de los furnis son propiedad de Sulake Oy. Si Sulake pide retirar algún contenido, se retira.",
+  },
+  privacy: {
+    metaTitle: "Privacidad y cookies",
+    metaDesc: "Qué guarda Bomhams Market, dónde y cómo borrarlo. Sin publicidad ni seguimiento.",
+    title: "Privacidad y cookies",
+    intro:
+      "Bomhams Market no tiene publicidad ni seguimiento, no vende datos y no pide tu email. Esto es todo lo que se guarda y dónde.",
+    sections: [
+      {
+        title: "En tu navegador (necesario)",
+        items: [
+          "Tu lista de alertas, las ofertas detectadas y sus ajustes. Quedan guardados aunque cierres la pestaña o apagues la computadora, y se borran si borrás los datos de este sitio en tu navegador.",
+          "Un registro de las consultas en vivo a Habbo de los últimos minutos, para no pasar el límite que pone Habbo.",
+          "Tu elección sobre las cookies.",
+        ],
+      },
+      {
+        title: "Preferencias (solo si aceptás)",
+        items: [
+          "La cookie fm_lang, con el idioma que elegiste, para abrir la portada en ese idioma. Dura 1 año.",
+          "Si apagás el fondo de estrellas, se recuerda para la próxima visita.",
+        ],
+      },
+      {
+        title: "Si creás una cuenta",
+        items: [
+          "Guardamos tu nombre de usuario, tu contraseña cifrada (nadie puede leerla, ni siquiera quien administra el sitio), tu lista de alertas y la fecha de creación. Nada más.",
+          "La cookie de sesión bm_session, necesaria para que sigas conectado. No se puede leer desde la página y dura 30 días o hasta que cierres sesión.",
+          "Podés borrar tu cuenta y todos sus datos cuando quieras desde «Mi cuenta».",
+          "No uses la misma contraseña que en Habbo ni en otro sitio. Como no pedimos email, si te olvidás la contraseña no se puede recuperar: vas a tener que crear otra cuenta.",
+        ],
+      },
+      {
+        title: "Servicios que intervienen",
+        items: [
+          "Vercel aloja el sitio: como cualquier servidor, recibe tu dirección IP y registra los pedidos por seguridad durante poco tiempo.",
+          "Upstash guarda las cuentas (base de datos conectada a través de Vercel).",
+          "Tu navegador consulta los precios en vivo directo a Habbo e Immutable, sin enviarles cookies. Las imágenes de los furnis vienen de los servidores de Habbo.",
+        ],
+      },
+    ],
+    change: "Para cambiar tu elección sobre las cookies, tocá «Cookies» en el pie de página.",
   },
   nft: {
     banner: (marketLink: ReactNode) => (

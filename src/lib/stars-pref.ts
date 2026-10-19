@@ -1,10 +1,17 @@
 "use client";
 
-/** Preferencia "estrellas sí / no", guardada en este navegador. */
+import { canRememberPrefs } from "./consent";
+
+/**
+ * Preferencia "estrellas sí / no". Se guarda en el navegador solo si la persona
+ * aceptó las cookies de preferencias; si no, vale hasta que recargue la página.
+ */
 const KEY = "fm:stars";
 const EVENT = "fm:stars-changed";
+let sessionValue: boolean | null = null;
 
 export function starsEnabled(): boolean {
+  if (sessionValue !== null) return sessionValue;
   try {
     return localStorage.getItem(KEY) !== "off";
   } catch {
@@ -13,8 +20,9 @@ export function starsEnabled(): boolean {
 }
 
 export function setStarsEnabled(on: boolean) {
+  sessionValue = on;
   try {
-    if (on) localStorage.removeItem(KEY);
+    if (on || !canRememberPrefs()) localStorage.removeItem(KEY);
     else localStorage.setItem(KEY, "off");
   } catch {
     // sin almacenamiento: vale solo para esta visita

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 /** Píxeles encendidos del cielo de estrellas en un círculo alrededor de (x, y); sin radio, toda la pantalla. */
 async function litPixels(page: Page, x = 0, y = 0, radius = 0): Promise<number> {

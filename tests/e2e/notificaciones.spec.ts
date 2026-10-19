@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // El Chromium headless "liviano" siempre informa las notificaciones como bloqueadas;
 // el Chromium completo en modo headless sí las permite.

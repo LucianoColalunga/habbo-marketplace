@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("robots.txt y sitemap con las páginas en los tres idiomas", async ({ request }) => {
   const robots = await request.get("/robots.txt");
