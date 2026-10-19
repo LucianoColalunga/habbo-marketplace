@@ -3,13 +3,14 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { TimeAgo } from "@/components/Freshness";
 import { homeHotel } from "@/lib/i18n/config";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { NFT_COLLECTIONS } from "@/lib/nft/collections";
 import { getNftMeta } from "@/lib/nft/views";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.nft.about.metaTitle };
+  const { lang, p } = await getI18n();
+  return pageMeta({ lang, p, section: "nft", path: "/nft/acerca", title: p.nft.about.metaTitle, description: p.seo.nftAboutDesc });
 }
 
 function Block({ title, children }: { title: string; children: ReactNode }) {

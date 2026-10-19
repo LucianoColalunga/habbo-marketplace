@@ -12,6 +12,32 @@ export const es = {
     nftDescription:
       "Precios piso, ventas y tendencias de los coleccionables NFT oficiales de Habbo en la blockchain Immutable. Sección separada del Marketplace de créditos.",
   },
+  /** Títulos y descripciones para buscadores y para la vista previa al compartir. */
+  seo: {
+    ogAltMarket: "Furnímetro: precios del Marketplace de Habbo",
+    ogAltNft: "Furnímetro: precios de los NFT oficiales de Habbo",
+    home: (label: string) => `Precios del Marketplace de Habbo ${label}`,
+    homeDesc: (label: string, region: string) =>
+      `Precio mínimo, ofertas abiertas, promedios e historial de los furnis del Marketplace de Habbo ${label} (${region}). Rankings y ofertas detectadas cada día.`,
+    rankings: (kind: string, label: string) => `${kind} del Marketplace de Habbo ${label}`,
+    rankingsDesc: (hint: string, label: string) =>
+      `${hint} Ranking de furnis del Marketplace de Habbo ${label}, actualizado con cada escaneo.`,
+    deals: (label: string) => `Ofertas de furnis en Habbo ${label}`,
+    dealsDesc: (label: string) =>
+      `Furnis publicados muy por debajo de lo que se suele pagar en el Marketplace de Habbo ${label}, con verificación en vivo.`,
+    alerts: (label: string) => `Alertas de precio de furnis en Habbo ${label}`,
+    alertsDesc: "Elegí furnis y recibí un aviso cuando alguien los publique barato en el Marketplace de Habbo. Gratis y sin cuenta.",
+    about: (label: string) => `Datos y límites del Marketplace de Habbo ${label}`,
+    aboutDesc: "De dónde salen los precios (API pública de Habbo), qué tan actuales son y qué límites tienen.",
+    furni: (name: string, label: string) => `${name}: precio en Habbo ${label}`,
+    nftHome: "Precios de los NFT oficiales de Habbo",
+    nftCollection: (name: string) => `${name}: precios y ventas`,
+    nftCollectionDesc: (name: string) =>
+      `Precio piso, ventas de la semana y rankings de ${name} de Habbo en la blockchain Immutable, en dólares.`,
+    nftRanking: (kind: string) => `NFT de Habbo: ${kind}`,
+    nftRankingDesc: (hint: string) => `${hint} NFT oficiales de Habbo en la blockchain Immutable.`,
+    nftAboutDesc: "De dónde salen los precios de los NFT de Habbo (API pública de Immutable), qué tan actuales son y qué límites tienen.",
+  },
   header: { homeAria: "Furnímetro, inicio", nftHomeAria: "Furnímetro NFT, inicio" },
   footer: {
     about: (

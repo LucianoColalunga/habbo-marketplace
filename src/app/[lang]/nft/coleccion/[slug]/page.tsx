@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { NftRankingView } from "@/components/nft/NftRankingView";
 import { PageSkeleton } from "@/components/Skeletons";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { collectionBySlug, isNftCollectionSlug, NFT_COLLECTIONS } from "@/lib/nft/collections";
 
@@ -11,8 +12,17 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/nft/coleccion/[slug]">): Promise<Metadata> {
-  const [{ slug }, { p }] = await Promise.all([params, getI18n()]);
-  return { title: isNftCollectionSlug(slug) ? p.nft.collections[slug] : p.nft.rankings.collectionMeta };
+  const [{ slug }, { lang, p }] = await Promise.all([params, getI18n()]);
+  if (!isNftCollectionSlug(slug)) return { title: p.nft.rankings.collectionMeta };
+  const name = p.nft.collections[slug];
+  return pageMeta({
+    lang,
+    p,
+    section: "nft",
+    path: `/nft/coleccion/${slug}`,
+    title: p.seo.nftCollection(name),
+    description: p.seo.nftCollectionDesc(name),
+  });
 }
 
 async function Content({ params }: Pick<PageProps<"/[lang]/nft/coleccion/[slug]">, "params">) {

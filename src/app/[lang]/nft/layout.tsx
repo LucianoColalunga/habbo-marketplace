@@ -7,13 +7,15 @@ import { SearchBox } from "@/components/SearchBox";
 import { SectionSwitch } from "@/components/SectionSwitch";
 import { StarsToggle } from "@/components/StarsToggle";
 import { homeHotel } from "@/lib/i18n/config";
+import { ogImage } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
+  const { lang, p } = await getI18n();
   return {
     title: { default: p.meta.nftTitle, template: p.meta.nftTemplate },
     description: p.meta.nftDescription,
+    openGraph: { images: [ogImage(lang, "nft", p)] },
   };
 }
 

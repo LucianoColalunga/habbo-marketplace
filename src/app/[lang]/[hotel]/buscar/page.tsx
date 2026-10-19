@@ -7,11 +7,13 @@ import { SearchBox } from "@/components/SearchBox";
 import { Credits } from "@/components/ui";
 import { searchFurni } from "@/lib/data/views";
 import { isEnabledHotel, type HotelCode } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.search.metaTitle };
+export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]/buscar">): Promise<Metadata> {
+  const [{ hotel }, { lang, p }] = await Promise.all([params, getI18n()]);
+  // Los resultados de una búsqueda interna no se indexan (sí se siguen sus enlaces).
+  return pageMeta({ lang, p, path: `/${hotel}/buscar`, title: p.search.metaTitle, description: p.meta.description, noindex: true });
 }
 
 export default function BuscarPage({ params, searchParams }: PageProps<"/[lang]/[hotel]/buscar">) {

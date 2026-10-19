@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { NftImage } from "@/components/nft/NftImage";
 import { NftLive } from "@/components/nft/NftLive";
 import { PageSkeleton } from "@/components/Skeletons";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { collectionBySlug } from "@/lib/nft/collections";
 import { getNftItem } from "@/lib/nft/views";
@@ -17,10 +18,12 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/nft/item/[id]">): Promise<Metadata> {
-  const [{ id }, { p }] = await Promise.all([params, getI18n()]);
-  if (!SAFE_ID.test(id)) return { title: p.nft.item.notFoundTitle };
+  const [{ id }, { lang, p }] = await Promise.all([params, getI18n()]);
+  const missing: Metadata = { title: p.nft.item.notFoundTitle, robots: { index: false } };
+  if (!SAFE_ID.test(id)) return missing;
   const { row } = await getNftItem(id);
-  return row ? { title: row.n, description: p.nft.item.metaDesc(row.n) } : { title: p.nft.item.notFoundTitle };
+  if (!row) return missing;
+  return pageMeta({ lang, p, section: "nft", path: `/nft/item/${row.id}`, title: row.n, description: p.nft.item.metaDesc(row.n) });
 }
 
 async function Content({ params }: Pick<PageProps<"/[lang]/nft/item/[id]">, "params">) {

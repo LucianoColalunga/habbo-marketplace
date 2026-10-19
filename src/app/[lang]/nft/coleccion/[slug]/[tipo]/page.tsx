@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { NftRankingView } from "@/components/nft/NftRankingView";
 import { PageSkeleton } from "@/components/Skeletons";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { collectionBySlug, isNftCollectionSlug, NFT_COLLECTIONS } from "@/lib/nft/collections";
 import { isNftRankingKind, NFT_RANKINGS } from "@/lib/nft/rankings";
@@ -12,9 +13,19 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/nft/coleccion/[slug]/[tipo]">): Promise<Metadata> {
-  const [{ slug, tipo }, { p }] = await Promise.all([params, getI18n()]);
+  const [{ slug, tipo }, { lang, p }] = await Promise.all([params, getI18n()]);
   if (!isNftCollectionSlug(slug) || !isNftRankingKind(tipo)) return { title: p.nft.rankings.collectionMeta };
-  return { title: `${p.nft.collections[slug]}: ${p.nft.rankings.kinds[tipo].title}` };
+  const name = p.nft.collections[slug];
+  const kind = p.nft.rankings.kinds[tipo];
+  return pageMeta({
+    lang,
+    p,
+    section: "nft",
+    // "Más vendidos" es lo mismo que la portada de la colección.
+    path: tipo === "vendidos" ? `/nft/coleccion/${slug}` : `/nft/coleccion/${slug}/${tipo}`,
+    title: `${name}: ${kind.title}`,
+    description: `${kind.hint} ${p.seo.nftCollectionDesc(name)}`,
+  });
 }
 
 async function Content({ params }: Pick<PageProps<"/[lang]/nft/coleccion/[slug]/[tipo]">, "params">) {

@@ -160,3 +160,18 @@ export async function searchNft(query: string, limit = 24): Promise<NftRow[]> {
   scored.sort((a, b) => b.score - a.score || b.r.s7 - a.r.s7 || a.r.n.localeCompare(b.r.n));
   return scored.slice(0, limit).map((x) => x.r);
 }
+
+/** NFT con más ventas en 30 días (para el sitemap). */
+export async function getTopNftIds(limit: number): Promise<{ ids: string[]; generatedAt: string | null }> {
+  "use cache";
+  cacheLife("market");
+  cacheTag("nft");
+  const s = await loadSummary();
+  if (!s) return { ids: [], generatedAt: null };
+  const ids = Object.values(s.stacks)
+    .filter((r) => r.s30 > 0)
+    .sort((a, b) => b.s30 - a.s30 || b.v7 - a.v7)
+    .slice(0, limit)
+    .map((r) => r.id);
+  return { ids, generatedAt: s.generatedAt };
+}

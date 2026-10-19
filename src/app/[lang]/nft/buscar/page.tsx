@@ -3,12 +3,21 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { NftImage } from "@/components/nft/NftImage";
 import { SearchBox } from "@/components/SearchBox";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { searchNft } from "@/lib/nft/views";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.search.nftMetaTitle };
+  const { lang, p } = await getI18n();
+  return pageMeta({
+    lang,
+    p,
+    section: "nft",
+    path: "/nft/buscar",
+    title: p.search.nftMetaTitle,
+    description: p.meta.nftDescription,
+    noindex: true,
+  });
 }
 
 async function Results({ searchParams }: { searchParams: PageProps<"/[lang]/nft/buscar">["searchParams"] }) {

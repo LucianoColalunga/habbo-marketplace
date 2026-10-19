@@ -11,6 +11,30 @@ export const pt: Pages = {
     nftDescription:
       "Preço mínimo, vendas e tendências dos colecionáveis NFT oficiais do Habbo na blockchain Immutable. Seção separada do Marketplace de créditos.",
   },
+  seo: {
+    ogAltMarket: "Furnímetro: preços do Marketplace do Habbo",
+    ogAltNft: "Furnímetro: preços dos NFT oficiais do Habbo",
+    home: (label) => `Preços do Marketplace do Habbo ${label}`,
+    homeDesc: (label, region) =>
+      `Menor preço, ofertas abertas, médias e histórico dos mobis do Marketplace do Habbo ${label} (${region}). Rankings e ofertas detectadas todos os dias.`,
+    rankings: (kind, label) => `${kind} do Marketplace do Habbo ${label}`,
+    rankingsDesc: (hint, label) => `${hint} Ranking de mobis do Marketplace do Habbo ${label}, atualizado a cada varredura.`,
+    deals: (label) => `Ofertas de mobis no Habbo ${label}`,
+    dealsDesc: (label) =>
+      `Mobis anunciados bem abaixo do que costuma ser pago no Marketplace do Habbo ${label}, com verificação ao vivo.`,
+    alerts: (label) => `Alertas de preço de mobis no Habbo ${label}`,
+    alertsDesc: "Escolha mobis e receba um aviso quando alguém anunciar barato no Marketplace do Habbo. Grátis e sem conta.",
+    about: (label) => `Dados e limites do Marketplace do Habbo ${label}`,
+    aboutDesc: "De onde vêm os preços (API pública do Habbo), quão atuais são e quais limites têm.",
+    furni: (name, label) => `${name}: preço no Habbo ${label}`,
+    nftHome: "Preços dos NFT oficiais do Habbo",
+    nftCollection: (name) => `${name}: preços e vendas`,
+    nftCollectionDesc: (name) =>
+      `Preço mínimo, vendas da semana e rankings de ${name} do Habbo na blockchain Immutable, em dólares.`,
+    nftRanking: (kind) => `NFT do Habbo: ${kind}`,
+    nftRankingDesc: (hint) => `${hint} NFT oficiais do Habbo na blockchain Immutable.`,
+    nftAboutDesc: "De onde vêm os preços dos NFT do Habbo (API pública da Immutable), quão atuais são e quais limites têm.",
+  },
   header: { homeAria: "Furnímetro, início", nftHomeAria: "Furnímetro NFT, início" },
   footer: {
     about: (

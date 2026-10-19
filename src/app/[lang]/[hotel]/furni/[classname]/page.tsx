@@ -8,6 +8,7 @@ import { WatchButton } from "@/components/alerts/WatchButton";
 import { Notice } from "@/components/ui";
 import { getItemBase, getItemHistory, getMarketMeta } from "@/lib/data/views";
 import { enabledHotels, HOTELS, isEnabledHotel, type HotelCode } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 
 export function generateStaticParams() {
@@ -26,12 +27,16 @@ function decodeKey(raw: string): string {
 export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]/furni/[classname]">): Promise<Metadata> {
   const { hotel, classname } = await params;
   if (!isEnabledHotel(hotel)) return {};
-  const [base, { p }] = await Promise.all([getItemBase(hotel, decodeKey(classname)), getI18n()]);
-  if (!base.item) return { title: p.item.notFoundTitle };
-  return {
-    title: `${base.item.n} (${HOTELS[hotel].label})`,
-    description: p.item.metaDesc(base.item.n, HOTELS[hotel].label),
-  };
+  const [base, { lang, p }] = await Promise.all([getItemBase(hotel, decodeKey(classname)), getI18n()]);
+  if (!base.item) return { title: p.item.notFoundTitle, robots: { index: false } };
+  const label = HOTELS[hotel].label;
+  return pageMeta({
+    lang,
+    p,
+    path: `/${hotel}/furni/${encodeURIComponent(base.item.k)}`,
+    title: p.seo.furni(base.item.n, label),
+    description: p.item.metaDesc(base.item.n, label),
+  });
 }
 
 export default function FurniPage({ params }: PageProps<"/[lang]/[hotel]/furni/[classname]">) {

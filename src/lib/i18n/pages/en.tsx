@@ -11,6 +11,28 @@ export const en: Pages = {
     nftDescription:
       "Floor prices, sales and trends of Habbo's official NFT collectibles on the Immutable blockchain. A section separate from the credits Marketplace.",
   },
+  seo: {
+    ogAltMarket: "Furnímetro: Habbo Marketplace prices",
+    ogAltNft: "Furnímetro: prices of Habbo's official NFTs",
+    home: (label) => `Habbo ${label} Marketplace prices`,
+    homeDesc: (label, region) =>
+      `Lowest price, open offers, averages and history for every furni on the Habbo ${label} Marketplace (${region}). Daily rankings and deals.`,
+    rankings: (kind, label) => `${kind} on the Habbo ${label} Marketplace`,
+    rankingsDesc: (hint, label) => `${hint} Furni ranking for the Habbo ${label} Marketplace, updated with every scan.`,
+    deals: (label) => `Furni deals on Habbo ${label}`,
+    dealsDesc: (label) => `Furni listed well below what people usually pay on the Habbo ${label} Marketplace, with live checks.`,
+    alerts: (label) => `Furni price alerts for Habbo ${label}`,
+    alertsDesc: "Pick furni and get notified when someone lists them cheap on the Habbo Marketplace. Free, no account needed.",
+    about: (label) => `Habbo ${label} Marketplace data and limits`,
+    aboutDesc: "Where the prices come from (Habbo's public API), how fresh they are and what their limits are.",
+    furni: (name, label) => `${name}: price on Habbo ${label}`,
+    nftHome: "Prices of Habbo's official NFTs",
+    nftCollection: (name) => `${name}: prices and sales`,
+    nftCollectionDesc: (name) => `Floor price, weekly sales and rankings of Habbo ${name} on the Immutable blockchain, in dollars.`,
+    nftRanking: (kind) => `Habbo NFTs: ${kind}`,
+    nftRankingDesc: (hint) => `${hint} Habbo's official NFTs on the Immutable blockchain.`,
+    nftAboutDesc: "Where Habbo NFT prices come from (Immutable's public API), how fresh they are and what their limits are.",
+  },
   header: { homeAria: "Furnímetro, home", nftHomeAria: "Furnímetro NFT, home" },
   footer: {
     about: (

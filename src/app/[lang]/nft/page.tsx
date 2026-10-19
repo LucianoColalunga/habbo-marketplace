@@ -1,11 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { TimeAgo } from "@/components/Freshness";
 import { NftImage } from "@/components/nft/NftImage";
 import { NftMiniList } from "@/components/nft/NftList";
 import { SearchBox } from "@/components/SearchBox";
 import { Notice, SectionTitle, StatTile } from "@/components/ui";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { getNftHome } from "@/lib/nft/views";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { lang, p } = await getI18n();
+  return pageMeta({ lang, p, section: "nft", path: "/nft", title: p.seo.nftHome, description: p.meta.nftDescription });
+}
 
 export default async function NftHome() {
   const [view, { p, f, href }] = await Promise.all([getNftHome(), getI18n()]);

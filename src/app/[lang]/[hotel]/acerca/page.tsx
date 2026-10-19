@@ -5,11 +5,19 @@ import { TimeAgo } from "@/components/Freshness";
 import { PageSkeleton } from "@/components/Skeletons";
 import { getMarketMeta } from "@/lib/data/views";
 import { HOTELS, isEnabledHotel } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.about.metaTitle };
+export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]/acerca">): Promise<Metadata> {
+  const [{ hotel }, { lang, p }] = await Promise.all([params, getI18n()]);
+  if (!isEnabledHotel(hotel)) return { title: p.about.metaTitle };
+  return pageMeta({
+    lang,
+    p,
+    path: `/${hotel}/acerca`,
+    title: p.seo.about(HOTELS[hotel].label),
+    description: p.seo.aboutDesc,
+  });
 }
 
 function Block({ title, children }: { title: string; children: ReactNode }) {

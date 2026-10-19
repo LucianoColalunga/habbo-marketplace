@@ -10,12 +10,15 @@ import { PageSkeleton } from "@/components/Skeletons";
 import { Notice } from "@/components/ui";
 import { getDealsView, getMarketMeta } from "@/lib/data/views";
 import { HOTELS, isEnabledHotel } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 import { DEFAULT_DEAL_OPTIONS } from "@/lib/market/deals";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.deals.metaTitle };
+export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]/ofertas">): Promise<Metadata> {
+  const [{ hotel }, { lang, p }] = await Promise.all([params, getI18n()]);
+  if (!isEnabledHotel(hotel)) return { title: p.deals.metaTitle };
+  const label = HOTELS[hotel].label;
+  return pageMeta({ lang, p, path: `/${hotel}/ofertas`, title: p.seo.deals(label), description: p.seo.dealsDesc(label) });
 }
 
 async function OfertasPageContent({ params }: Pick<PageProps<"/[lang]/[hotel]/ofertas">, "params">) {

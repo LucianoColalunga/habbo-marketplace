@@ -4,6 +4,7 @@ import type { HotelCode } from "@/lib/hotels";
 import type { DayPoint, SnapPoint } from "@/lib/market/history";
 import type { ItemSummary } from "@/lib/market/stats";
 import type { MarketSummary, ScanReport } from "@/lib/market/summary";
+import { isSafeClassname } from "@/lib/habbo/api";
 import { rankMatches } from "@/lib/search";
 import { buildDeals, buildRanking, totals, toRow, type FurniRow, type MarketTotals, type RankingKind } from "./rankings";
 import { loadCatalog, loadHistory, loadSummary, type CatalogIndex } from "./store";
@@ -142,4 +143,19 @@ export async function getItemHistory(hotel: HotelCode, k: string): Promise<ItemH
   cacheTag(`market:${hotel}`);
   const history = await loadHistory(hotel);
   return { days: history?.days[k] ?? [], snaps: history?.snaps[k] ?? [], updatedAt: history?.updatedAt ?? null };
+}
+
+/** Furnis con más ventas en 30 días (para el sitemap): solo los más buscados, no los 13.700. */
+export async function getTopFurniKeys(hotel: HotelCode, limit: number): Promise<{ keys: string[]; generatedAt: string | null }> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const summary = await loadSummary(hotel);
+  if (!summary) return { keys: [], generatedAt: null };
+  const keys = Object.entries(summary.items)
+    .filter(([k, s]) => s.s30 > 0 && isSafeClassname(k))
+    .sort((a, b) => b[1].s30 - a[1].s30 || b[1].s7 - a[1].s7)
+    .slice(0, limit)
+    .map(([k]) => k);
+  return { keys, generatedAt: summary.generatedAt };
 }

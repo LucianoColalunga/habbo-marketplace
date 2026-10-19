@@ -15,7 +15,8 @@
     "collect": "tsx --env-file-if-exists=.env.local scripts/collect.ts",
     "alerts": "tsx --env-file-if-exists=.env.local scripts/alerts.ts",
     "push-data": "tsx --env-file-if-exists=.env.vercel scripts/push-data.ts",
-    "collect:nft": "tsx --env-file-if-exists=.env.local scripts/collect-nft.ts"
+    "collect:nft": "tsx --env-file-if-exists=.env.local scripts/collect-nft.ts",
+    "og-images": "node scripts/og-images.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.8.2",

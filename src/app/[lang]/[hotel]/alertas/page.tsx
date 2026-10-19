@@ -5,12 +5,20 @@ import { AlertsManager } from "@/components/alerts/AlertsManager";
 import { JoinChannels } from "@/components/JoinChannels";
 import { PageSkeleton } from "@/components/Skeletons";
 import { Notice } from "@/components/ui";
-import { enabledHotels, isEnabledHotel } from "@/lib/hotels";
+import { enabledHotels, HOTELS, isEnabledHotel } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await getI18n();
-  return { title: p.alerts.metaTitle };
+export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]/alertas">): Promise<Metadata> {
+  const [{ hotel }, { lang, p }] = await Promise.all([params, getI18n()]);
+  if (!isEnabledHotel(hotel)) return { title: p.alerts.metaTitle };
+  return pageMeta({
+    lang,
+    p,
+    path: `/${hotel}/alertas`,
+    title: p.seo.alerts(HOTELS[hotel].label),
+    description: p.seo.alertsDesc,
+  });
 }
 
 async function AlertasPageContent({ params }: Pick<PageProps<"/[lang]/[hotel]/alertas">, "params">) {

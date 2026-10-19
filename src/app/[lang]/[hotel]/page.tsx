@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -9,7 +10,15 @@ import { PageSkeleton } from "@/components/Skeletons";
 import { CoinGlyph, Notice, SectionTitle, StatTile } from "@/components/ui";
 import { getHomeView } from "@/lib/data/views";
 import { HOTELS, isEnabledHotel } from "@/lib/hotels";
+import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
+
+export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]">): Promise<Metadata> {
+  const [{ hotel }, { lang, p, t }] = await Promise.all([params, getI18n()]);
+  if (!isEnabledHotel(hotel)) return {};
+  const label = HOTELS[hotel].label;
+  return pageMeta({ lang, p, path: `/${hotel}`, title: p.seo.home(label), description: p.seo.homeDesc(label, t.hotel.regions[hotel]) });
+}
 
 async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "params">) {
   const { hotel } = await params;
