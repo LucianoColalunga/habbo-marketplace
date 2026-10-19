@@ -123,7 +123,7 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
           {permission === "granted" && settings.notifications && (
             <button
               type="button"
-              onClick={() => void showNotification("Furnímetro", t.testBody, href(`/${hotel}/alertas`))}
+              onClick={() => void showNotification("Bomhams Market", t.testBody, href(`/${hotel}/alertas`))}
               className="text-text-2 underline hover:text-text"
             >
               {t.test}

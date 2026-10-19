@@ -8,7 +8,7 @@ export function NftImage({ src, size = 40, alt = "" }: { src: string; size?: num
   const ok = src.startsWith("https://nft-tokens.habbo.com/") && !failed;
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-2 ring-1 ring-[#a78bfa]/25"
+      className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-2 ring-1 ring-[#f5b942]/25"
       style={{ width: size, height: size }}
     >
       {ok ? (

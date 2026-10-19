@@ -171,7 +171,7 @@ ${itemUrl(base, hotel, d.k)}` : ""),
   }
 
   if (lines.length > 0) {
-    const text = `Furnímetro — ${lines.length} aviso(s)\n${lines.join("\n")}`;
+    const text = `Bomhams Market — ${lines.length} aviso(s)\n${lines.join("\n")}`;
     for (const channel of channels) {
       try {
         await channel.send(text);
@@ -242,7 +242,7 @@ export async function sendTestMessage(
   }
   const base = siteUrl(env);
   const text =
-    "✅ Furnímetro quedó conectado a este canal. Acá se publican las ofertas más fuertes que detecta cada escaneo." +
+    "✅ Bomhams Market quedó conectado a este canal. Acá se publican las ofertas más fuertes que detecta cada escaneo." +
     (base ? `
 ${base}` : "");
   for (const channel of channels) {

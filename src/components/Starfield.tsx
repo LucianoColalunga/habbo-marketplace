@@ -6,7 +6,7 @@ import { splitLocale } from "@/lib/i18n/config";
 import { StarfieldEngine } from "@/lib/starfield";
 import { starsEnabled, subscribeStars } from "@/lib/stars-pref";
 
-const ACCENT = { market: "#f5b942", nft: "#a78bfa" };
+const ACCENT = { market: "#a78bfa", nft: "#f5b942" };
 const INTERACTIVE = "a,button,input,select,textarea,label,summary,option,[role=button],[role=option],[role=combobox],[contenteditable],img,svg,video";
 
 function alphaOf(color: string): number {

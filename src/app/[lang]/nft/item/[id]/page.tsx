@@ -54,7 +54,7 @@ async function Content({ params }: Pick<PageProps<"/[lang]/nft/item/[id]">, "par
           <h1 className="font-display text-3xl font-bold text-text">{r.n}</h1>
           <ul className="mt-3 flex flex-wrap gap-2 text-xs text-text-2">
             {chips.map((c) => (
-              <li key={String(c)} className="rounded-full border border-[#a78bfa]/40 px-2.5 py-1">
+              <li key={String(c)} className="rounded-full border border-[#f5b942]/40 px-2.5 py-1">
                 {c}
               </li>
             ))}

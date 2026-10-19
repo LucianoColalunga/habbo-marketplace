@@ -3,6 +3,6 @@
   <path d="M16 4 27 10v12L16 28 5 22V10Z" fill="#1c2030" stroke="#343a4a" stroke-width="1"/>
   <path d="M16 4 27 10 16 16 5 10Z" fill="#242a3c"/>
   <path d="M16 16v12L5 22V10Z" fill="#151821"/>
-  <path d="M8.5 20.5 12.5 17l3 2.2 4.3-5 4.2-2.4" fill="none" stroke="#f5b942" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8.5 20.5 12.5 17l3 2.2 4.3-5 4.2-2.4" fill="none" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="24" cy="11.8" r="2" fill="#f5b942"/>
 </svg>

@@ -19,7 +19,7 @@ export default async function NftHome() {
   const h = p.nft.home;
   return (
     <div className="space-y-10">
-      <section className="nft-grid -mx-4 px-4 py-8 md:mx-0 md:rounded-2xl md:border md:border-[#a78bfa]/30 md:px-8">
+      <section className="nft-grid -mx-4 px-4 py-8 md:mx-0 md:rounded-2xl md:border md:border-[#f5b942]/30 md:px-8">
         <p className="text-sm font-medium text-accent">{h.kicker}</p>
         <h1 className="mt-2 max-w-2xl font-display text-3xl font-bold text-text md:text-4xl">{h.title}</h1>
         <p className="mt-3 max-w-2xl text-text-2">{h.intro}</p>

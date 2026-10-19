@@ -7,7 +7,7 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"], weight: ["500", "700"] });
 
-export const metadata: Metadata = { title: "404 · Furnímetro" };
+export const metadata: Metadata = { title: "404 · Bomhams Market" };
 
 /** Página para direcciones que no existen en ningún idioma (se muestra en los tres). */
 export default function GlobalNotFound() {

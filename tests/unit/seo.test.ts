@@ -7,7 +7,7 @@ import { siteUrl } from "@/lib/site";
 
 describe("dirección del sitio", () => {
   it("usa SITE_URL, si no el dominio de producción de Vercel, y nunca algo raro", () => {
-    expect(siteUrl({ SITE_URL: "https://furnimetro.example/x" })).toBe("https://furnimetro.example");
+    expect(siteUrl({ SITE_URL: "https://bomhams.example/x" })).toBe("https://bomhams.example");
     expect(siteUrl({ VERCEL_PROJECT_PRODUCTION_URL: "habbo-marketplace-three.vercel.app" })).toBe(
       "https://habbo-marketplace-three.vercel.app",
     );
@@ -30,7 +30,7 @@ describe("metadata de cada página", () => {
     expect(meta.openGraph).toMatchObject({
       url: "/pt/nft",
       locale: "pt_BR",
-      title: "NFT · NFT · Furnímetro",
+      title: "NFT · NFT · Bomhams Market",
       images: [{ url: "/og/nft-pt.png", width: 1200, height: 630 }],
     });
     expect(meta.robots).toBeUndefined();
@@ -65,15 +65,15 @@ describe("sitemap", () => {
   });
 
   it("cada página va en los tres idiomas, con direcciones absolutas", () => {
-    const entries = buildSitemap("https://furnimetro.example", { ...input, hotels: [...input.hotels] });
+    const entries = buildSitemap("https://bomhams.example", { ...input, hotels: [...input.hotels] });
     expect(entries.length).toBe(sitemapPages({ ...input, hotels: [...input.hotels] }).length * 3);
     const throne = entries.filter((e) => e.url.endsWith("/com/furni/throne"));
     expect(throne.map((e) => e.url)).toEqual([
-      "https://furnimetro.example/com/furni/throne",
-      "https://furnimetro.example/pt/com/furni/throne",
-      "https://furnimetro.example/en/com/furni/throne",
+      "https://bomhams.example/com/furni/throne",
+      "https://bomhams.example/pt/com/furni/throne",
+      "https://bomhams.example/en/com/furni/throne",
     ]);
-    expect(throne[0].alternates?.languages).toMatchObject({ "x-default": "https://furnimetro.example/com/furni/throne" });
+    expect(throne[0].alternates?.languages).toMatchObject({ "x-default": "https://bomhams.example/com/furni/throne" });
     expect(throne[0].lastModified).toBe("2026-10-18T06:00:00.000Z");
   });
 });

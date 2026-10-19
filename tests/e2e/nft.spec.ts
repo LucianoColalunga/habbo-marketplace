@@ -13,9 +13,9 @@ test("las dos secciones están separadas y se puede ir y volver", async ({ page 
     "aria-current",
     "page",
   );
-  // El acento de la sección NFT es violeta.
+  // El acento de la sección NFT es dorado (el Marketplace es violeta).
   const accent = await page.evaluate(() => getComputedStyle(document.querySelector(".theme-nft")!).getPropertyValue("--accent").trim());
-  expect(accent).toBe("#a78bfa");
+  expect(accent).toBe("#f5b942");
   await page.getByRole("navigation", { name: "Sección del sitio" }).getByRole("link", { name: /Marketplace/ }).click();
   await expect(page).toHaveURL(/\/es$/);
 });

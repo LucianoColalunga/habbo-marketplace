@@ -96,7 +96,7 @@ describe("enlaces a los canales", () => {
     const { safeCommunityUrl, communityLinks } = await import("@/lib/community");
     expect(safeCommunityUrl("discord", "https://discord.gg/abcDEF12")).toBe("https://discord.gg/abcDEF12");
     expect(safeCommunityUrl("discord", "https://discord.com/invite/abc123")).toBe("https://discord.com/invite/abc123");
-    expect(safeCommunityUrl("telegram", "https://t.me/FurnimetroOfertas")).toBe("https://t.me/FurnimetroOfertas");
+    expect(safeCommunityUrl("telegram", "https://t.me/BomhamsOfertas")).toBe("https://t.me/BomhamsOfertas");
     expect(safeCommunityUrl("whatsapp", "https://whatsapp.com/channel/0029VaAbCdEfGh123")).toBe("https://whatsapp.com/channel/0029VaAbCdEfGh123");
     for (const [id, bad] of [
       ["discord", "http://discord.gg/abc"],
@@ -107,7 +107,7 @@ describe("enlaces a los canales", () => {
     ] as const) {
       expect(safeCommunityUrl(id, bad)).toBeNull();
     }
-    expect(communityLinks({ telegram: "https://t.me/FurnimetroOfertas", discord: "malo" }).map((l) => l.id)).toEqual(["telegram"]);
+    expect(communityLinks({ telegram: "https://t.me/BomhamsOfertas", discord: "malo" }).map((l) => l.id)).toEqual(["telegram"]);
     expect(communityLinks({})).toEqual([]);
   });
 });

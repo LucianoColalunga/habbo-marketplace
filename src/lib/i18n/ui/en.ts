@@ -103,7 +103,7 @@ export const en: Ui = {
     howTitle: "To get the alerts",
     step1: "Turn on notifications. Your browser will ask for permission: choose",
     allow: "Allow",
-    step2: "Keep a Furnímetro tab open. It can be minimized; if you close it, alerts won't arrive.",
+    step2: "Keep a Bomhams Market tab open. It can be minimized; if you close it, alerts won't arrive.",
     step3: "Your list is saved in this browser. On another phone or computer you'll need to set it up again.",
     showNotifs: "Show browser notifications",
     unsupported: "This browser doesn't show notifications: alerts will appear inside the page.",

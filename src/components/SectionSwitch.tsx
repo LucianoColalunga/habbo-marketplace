@@ -16,7 +16,7 @@ export async function SectionSwitch({ active, hotel }: { active: "market" | "nft
         prefetch={false}
         href={marketHref}
         aria-current={active === "market" ? "page" : undefined}
-        className={`${base} ${active === "market" ? "bg-[#f5b942] text-[#1a1405]" : "text-text-2 hover:text-text"}`}
+        className={`${base} ${active === "market" ? "bg-[#a78bfa] text-[#140d2b]" : "text-text-2 hover:text-text"}`}
       >
         {t.section.market} <span className="hidden font-normal sm:inline">· {t.section.marketSub}</span>
       </Link>
@@ -24,7 +24,7 @@ export async function SectionSwitch({ active, hotel }: { active: "market" | "nft
         prefetch={false}
         href={href("/nft")}
         aria-current={active === "nft" ? "page" : undefined}
-        className={`${base} ${active === "nft" ? "bg-[#a78bfa] text-[#140d2b]" : "text-text-2 hover:text-text"}`}
+        className={`${base} ${active === "nft" ? "bg-[#f5b942] text-[#1a1405]" : "text-text-2 hover:text-text"}`}
       >
         {t.section.nft} <span className="hidden font-normal sm:inline">· {t.section.nftSub}</span>
       </Link>

@@ -15,7 +15,7 @@ const TEXT = {
     en: { chip: "NFT · blockchain", title: "Habbo's official NFTs: prices and sales", sub: "Furni, clothes, pets, tokens and add-ons on Immutable", fan: "Unofficial fan site" },
   },
 };
-const ACCENT = { market: { color: "#f5b942", ink: "#1a1405" }, nft: { color: "#a78bfa", ink: "#140d2b" } };
+const ACCENT = { market: { color: "#a78bfa", ink: "#140d2b" }, nft: { color: "#f5b942", ink: "#1a1405" } };
 
 /** Estrellas siempre iguales (números "al azar" repetibles). */
 function stars(accent) {
@@ -52,8 +52,8 @@ function html(section, lang) {
 </svg>
 <div class="wrap">
   <div class="brand">
-    <svg viewBox="0 0 32 32" width="64" height="64"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z" fill="#1c2030" stroke="#343a4a"/><path d="M16 3 28 9.5 16 16 4 9.5Z" fill="#242a3c"/><path d="M16 16v13L4 22.5v-13Z" fill="#151821"/><path d="M7.5 20.5 12 16.8l3.2 2.4 4.6-5.4 4.7-2.6" fill="none" stroke="#f5b942" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24.5" cy="11.2" r="2" fill="#f5b942"/></svg>
-    <div>Furní<span>metro</span></div>
+    <svg viewBox="0 0 32 32" width="64" height="64"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z" fill="#1c2030" stroke="#343a4a"/><path d="M16 3 28 9.5 16 16 4 9.5Z" fill="#242a3c"/><path d="M16 16v13L4 22.5v-13Z" fill="#151821"/><path d="M7.5 20.5 12 16.8l3.2 2.4 4.6-5.4 4.7-2.6" fill="none" stroke="${a.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24.5" cy="11.2" r="2" fill="${a.color}"/></svg>
+    <div>Bomhams <span>Market</span></div>
   </div>
   <div class="chip">${t.chip}</div>
   <h1>${t.title}</h1>

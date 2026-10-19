@@ -23,7 +23,7 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
   const { lang, p, href } = await getI18n();
   return (
     <div className="theme-nft flex min-h-full flex-1 flex-col">
-      <header className="sticky top-0 z-30 border-b border-[#a78bfa]/30 bg-bg/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-[#f5b942]/30 bg-bg/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <Link prefetch={false} href={href("/nft")} className="shrink-0" aria-label={p.header.nftHomeAria}>
             <Logo />
@@ -38,7 +38,7 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
         </div>
         <NftNav />
       </header>
-      <div className="border-b border-[#a78bfa]/20 bg-[#1c1a2a]">
+      <div className="border-b border-[#f5b942]/20 bg-[#221e15]">
         <p className="mx-auto max-w-6xl px-4 py-2 text-sm text-text-2">
           {p.nft.banner(
             <Link prefetch={false} href={href(`/${homeHotel(lang)}`)} className="text-accent underline-offset-2 hover:underline">

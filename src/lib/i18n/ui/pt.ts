@@ -103,7 +103,7 @@ export const pt: Ui = {
     howTitle: "Para receber os avisos",
     step1: "Ative as notificações. O navegador vai perguntar se você permite: escolha",
     allow: "Permitir",
-    step2: "Deixe uma aba do Furnímetro aberta. Ela pode estar minimizada; se você fechar, os avisos não chegam.",
+    step2: "Deixe uma aba do Bomhams Market aberta. Ela pode estar minimizada; se você fechar, os avisos não chegam.",
     step3: "Sua lista fica salva neste navegador. Em outro celular ou computador, você precisa montá-la de novo.",
     showNotifs: "Mostrar notificações do navegador",
     unsupported: "Este navegador não mostra notificações: os avisos vão aparecer dentro da página.",

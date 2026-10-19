@@ -2,18 +2,18 @@ import type { Pages } from "./es";
 
 export const en: Pages = {
   meta: {
-    title: "Furnímetro — Marketplace prices",
-    template: "%s · Furnímetro",
+    title: "Bomhams Market — Marketplace prices",
+    template: "%s · Bomhams Market",
     description:
       "Prices, open offers, averages and history of the furni Marketplace, using data from Habbo's public API. Unofficial fan site.",
     nftTitle: "Habbo NFTs — prices and sales",
-    nftTemplate: "%s · NFT · Furnímetro",
+    nftTemplate: "%s · NFT · Bomhams Market",
     nftDescription:
       "Floor prices, sales and trends of Habbo's official NFT collectibles on the Immutable blockchain. A section separate from the credits Marketplace.",
   },
   seo: {
-    ogAltMarket: "Furnímetro: Habbo Marketplace prices",
-    ogAltNft: "Furnímetro: prices of Habbo's official NFTs",
+    ogAltMarket: "Bomhams Market: Habbo Marketplace prices",
+    ogAltNft: "Bomhams Market: prices of Habbo's official NFTs",
     home: (label) => `Habbo ${label} Marketplace prices`,
     homeDesc: (label, region) =>
       `Lowest price, open offers, averages and history for every furni on the Habbo ${label} Marketplace (${region}). Daily rankings and deals.`,
@@ -33,11 +33,11 @@ export const en: Pages = {
     nftRankingDesc: (hint) => `${hint} Habbo's official NFTs on the Immutable blockchain.`,
     nftAboutDesc: "Where Habbo NFT prices come from (Immutable's public API), how fresh they are and what their limits are.",
   },
-  header: { homeAria: "Furnímetro, home", nftHomeAria: "Furnímetro NFT, home" },
+  header: { homeAria: "Bomhams Market, home", nftHomeAria: "Bomhams Market NFT, home" },
   footer: {
     about: (
       <>
-        <strong className="text-text">Furnímetro</strong> is a non-commercial fan site. It is not official and is not affiliated
+        <strong className="text-text">Bomhams Market</strong> is a non-commercial fan site. It is not official and is not affiliated
         with, sponsored or endorsed by Sulake Oy or Azerion. Habbo is a registered trademark of Sulake Oy.
       </>
     ),
@@ -266,7 +266,7 @@ export const en: Pages = {
       "Your alert list and the deals found are saved only in your browser. The site has no accounts and no tracking cookies (it only remembers the language you picked). Live lookups go from your browser straight to the Habbo API, without sending cookies.",
     legalTitle: "Legal notice",
     legal:
-      "Furnímetro is a free, non-commercial fan site. It is not official and is not affiliated with, sponsored or endorsed by Sulake Oy or Azerion. Habbo and the furni names and images are property of Sulake Oy. If Sulake asks for any content to be removed, it will be removed.",
+      "Bomhams Market is a free, non-commercial fan site. It is not official and is not affiliated with, sponsored or endorsed by Sulake Oy or Azerion. Habbo and the furni names and images are property of Sulake Oy. If Sulake asks for any content to be removed, it will be removed.",
   },
   nft: {
     banner: (marketLink) => (
@@ -278,7 +278,7 @@ export const en: Pages = {
     ),
     marketLink: "Marketplace (credits)",
     footerData:
-      "Data from the public Immutable zkEVM API; images served by Habbo (nft-tokens.habbo.com). Furnímetro is not official or affiliated with Sulake Oy, Azerion or Immutable.",
+      "Data from the public Immutable zkEVM API; images served by Habbo (nft-tokens.habbo.com). Bomhams Market is not official or affiliated with Sulake Oy, Azerion or Immutable.",
     footerRisk:
       "This is not financial advice. NFT prices change fast and can drop to zero; dollar amounts are approximate, based on the exchange rate at the time.",
     collections: {
@@ -430,7 +430,7 @@ export const en: Pages = {
       ),
       noticeTitle: "Notice",
       notice:
-        "This is not financial advice. NFTs are volatile assets: their price can change a lot or drop to zero. Furnímetro doesn't sell, buy or hold anything; it only shows public data. It is not an official site of Habbo, Sulake, Azerion or Immutable.",
+        "This is not financial advice. NFTs are volatile assets: their price can change a lot or drop to zero. Bomhams Market doesn't sell, buy or hold anything; it only shows public data. It is not an official site of Habbo, Sulake, Azerion or Immutable.",
     },
   },
 };

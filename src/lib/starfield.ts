@@ -58,7 +58,7 @@ export class StarfieldEngine {
   width = 0;
   height = 0;
   /** Colores: 0 y 1 son los de base; 2 es el acento de la sección. */
-  palette: string[] = ["#cfe1ff", "#3987e5", "#f5b942"];
+  palette: string[] = ["#cfe1ff", "#3987e5", "#a78bfa"];
 
   constructor(private rand: () => number = Math.random) {}
 

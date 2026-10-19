@@ -113,7 +113,7 @@ describe("notificadores", () => {
   it("mensaje de prueba a todos los canales", async () => {
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));
     const res = await sendTestMessage(
-      { DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1/abc", TELEGRAM_BOT_TOKEN: "123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ", TELEGRAM_CHAT_ID: "@furnimetro" } as never,
+      { DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1/abc", TELEGRAM_BOT_TOKEN: "123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ", TELEGRAM_CHAT_ID: "@bomhams" } as never,
       fetchImpl,
     );
     expect(res).toEqual({ channels: ["discord", "telegram"], errors: [] });

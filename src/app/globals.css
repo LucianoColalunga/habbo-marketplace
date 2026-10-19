@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Furnímetro — tema oscuro.
+ * Bomhams Market — tema oscuro.
  * Colores de gráficos validados para daltonismo y contraste sobre --surface.
  */
 :root {
@@ -16,8 +16,8 @@
   --text: #eef0f4;
   --text-2: #b4b9c6;
   --muted: #868c99;
-  --accent: #f5b942;
-  --accent-ink: #1a1405;
+  --accent: #a78bfa;
+  --accent-ink: #140d2b;
   --series-1: #3987e5;
   --series-2: #d95926;
   --up: #0ca30c;
@@ -106,14 +106,14 @@ body {
   background-size: 34px 20px;
 }
 
-/* Sección NFT: mismo diseño base, acento violeta para que nunca se confunda con el Marketplace. */
+/* Sección NFT: mismo diseño base, acento dorado (el Marketplace es violeta) para que nunca se confundan. */
 .theme-nft {
-  --accent: #a78bfa;
-  --accent-ink: #140d2b;
+  --accent: #f5b942;
+  --accent-ink: #1a1405;
 }
 
 .nft-grid {
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(167, 139, 250, 0.12) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(245, 185, 66, 0.12) 1px, transparent 0);
   background-size: 22px 22px;
 }

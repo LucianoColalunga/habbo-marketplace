@@ -1,4 +1,4 @@
-# Furnímetro — precios del Marketplace de Habbo
+# Bomhams Market — precios del Marketplace de Habbo
 
 Web para seguir el **Marketplace de furnis de Habbo**: precio mínimo publicado, cuántos hay a la venta, promedios,
 evolución del precio, rankings (más vendidos, mayores subas y bajas, más publicados) y **alertas** cuando un furni
@@ -30,7 +30,7 @@ aparece por debajo de su precio normal.
 ## Sección NFT (separada)
 
 En `/nft` hay una sección aparte para los **coleccionables NFT oficiales de Habbo** (Furni, Clothes, Pets, Tokens y
-Add-ons en la blockchain Immutable zkEVM). Tiene su propio color (violeta), su propio menú y un aviso fijo; arriba de todo
+Add-ons en la blockchain Immutable zkEVM). Tiene su propio color (dorado; el Marketplace es violeta), su propio menú y un aviso fijo; arriba de todo
 hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se mezclen.
 
 - Precio piso, mejor oferta de compra, última venta y publicaciones más baratas **en vivo** (desde el navegador).
@@ -184,8 +184,8 @@ las ofertas más fuertes (por defecto, 30 % o más por debajo de lo que se pagó
 repetir). Los pasos están en `/es/alertas/servidor` (página sin enlaces desde el sitio):
 
 1. **Telegram:** canal público + bot creado con [@BotFather](https://t.me/BotFather), agregado al canal como
-   administrador. Variables: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (ej. `@FurnimetroOfertas`) y
-   `NEXT_PUBLIC_TELEGRAM_URL` (ej. `https://t.me/FurnimetroOfertas`).
+   administrador. Variables: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (ej. `@BomhamsOfertas`) y
+   `NEXT_PUBLIC_TELEGRAM_URL` (ej. `https://t.me/BomhamsOfertas`).
 2. **Discord:** webhook del canal de ofertas (`DISCORD_WEBHOOK_URL`) e invitación que no venza (`NEXT_PUBLIC_DISCORD_URL`).
 3. **WhatsApp:** enlace del canal (`NEXT_PUBLIC_WHATSAPP_URL`). WhatsApp no ofrece una forma oficial de publicar en canales
    automáticamente (los servicios que lo hacen usan sesiones no oficiales y pueden bloquear el número), así que ahí se

@@ -98,7 +98,7 @@ Se leyeron las **Condiciones del servicio de Habbo.es** (versión 13.2.2025). Pu
   nombres e íconos de furnis entra en esta zona: **Sulake podría pedir que se retiren**. Por eso el sitio se presenta
   como sitio de fans no oficial, enlaza las imágenes en lugar de copiarlas y deja apagarlas con una variable. Si se va a
   promocionar públicamente, conviene pedir aprobación a Habbo como fansite.
-- Los enlaces al servicio no deben usar las marcas ni sugerir asociación con Sulake. → Marca propia ("Furnímetro"),
+- Los enlaces al servicio no deben usar las marcas ni sugerir asociación con Sulake. → Marca propia ("Bomhams Market"),
   aviso de "no oficial" en todas las páginas y ningún logo de Habbo.
 - No se encontró ninguna cláusula específica sobre la API pública ni sobre límites de uso. La API está documentada por
   la propia Habbo en Swagger, lo que indica que está pensada para que la usen terceros.
