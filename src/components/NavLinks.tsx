@@ -7,6 +7,7 @@ import { splitLocale } from "@/lib/i18n/config";
 
 const LINKS = [
   { href: "", key: "home" },
+  { href: "/categorias", key: "categories" },
   { href: "/rankings", key: "rankings" },
   { href: "/ofertas", key: "deals" },
   { href: "/alertas", key: "alerts" },

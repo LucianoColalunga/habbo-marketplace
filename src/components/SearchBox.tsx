@@ -24,9 +24,17 @@ interface NftResult {
   floorUsd: number | null;
 }
 
-/** Resultado normalizado para mostrar igual furnis del Marketplace y NFT. */
+interface CategoryResult {
+  path: string;
+  label: string;
+  count: number;
+}
+
+/** Resultado normalizado para mostrar igual furnis del Marketplace, NFT y categorías. */
 interface Result {
   key: string;
+  /** Si está, el resultado es una categoría y lleva a esta dirección. */
+  path?: string;
   title: string;
   subtitle: string;
   price: string | null;
@@ -44,6 +52,10 @@ function fromMarket(r: MarketResult, t: Ui, f: Format): Result {
     priceSub: r.oo > 0 ? t.common.forSale(f.int(r.oo)) : t.common.noOffers,
     r: r.r,
   };
+}
+
+function fromCategory(c: CategoryResult, t: Ui, f: Format): Result {
+  return { key: `cat:${c.path}`, path: c.path, title: c.label, subtitle: t.search.category, price: null, priceSub: t.search.seeCategory(f.int(c.count)) };
 }
 
 function fromNft(r: NftResult, t: Ui, f: Format): Result {
@@ -73,7 +85,7 @@ export function SearchBox({
   size?: "md" | "lg";
 }) {
   const router = useRouter();
-  const { t, f, href } = useI18n();
+  const { lang, t, f, href } = useI18n();
   const listId = useId();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -111,12 +123,13 @@ export function SearchBox({
       try {
         const url = nft
           ? `/api/nft/search?q=${encodeURIComponent(q)}&limit=8`
-          : `/api/search?hotel=${hotel}&q=${encodeURIComponent(q)}&limit=8`;
+          : `/api/search?hotel=${hotel}&lang=${lang}&q=${encodeURIComponent(q)}&limit=8`;
         const res = await fetch(url, { signal: controller.signal });
-        const body = (await res.json()) as { results?: (MarketResult | NftResult)[] };
-        setResults(
-          (body.results ?? []).map((r) => (nft ? fromNft(r as NftResult, t, f) : fromMarket(r as MarketResult, t, f))),
-        );
+        const body = (await res.json()) as { results?: (MarketResult | NftResult)[]; categories?: CategoryResult[] };
+        setResults([
+          ...(body.categories ?? []).map((c) => fromCategory(c, t, f)),
+          ...(body.results ?? []).map((r) => (nft ? fromNft(r as NftResult, t, f) : fromMarket(r as MarketResult, t, f))),
+        ]);
         setActive(-1);
         setOpen(true);
       } catch {
@@ -135,10 +148,11 @@ export function SearchBox({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const go = (key: string) => {
+  const go = (r: Result) => {
     setOpen(false);
     onType("");
-    router.push(href(nft ? `/nft/item/${encodeURIComponent(key)}` : `/${hotel}/furni/${encodeURIComponent(key)}`));
+    if (r.path) return router.push(r.path);
+    router.push(href(nft ? `/nft/item/${encodeURIComponent(r.key)}` : `/${hotel}/furni/${encodeURIComponent(r.key)}`));
   };
 
   const big = size === "lg";
@@ -148,7 +162,7 @@ export function SearchBox({
         role="search"
         onSubmit={(e) => {
           e.preventDefault();
-          if (active >= 0 && results[active]) return go(results[active].key);
+          if (active >= 0 && results[active]) return go(results[active]);
           const q = query.trim();
           if (q) {
             setOpen(false);
@@ -218,12 +232,22 @@ export function SearchBox({
               aria-selected={i === active}
               onMouseDown={(e) => {
                 e.preventDefault();
-                go(r.key);
+                go(r);
               }}
               onMouseEnter={() => setActive(i)}
               className={`flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 ${i === active ? "bg-surface-3" : ""}`}
             >
-              {nft ? <NftImage src={r.img ?? ""} size={32} /> : <FurniIcon k={r.key} r={r.r ?? 0} size={32} />}
+              {r.path ? (
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" className="h-4 w-4">
+                    <path d="M2.5 5.5a2 2 0 0 1 2-2h3.6l1.8 2h5.6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2Z" fill="currentColor" />
+                  </svg>
+                </span>
+              ) : nft ? (
+                <NftImage src={r.img ?? ""} size={32} />
+              ) : (
+                <FurniIcon k={r.key} r={r.r ?? 0} size={32} />
+              )}
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm text-text">{r.title}</span>
                 <span className="block truncate text-xs text-muted">{r.subtitle}</span>

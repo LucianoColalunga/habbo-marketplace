@@ -18,14 +18,19 @@ interface PageSpec {
   priority: number;
 }
 
+/** Cuántas colecciones (líneas de furnis) por hotel van al sitemap. */
+const SITEMAP_COLLECTIONS = 30;
+
 export interface SitemapInput {
   hotels: HotelCode[];
+  /** Categorías con sus subcategorías (de la clasificación del catálogo de cada hotel). */
+  categories?: Partial<Record<HotelCode, { slug: string; subs: { slug: string }[] }[]>>;
   furni: Partial<Record<HotelCode, { keys: string[]; generatedAt: string | null }>>;
   nft: { ids: string[]; generatedAt: string | null };
 }
 
 /** Lista de páginas que conviene que Google conozca, cada una en los tres idiomas. */
-export function sitemapPages({ hotels, furni, nft }: SitemapInput): PageSpec[] {
+export function sitemapPages({ hotels, furni, nft, categories = {} }: SitemapInput): PageSpec[] {
   const pages: PageSpec[] = [];
   for (const h of hotels) {
     const at = furni[h]?.generatedAt ?? null;
@@ -35,6 +40,13 @@ export function sitemapPages({ hotels, furni, nft }: SitemapInput): PageSpec[] {
     pages.push({ path: `/${h}/ofertas`, lastModified: at, changeFrequency: "daily", priority: 0.8 });
     pages.push({ path: `/${h}/alertas`, changeFrequency: "monthly", priority: 0.4 });
     pages.push({ path: `/${h}/acerca`, changeFrequency: "monthly", priority: 0.3 });
+    const cats = categories[h] ?? [];
+    if (cats.length > 0) pages.push({ path: `/${h}/categorias`, lastModified: at, changeFrequency: "daily", priority: 0.7 });
+    for (const c of cats) {
+      pages.push({ path: `/${h}/categorias/${c.slug}`, lastModified: at, changeFrequency: "daily", priority: 0.6 });
+      const subs = c.slug === "colecciones" ? c.subs.slice(0, SITEMAP_COLLECTIONS) : c.subs;
+      for (const s of subs) pages.push({ path: `/${h}/categorias/${c.slug}/${s.slug}`, lastModified: at, changeFrequency: "daily", priority: 0.5 });
+    }
     for (const k of furni[h]?.keys ?? []) {
       pages.push({ path: `/${h}/furni/${encodeURIComponent(k)}`, lastModified: at, changeFrequency: "daily", priority: 0.6 });
     }

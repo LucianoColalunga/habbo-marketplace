@@ -8,10 +8,11 @@ import { JoinChannels } from "@/components/JoinChannels";
 import { SearchBox } from "@/components/SearchBox";
 import { PageSkeleton } from "@/components/Skeletons";
 import { CoinGlyph, Notice, SectionTitle, StatTile } from "@/components/ui";
-import { getHomeView } from "@/lib/data/views";
+import { getCategoryOverview, getHomeView } from "@/lib/data/views";
 import { HOTELS, isEnabledHotel } from "@/lib/hotels";
 import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
+import { categoryBySlug } from "@/lib/market/categories";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]">): Promise<Metadata> {
   const [{ hotel }, { lang, p, t }] = await Promise.all([params, getI18n()]);
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]">)
 async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "params">) {
   const { hotel } = await params;
   if (!isEnabledHotel(hotel)) notFound();
-  const [view, { p, t, f, href }] = await Promise.all([getHomeView(hotel), getI18n()]);
+  const [view, cards, { lang, p, t, f, href }] = await Promise.all([getHomeView(hotel), getCategoryOverview(hotel), getI18n()]);
   const h = p.home;
 
   return (
@@ -50,6 +51,31 @@ async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "
           )}
         </p>
       </section>
+
+      {cards.length > 0 && (
+        <section aria-label={p.categories.homeTitle}>
+          <SectionTitle
+            title={p.categories.homeTitle}
+            hint={p.categories.homeHint}
+            href={href(`/${hotel}/categorias`)}
+            linkLabel={p.categories.index}
+          />
+          <ul className="flex flex-wrap gap-2">
+            {cards.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  prefetch={false}
+                  href={href(`/${hotel}/categorias/${c.slug}`)}
+                  className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-text hover:bg-surface-2"
+                >
+                  {categoryBySlug(c.slug)?.label[lang]}
+                  <span className="tnum text-xs text-muted">{f.int(c.count)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {!view.meta.hasData && <Notice tone="warn">{h.noData}</Notice>}
 

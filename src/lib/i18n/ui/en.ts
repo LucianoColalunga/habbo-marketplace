@@ -19,6 +19,7 @@ export const en: Ui = {
   nav: {
     aria: "Sections",
     home: "Home",
+    categories: "Categories",
     rankings: "Rankings",
     deals: "Deals",
     alerts: "Alerts",
@@ -56,6 +57,20 @@ export const en: Ui = {
     searching: "searching…",
     floor: "floor price",
     noListings: "no listings",
+    category: "Category",
+    seeCategory: (n) => `see all ${n}`,
+  },
+  catList: {
+    sortAria: "Sort",
+    popular: "Best sellers",
+    cheap: "Cheapest",
+    expensive: "Most expensive",
+    name: "Name",
+    filter: "Filter by name…",
+    filterAria: "Filter this list by name",
+    sold30: (n) => `${n} sold in 30 days`,
+    noMarket: "no sales recorded",
+    none: "No furni matches that filter.",
   },
   chart: {
     noData: "No data to chart.",

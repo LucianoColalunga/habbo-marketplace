@@ -19,6 +19,7 @@ export const pt: Ui = {
   nav: {
     aria: "Seções",
     home: "Início",
+    categories: "Categorias",
     rankings: "Rankings",
     deals: "Ofertas",
     alerts: "Alertas",
@@ -56,6 +57,20 @@ export const pt: Ui = {
     searching: "buscando…",
     floor: "preço mínimo",
     noListings: "sem anúncios",
+    category: "Categoria",
+    seeCategory: (n) => `ver os ${n}`,
+  },
+  catList: {
+    sortAria: "Ordenar",
+    popular: "Mais vendidos",
+    cheap: "Mais baratos",
+    expensive: "Mais caros",
+    name: "Nome",
+    filter: "Filtrar por nome…",
+    filterAria: "Filtrar esta lista por nome",
+    sold30: (n) => `${n} vendidos em 30 dias`,
+    noMarket: "sem vendas registradas",
+    none: "Nenhum mobi corresponde a esse filtro.",
   },
   chart: {
     noData: "Sem dados para o gráfico.",

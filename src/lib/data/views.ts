@@ -6,6 +6,16 @@ import type { ItemSummary } from "@/lib/market/stats";
 import type { MarketSummary, ScanReport } from "@/lib/market/summary";
 import { isSafeClassname } from "@/lib/habbo/api";
 import { rankMatches } from "@/lib/search";
+import type { Lang } from "@/lib/i18n/config";
+import {
+  buildCategoryIndex,
+  categoryBySlug,
+  CATEGORIES,
+  matchCategories,
+  subcategoriesOf,
+  type CategoryIndex,
+  type CategoryMatch,
+} from "@/lib/market/categories";
 import { buildDeals, buildRanking, totals, toRow, type FurniRow, type MarketTotals, type RankingKind } from "./rankings";
 import { loadCatalog, loadHistory, loadSummary, type CatalogIndex } from "./store";
 
@@ -158,4 +168,104 @@ export async function getTopFurniKeys(hotel: HotelCode, limit: number): Promise<
     .slice(0, limit)
     .map(([k]) => k);
   return { keys, generatedAt: summary.generatedAt };
+}
+
+/* ---------- Categorías ---------- */
+
+export interface CategoryRow {
+  k: string;
+  n: string;
+  r: number;
+  cp: number;
+  oo: number;
+  s30: number;
+  a7: number | null;
+}
+
+/** Como mucho, cuántos furnis se muestran en la página de una categoría. */
+export const CATEGORY_LIMIT = 500;
+
+const categoryMemo = new Map<string, { hash: string; index: CategoryIndex }>();
+
+/** Clasificación del catálogo de un hotel (se calcula una vez por versión del catálogo). */
+async function categoriesOf(hotel: HotelCode): Promise<{ index: CategoryIndex; catalog: CatalogIndex } | null> {
+  const catalog = await loadCatalog(hotel);
+  if (!catalog) return null;
+  const hit = categoryMemo.get(hotel);
+  if (hit && hit.hash === catalog.catalog.hash) return { index: hit.index, catalog };
+  const index = buildCategoryIndex(catalog.catalog.items);
+  categoryMemo.set(hotel, { hash: catalog.catalog.hash, index });
+  return { index, catalog };
+}
+
+function rowsFor(keys: string[], catalog: CatalogIndex, summary: MarketSummary | null): CategoryRow[] {
+  return keys
+    .map((k) => {
+      const item = catalog.byKey.get(k);
+      const s = summary?.items[k];
+      return { k, n: item?.n ?? k, r: item?.r ?? 0, cp: s?.cp ?? 0, oo: s?.oo ?? 0, s30: s?.s30 ?? 0, a7: s?.a7 ?? null };
+    })
+    .sort((a, b) => b.s30 - a.s30 || b.oo - a.oo || a.n.localeCompare(b.n));
+}
+
+export interface CategoryCard {
+  slug: string;
+  count: number;
+  /** Los furnis más vendidos de la categoría, para mostrar su ícono. */
+  icons: { k: string; r: number }[];
+  subs: { slug: string; count: number }[];
+}
+
+export async function getCategoryOverview(hotel: HotelCode): Promise<CategoryCard[]> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const [data, summary] = await Promise.all([categoriesOf(hotel), loadSummary(hotel)]);
+  if (!data) return [];
+  return CATEGORIES.map((c) => {
+    const keys = data.index.members[c.slug] ?? [];
+    return {
+      slug: c.slug,
+      count: keys.length,
+      icons: rowsFor(keys, data.catalog, summary)
+        .slice(0, 3)
+        .map((r) => ({ k: r.k, r: r.r })),
+      subs: subcategoriesOf(data.index, c),
+    };
+  }).filter((c) => c.count > 0);
+}
+
+export interface CategoryView {
+  total: number;
+  rows: CategoryRow[];
+  subs: { slug: string; count: number }[];
+  generatedAt: string | null;
+}
+
+/** Furnis de una categoría o subcategoría, los más vendidos primero. null si no existe. */
+export async function getCategoryView(hotel: HotelCode, cat: string, sub: string | null): Promise<CategoryView | null> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const def = categoryBySlug(cat);
+  if (!def) return null;
+  const [data, summary] = await Promise.all([categoriesOf(hotel), loadSummary(hotel)]);
+  if (!data) return { total: 0, rows: [], subs: [], generatedAt: summary?.generatedAt ?? null };
+  const keys = data.index.members[sub ? `${cat}/${sub}` : cat];
+  if (!keys) return sub ? null : { total: 0, rows: [], subs: [], generatedAt: summary?.generatedAt ?? null };
+  return {
+    total: keys.length,
+    rows: rowsFor(keys, data.catalog, summary).slice(0, CATEGORY_LIMIT),
+    subs: subcategoriesOf(data.index, def),
+    generatedAt: summary?.generatedAt ?? null,
+  };
+}
+
+/** Categorías que coinciden con una búsqueda ("pisos", "sofás"...). */
+export async function searchCategories(hotel: HotelCode, query: string, lang: Lang): Promise<CategoryMatch[]> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const data = await categoriesOf(hotel);
+  return data ? matchCategories(data.index, query.slice(0, 60), lang) : [];
 }

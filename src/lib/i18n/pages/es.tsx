@@ -30,6 +30,12 @@ export const es = {
     about: (label: string) => `Datos y límites del Marketplace de Habbo ${label}`,
     aboutDesc: "De dónde salen los precios (API pública de Habbo), qué tan actuales son y qué límites tienen.",
     furni: (name: string, label: string) => `${name}: precio en Habbo ${label}`,
+    categories: (label: string) => `Categorías de furnis de Habbo ${label}`,
+    categoriesDesc: (label: string) =>
+      `Furnis del Marketplace de Habbo ${label} por tipo, uso o colección: asientos, pisos, iluminación, rares, wired y más, con su precio.`,
+    category: (cat: string, label: string) => `${cat}: precios en Habbo ${label}`,
+    categoryDesc: (cat: string, label: string, n: string) =>
+      `Precio mínimo, ofertas abiertas y ventas de ${n} furnis de «${cat}» en el Marketplace de Habbo ${label}.`,
     nftHome: "Precios de los NFT oficiales de Habbo",
     nftCollection: (name: string) => `${name}: precios y ventas`,
     nftCollectionDesc: (name: string) =>
@@ -112,6 +118,22 @@ export const es = {
     colForSale: "En venta",
     colAvg7: "Promedio 7 d",
     col30: "30 días",
+  },
+  categories: {
+    title: (label: string) => `Categorías de ${label}`,
+    intro: "Explorá los furnis por tipo, uso o colección. Cada categoría tiene subcategorías: en Asientos, por ejemplo, están los sofás, las sillas y los tronos.",
+    count: (n: string) => `${n} furnis`,
+    all: "Todos",
+    index: "Categorías",
+    breadcrumb: "Ruta",
+    subsAria: "Subcategorías",
+    limited: (shown: string, total: string) =>
+      `Se muestran los ${shown} con más ventas de ${total}. Elegí una subcategoría o usá el buscador para ver el resto.`,
+    empty: "Todavía no hay furnis en esta categoría.",
+    pending: "Todavía no se descargó el catálogo de este hotel. Volvé en un rato.",
+    collectionsHint: "Cada línea de furnis del juego, como Pura, Iced o Mode.",
+    homeTitle: "Explorá por categoría",
+    homeHint: "Asientos, pisos, iluminación, rares, wired y más",
   },
   rankings: {
     metaTitle: "Rankings",

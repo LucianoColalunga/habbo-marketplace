@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { FurniIcon } from "@/components/FurniIcon";
 import { SearchBox } from "@/components/SearchBox";
 import { Credits } from "@/components/ui";
-import { searchFurni } from "@/lib/data/views";
+import { searchCategories, searchFurni } from "@/lib/data/views";
 import { isEnabledHotel, type HotelCode } from "@/lib/hotels";
 import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
@@ -48,14 +48,38 @@ async function Results({
   hotel: HotelCode;
   searchParams: PageProps<"/[lang]/[hotel]/buscar">["searchParams"];
 }) {
-  const [{ q: raw }, { p, t, f, href }] = await Promise.all([searchParams, getI18n()]);
+  const [{ q: raw }, { lang, p, t, f, href }] = await Promise.all([searchParams, getI18n()]);
   const s = p.search;
   const q = (Array.isArray(raw) ? raw[0] : raw)?.trim() ?? "";
   if (q.length < 2) return <p className="text-text-2">{s.min2}</p>;
-  const results = await searchFurni(hotel, q, 60);
-  if (results.length === 0) return <p className="text-text-2">{s.none(q)}</p>;
+  const [results, cats] = await Promise.all([searchFurni(hotel, q, 60), searchCategories(hotel, q, lang)]);
+  const chips =
+    cats.length > 0 ? (
+      <ul className="mb-4 flex flex-wrap gap-2">
+        {cats.map((c) => (
+          <li key={`${c.cat}/${c.sub ?? ""}`}>
+            <Link
+              prefetch={false}
+              href={href(`/${hotel}/categorias/${c.cat}${c.sub ? `/${c.sub}` : ""}`)}
+              className="inline-flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3 py-1.5 text-sm text-text hover:bg-accent/20"
+            >
+              {c.label} <span className="text-xs text-text-2">{t.search.seeCategory(f.int(c.count))}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    ) : null;
+  if (results.length === 0) {
+    return (
+      <div>
+        {chips}
+        <p className="text-text-2">{s.none(q)}</p>
+      </div>
+    );
+  }
   return (
     <div>
+      {chips}
       <p className="mb-3 text-sm text-text-2">
         {results.length === 60 ? s.first60 : s.results(results.length)}
         {s.forQ(q)}

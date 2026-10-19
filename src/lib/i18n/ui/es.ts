@@ -21,6 +21,7 @@ export const es = {
   nav: {
     aria: "Secciones",
     home: "Inicio",
+    categories: "Categorías",
     rankings: "Rankings",
     deals: "Ofertas",
     alerts: "Alertas",
@@ -58,6 +59,20 @@ export const es = {
     searching: "buscando…",
     floor: "precio piso",
     noListings: "sin publicaciones",
+    category: "Categoría",
+    seeCategory: (n: string) => `ver los ${n}`,
+  },
+  catList: {
+    sortAria: "Ordenar",
+    popular: "Más vendidos",
+    cheap: "Más baratos",
+    expensive: "Más caros",
+    name: "Nombre",
+    filter: "Filtrar por nombre…",
+    filterAria: "Filtrar esta lista por nombre",
+    sold30: (n: string) => `${n} vendidos en 30 días`,
+    noMarket: "sin ventas registradas",
+    none: "Ningún furni coincide con ese filtro.",
   },
   chart: {
     noData: "Sin datos para graficar.",

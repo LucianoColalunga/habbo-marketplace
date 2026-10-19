@@ -27,6 +27,11 @@ export const pt: Pages = {
     about: (label) => `Dados e limites do Marketplace do Habbo ${label}`,
     aboutDesc: "De onde vêm os preços (API pública do Habbo), quão atuais são e quais limites têm.",
     furni: (name, label) => `${name}: preço no Habbo ${label}`,
+    categories: (label) => `Categorias de mobis do Habbo ${label}`,
+    categoriesDesc: (label) =>
+      `Mobis do Marketplace do Habbo ${label} por tipo, uso ou coleção: assentos, pisos, iluminação, raros, wired e mais, com o preço.`,
+    category: (cat, label) => `${cat}: preços no Habbo ${label}`,
+    categoryDesc: (cat, label, n) => `Menor preço, ofertas abertas e vendas de ${n} mobis de «${cat}» no Marketplace do Habbo ${label}.`,
     nftHome: "Preços dos NFT oficiais do Habbo",
     nftCollection: (name) => `${name}: preços e vendas`,
     nftCollectionDesc: (name) =>
@@ -109,6 +114,21 @@ export const pt: Pages = {
     colForSale: "À venda",
     colAvg7: "Média 7 d",
     col30: "30 dias",
+  },
+  categories: {
+    title: (label) => `Categorias do ${label}`,
+    intro: "Explore os mobis por tipo, uso ou coleção. Cada categoria tem subcategorias: em Assentos, por exemplo, estão os sofás, as cadeiras e os tronos.",
+    count: (n) => `${n} mobis`,
+    all: "Todos",
+    index: "Categorias",
+    breadcrumb: "Caminho",
+    subsAria: "Subcategorias",
+    limited: (shown, total) => `Mostramos os ${shown} mais vendidos de ${total}. Escolha uma subcategoria ou use a busca para ver o resto.`,
+    empty: "Ainda não há mobis nesta categoria.",
+    pending: "O catálogo deste hotel ainda não foi baixado. Volte daqui a pouco.",
+    collectionsHint: "Cada linha de mobis do jogo, como Pura, Iced ou Mode.",
+    homeTitle: "Explore por categoria",
+    homeHint: "Assentos, pisos, iluminação, raros, wired e mais",
   },
   rankings: {
     metaTitle: "Rankings",

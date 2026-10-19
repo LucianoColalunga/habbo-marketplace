@@ -23,13 +23,25 @@ export interface CatalogItem {
   c: string;
   /** Línea de furni (rare, iced, ...). */
   l: string;
+  /** Usos: 1 sentarse, 2 acostarse, 4 caminar encima, 8 apoyar cosas (se omite si es 0). */
+  f?: number;
+  /** Ambiente del juego (nature, kitchen, football...), si tiene. */
+  e?: string;
 }
+
+/** Banderas de uso de `CatalogItem.f`. */
+export const FURNI_FLAGS = { sit: 1, lay: 2, stand: 4, put: 8 } as const;
+
+/** Versión del formato del catálogo: si cambia, el recolector lo vuelve a descargar. */
+export const CATALOG_SCHEMA = 2;
 
 export interface Catalog {
   v: 1;
   hotel: HotelCode;
   hash: string;
   fetchedAt: string;
+  /** Formato (ver CATALOG_SCHEMA); los catálogos viejos no lo tienen. */
+  schema?: number;
   items: CatalogItem[];
 }
 
@@ -41,6 +53,11 @@ interface RawFurni {
   category?: string | null;
   furniline?: string | null;
   tradeable?: boolean;
+  cansiton?: boolean;
+  canlayon?: boolean;
+  canstandon?: boolean;
+  canputstuffon?: boolean;
+  environment?: string | null;
 }
 
 interface RawFurnidata {
@@ -61,6 +78,12 @@ export function compactFurnidata(raw: RawFurnidata, hotel: HotelCode, hash: stri
       const key = `${t}:${f.classname}`;
       if (seen.has(key)) continue;
       seen.add(key);
+      const flags =
+        (f.cansiton ? FURNI_FLAGS.sit : 0) |
+        (f.canlayon ? FURNI_FLAGS.lay : 0) |
+        (f.canstandon ? FURNI_FLAGS.stand : 0) |
+        (f.canputstuffon ? FURNI_FLAGS.put : 0);
+      const env = clean(f.environment).toLowerCase();
       items.push({
         k: f.classname,
         t,
@@ -69,12 +92,14 @@ export function compactFurnidata(raw: RawFurnidata, hotel: HotelCode, hash: stri
         r: Number.isFinite(f.revision) ? Number(f.revision) : 0,
         c: clean(f.category) || "other",
         l: clean(f.furniline),
+        ...(flags ? { f: flags } : {}),
+        ...(/^[a-z0-9_]{1,40}$/.test(env) ? { e: env } : {}),
       });
     }
   };
   add(raw.roomitemtypes?.furnitype, "r");
   add(raw.wallitemtypes?.furnitype, "w");
-  return { v: 1, hotel, hash, fetchedAt, items };
+  return { v: 1, hotel, hash, fetchedAt, schema: CATALOG_SCHEMA, items };
 }
 
 interface HashesResponse {

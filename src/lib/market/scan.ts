@@ -1,5 +1,5 @@
 import { DEFAULT_INTERVAL_MS, fetchMany, MAX_ITEMS_PER_TYPE, type ItemRef, type MarketStats } from "@/lib/habbo/api";
-import { fetchCatalog, fetchFurnidataHash, type Catalog } from "@/lib/habbo/furnidata";
+import { CATALOG_SCHEMA, fetchCatalog, fetchFurnidataHash, type Catalog } from "@/lib/habbo/furnidata";
 import type { HotelCode } from "@/lib/hotels";
 import { getStorage, keys, type Storage } from "@/lib/storage";
 import { emptyHistory, mergeHistory, type MarketHistory } from "./history";
@@ -114,7 +114,8 @@ export async function ensureCatalog(
     }
     throw error;
   }
-  if (stored && stored.data.hash === hash) return { catalog: stored.data, refreshed: false };
+  // Se vuelve a descargar si Habbo lo cambió o si el guardado tiene un formato viejo.
+  if (stored && stored.data.hash === hash && stored.data.schema === CATALOG_SCHEMA) return { catalog: stored.data, refreshed: false };
   log(`Descargando furnidata de ${hotel} (hash ${hash.slice(0, 8)})…`);
   const catalog = await fetchCatalog(hotel, hash, fetchImpl);
   await storage.write(keys.catalog(hotel), catalog);
