@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { enabledHotels, HOTELS, type HotelCode } from "@/lib/hotels";
 import { getI18n } from "@/lib/i18n/server";
+import { AccountButton } from "./account/AccountButton";
 import { HotelSwitcher } from "./HotelSwitcher";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
@@ -24,6 +25,7 @@ export async function SiteHeader({ hotel }: { hotel: HotelCode }) {
         <div className="order-2 ml-auto flex items-center gap-2 md:order-3">
           <HotelSwitcher hotel={hotel} hotels={hotels} />
           <LanguageSwitcher />
+          <AccountButton hotel={hotel} />
         </div>
       </div>
       <NavLinks hotel={hotel} />

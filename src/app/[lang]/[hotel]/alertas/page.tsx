@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { AccountHint } from "@/components/account/AccountButton";
 import { AlertsManager } from "@/components/alerts/AlertsManager";
 import { JoinChannels } from "@/components/JoinChannels";
 import { PageSkeleton } from "@/components/Skeletons";
@@ -31,6 +32,9 @@ async function AlertasPageContent({ params }: Pick<PageProps<"/[lang]/[hotel]/al
       <header>
         <h1 className="font-display text-3xl font-bold text-text">{a.title}</h1>
         <p className="mt-2 max-w-3xl text-text-2">{a.intro}</p>
+        <div className="mt-2">
+          <AccountHint hotel={hotel} />
+        </div>
       </header>
       <Notice>{a.how}</Notice>
       <JoinChannels title={a.channelsTitle} note={a.channelsNote} />

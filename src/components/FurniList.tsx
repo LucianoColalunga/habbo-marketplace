@@ -69,7 +69,7 @@ export async function FurniTable({ hotel, rows, metric }: { hotel: string; rows:
     return <p className="card p-8 text-center text-sm text-muted">{l.empty}</p>;
   }
   return (
-    <div className="card overflow-x-auto">
+    <div className="card overflow-x-auto relative">
       <table className="w-full min-w-[640px] text-sm">
         <thead className="text-left text-text-2">
           <tr className="border-b border-line">

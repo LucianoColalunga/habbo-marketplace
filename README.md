@@ -15,15 +15,21 @@ aparece por debajo de su precio normal.
 - **Ficha de cada furni**: precio mínimo publicado y ofertas abiertas **consultados en vivo**, promedio de 7 y 30 días,
   variación semanal, gráfico de precio (promedio diario + precio mínimo publicado), gráfico de unidades vendidas y tabla.
 - **Rankings**: más vendidos, más créditos movidos, mayores subas, mayores bajas, más caros y más publicados.
+- **Categorías**: los furnis por tipo, uso o colección, con subcategorías (Asientos → sofás, sillas, tronos;
+  Pisos → alfombras, baldosas; Rares → clásicos, LTD; Colecciones → Pura, Iced, Mode...). El buscador las entiende:
+  escribir "pisos" o "sofás" ofrece ver todos.
 - **Ofertas detectadas**: furnis cuyo precio mínimo está al menos 25 % por debajo de su promedio reciente, con botón para
   verificarlas en vivo.
 - **Alertas**: lista de furnis a vigilar con un umbral (% bajo el promedio o precio máximo). Avisa con notificaciones
-  del navegador, y opcionalmente por **Discord** o **Telegram** desde el servidor.
+  del navegador, y opcionalmente por **Discord** o **Telegram** desde el servidor. La lista queda guardada en el
+  navegador y, con una **cuenta** (usuario y contraseña), en cualquier dispositivo.
 - Hoteles **.es**, **.com** y **.com.br** por defecto (se pueden sumar .de, .fr, .it, .nl, .fi y .com.tr).
 - **Tres idiomas:** español, portugués e inglés; cada visitante elige con el selector ES · PT · EN.
 - **Cielo de estrellas** de fondo: titilan, se unen al mouse con líneas y **explotan al tocarlas**. Se puede apagar desde
   el pie de página y respeta la opción "reducir movimiento" del sistema.
-- Tema oscuro, responsive, identidad propia.
+- **Aviso de cookies** y página de privacidad: lo necesario siempre, las preferencias solo si la persona acepta.
+- Comunidad: enlace al perfil de Bomhams en X (<https://x.com/bomhams>).
+- Tema oscuro (créditos en violeta, NFT en dorado), responsive, identidad propia.
 - **Gratis:** todo entra en los planes gratuitos; ver [docs/COSTOS.md](docs/COSTOS.md) (cuánta gente aguanta y qué pasa
   si se pasa).
 
@@ -69,6 +75,22 @@ hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se
 - `/robots.txt`: todo indexable menos `/api/`, las búsquedas internas y la página del dueño.
 - Para Google Search Console: verificá el sitio con la etiqueta HTML y cargá su código en `GOOGLE_SITE_VERIFICATION`;
   después enviá `https://<tu-dominio>/sitemap.xml`.
+
+## Cuentas (opcional)
+
+Con una cuenta, la lista de alertas se guarda también en el servidor y aparece en cualquier dispositivo. Sin cuentas
+configuradas, la web funciona igual (la lista queda en el navegador) y el botón "Entrar" no aparece.
+
+- **Usuario y contraseña**, sin email. Contraseñas cifradas con scrypt (sal propia por cuenta), sesión en una cookie
+  firmada `HttpOnly`/`SameSite=Lax` de 30 días, bloqueo de 15 minutos tras 10 intentos fallidos, límite de registros por
+  conexión, protección contra CSRF (solo pedidos del propio sitio) y nombres reservados (admin, bomhams, habbo...).
+  Cambiar la contraseña cierra las otras sesiones; la cuenta se puede borrar desde "Mi cuenta".
+- **Base de datos**: Upstash Redis, gratis (500.000 operaciones y 250 MB por mes). En Vercel: *Storage → Create
+  Database → Upstash for Redis* (plan gratis) y conectarla al proyecto: agrega `KV_REST_API_URL` y `KV_REST_API_TOKEN`.
+  Después, volver a desplegar.
+- Opcional: `SESSION_SECRET` (32 caracteres o más) para firmar las sesiones; si no está, se deriva del token de la base.
+- Para probar en la PC sin base: `ACCOUNTS_DEV_STORE=1` guarda las cuentas en `.data/accounts-dev.json` (nunca se usa en
+  Vercel).
 
 ## Qué datos son reales (y qué no)
 
@@ -205,7 +227,8 @@ guardar las suscripciones en el servidor.
 
 ## Seguridad
 
-- **Sin cuentas ni contraseñas:** el sitio no tiene login ni guarda datos personales; las alertas viven en el navegador.
+- **Cuentas mínimas:** solo usuario, contraseña cifrada (scrypt) y la lista de alertas; sin email ni datos personales.
+  Sesión firmada `HttpOnly`, bloqueo por intentos fallidos, protección CSRF y borrado de cuenta (ver "Cuentas").
 - **Secretos solo en el servidor:** `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET` y los de Discord/Telegram nunca llegan al
   navegador (solo las variables `NEXT_PUBLIC_*` se publican). `.env*` está fuera de git y de los despliegues
   (`.gitignore` y `.vercelignore`).
@@ -241,8 +264,10 @@ Todas están explicadas en [.env.example](.env.example).
 
 ```
 src/
-  app/[lang]/          páginas por idioma: [hotel] (inicio, furni, rankings, ofertas, alertas, acerca) y nft/
-  app/api/             rutas API (búsqueda y cron)
+  app/[lang]/          páginas por idioma: [hotel] (inicio, furni, categorías, rankings, ofertas, alertas, cuenta,
+                       privacidad, acerca) y nft/
+  app/api/             rutas API (búsqueda, cuentas y cron)
+  lib/accounts/        cuentas: base de datos, contraseñas, sesión y sincronización de alertas
   components/          interfaz, gráficos SVG, alertas del navegador y fondo de estrellas
   lib/i18n/            idiomas: textos, direcciones y formatos de números y fechas
   lib/habbo/           cliente de la API (servidor y navegador), furnidata e imágenes

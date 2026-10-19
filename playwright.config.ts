@@ -33,6 +33,8 @@ export default defineConfig({
         command: `npx next start -p ${PORT}`,
         url: `http://localhost:${PORT}/es`,
         reuseExistingServer: true,
+        // Cuentas de prueba en un archivo local (.data/accounts-dev.json), nunca en Vercel.
+        env: { ACCOUNTS_DEV_STORE: "1" },
         timeout: 120_000,
       },
 });

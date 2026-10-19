@@ -31,7 +31,7 @@ test("la búsqueda no refleja HTML", async ({ request, page }) => {
   const payload = '<img src=x onerror="window.__xss=1">';
   const res = await request.get(`/api/search?hotel=es&q=${encodeURIComponent(payload)}`);
   expect(res.ok()).toBe(true);
-  expect(await res.json()).toEqual({ results: [] });
+  expect(await res.json()).toEqual({ results: [], categories: [] });
   await page.goto(`/es/buscar?q=${encodeURIComponent(payload)}`);
   await expect(page.getByText(/No encontramos furnis/)).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __xss?: number }).__xss)).toBeUndefined();

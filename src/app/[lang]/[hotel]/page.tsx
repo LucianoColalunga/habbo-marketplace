@@ -100,7 +100,7 @@ async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "
       <JoinChannels />
 
       {view.meta.hasData && (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <section className="card p-4">
             <SectionTitle title={h.bestSellers} hint={h.bestSellersHint} href={href(`/${hotel}/rankings/vendidos`)} />
             <FurniMiniList hotel={hotel} rows={view.vendidos} metric="s7" empty={h.noSales} />

@@ -5,7 +5,7 @@ import { test as base } from "@playwright/test";
  * ("aceptar todas"), para que no tape botones en las pruebas que no son sobre él.
  */
 export const test = base.extend({
-  page: async ({ page }, use) => {
+  page: async ({ page }, provide) => {
     await page.addInitScript(() => {
       try {
         if (!localStorage.getItem("bm:consent")) localStorage.setItem("bm:consent", JSON.stringify({ v: 1, prefs: true, at: Date.now() }));
@@ -13,7 +13,7 @@ export const test = base.extend({
         // sin almacenamiento
       }
     });
-    await use(page);
+    await provide(page);
   },
 });
 

@@ -27,6 +27,11 @@ mientras tanto cada lectura es gratis. Además el servidor recuerda lo leído un
 "In most cases, if you exceed your usage limits on the Hobby plan, you will have to wait until 30 days have passed
 before you can use the feature again." — documentación de Vercel.
 
+Si se activan las **cuentas**, la base de datos es Upstash Redis en su plan gratis: 500.000 operaciones y 250 MB por
+mes. Cada visita de alguien con sesión usa unas 2 operaciones y guardar la lista, 2 más: alcanza para cientos de
+personas activas por día. Si algún mes se llegara al tope, fallan solo las cuentas; las alertas siguen funcionando
+porque también se guardan en el navegador. No cargues una tarjeta en Upstash: así no hay forma de que cobre.
+
 ## Lo que medimos
 
 Con el sitio compilado (pruebas con Playwright, 17/10/2026):

@@ -59,7 +59,7 @@ export async function NftTable({ rows, metric }: { rows: NftRow[]; metric: NftMe
     return <p className="card p-8 text-center text-sm text-muted">{l.empty}</p>;
   }
   return (
-    <div className="card overflow-x-auto">
+    <div className="card overflow-x-auto relative">
       <table className="w-full min-w-[680px] text-sm">
         <thead className="text-left text-text-2">
           <tr className="border-b border-line">

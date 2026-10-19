@@ -142,7 +142,7 @@ export function AlertsManager({ hotel, hotels }: { hotel: HotelCode; hotels: Hot
         {rules.length === 0 ? (
           <p className="card p-6 text-sm text-muted">{t.emptyList}</p>
         ) : (
-          <div className="card overflow-x-auto">
+          <div className="card overflow-x-auto relative">
             <table className="w-full min-w-[640px] text-sm">
               <thead className="text-left text-text-2">
                 <tr className="border-b border-line">

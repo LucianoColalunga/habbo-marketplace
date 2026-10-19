@@ -53,6 +53,7 @@ export const pt: Pages = {
     linkAlerts: "Alertas de preço",
     linkSource: "Código-fonte",
     linkPrivacy: "Privacidade e cookies",
+    linkX: "Bomhams no X",
   },
   notFound: {
     title: "Não encontramos essa página",

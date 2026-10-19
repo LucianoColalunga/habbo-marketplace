@@ -55,7 +55,7 @@ export function CategoryList({ hotel, rows }: { hotel: string; rows: CategoryRow
       {shown.length === 0 ? (
         <p className="card p-6 text-center text-sm text-muted">{t.none}</p>
       ) : (
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((r) => (
             <li key={r.k}>
               <Link

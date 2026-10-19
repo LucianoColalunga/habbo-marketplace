@@ -51,6 +51,7 @@ export const en: Pages = {
     linkAlerts: "Price alerts",
     linkSource: "Source code",
     linkPrivacy: "Privacy & cookies",
+    linkX: "Bomhams on X",
   },
   notFound: {
     title: "We couldn't find that page",

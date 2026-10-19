@@ -220,7 +220,7 @@ export function ItemLive({ hotel, k, t: type, stored, storedAt, days, snaps }: P
           {showTable ? t.tableHide : t.tableShow}
         </button>
         {showTable && (
-          <div className="card mt-3 overflow-x-auto">
+          <div className="card mt-3 overflow-x-auto relative">
             <table className="w-full text-sm">
               <caption className="sr-only">{t.tableCaption}</caption>
               <thead className="text-left text-text-2">

@@ -53,7 +53,7 @@ export default async function NftHome() {
 
       <section aria-label={h.collectionsTitle}>
         <SectionTitle title={h.collectionsTitle} hint={h.collectionsHint} />
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {view.collections.map((c) => (
             <li key={c.slug}>
               <Link prefetch={false} href={href(`/nft/coleccion/${c.slug}`)} className="card flex h-full flex-col gap-2 p-4 hover:bg-surface-2">
@@ -70,7 +70,7 @@ export default async function NftHome() {
       </section>
 
       {view.meta.hasData && (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <section className="card p-4">
             <SectionTitle title={h.bestSellers} hint={h.bestSellersHint} href={href("/nft/rankings/vendidos")} />
             <NftMiniList rows={view.vendidos} metric="s7" empty={h.noSales} />

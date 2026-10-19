@@ -18,7 +18,7 @@ export function NavLinks({ hotel }: { hotel: string }) {
   const { t, href } = useI18n();
   const { rest } = splitLocale(usePathname() ?? "/");
   return (
-    <nav aria-label={t.nav.aria} className="mx-auto max-w-6xl overflow-x-auto px-4">
+    <nav aria-label={t.nav.aria} className="mx-auto max-w-6xl overflow-x-auto relative px-4">
       <ul className="flex gap-1 pb-2 text-sm">
         {LINKS.map((link) => {
           const path = `/${hotel}${link.href}`;

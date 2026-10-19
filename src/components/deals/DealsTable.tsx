@@ -90,7 +90,7 @@ export function DealsTable({ hotel, rows }: { hotel: HotelCode; rows: FurniRow[]
         </button>
       </div>
       {note && <p className="text-sm text-text-2">{t[note]}</p>}
-      <div className="card overflow-x-auto">
+      <div className="card overflow-x-auto relative">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="text-left text-text-2">
             <tr className="border-b border-line">

@@ -59,10 +59,13 @@ export function Starfield() {
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      // El ancho real de la página (en el celular, innerWidth puede ser mayor si hay zoom).
+      const w = document.documentElement.clientWidth || window.innerWidth;
+      const h = document.documentElement.clientHeight || window.innerHeight;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       engine.resize(w, h);
       if (reduce.matches) engine.draw(ctx, null);
@@ -129,5 +132,10 @@ export function Starfield() {
   }, [enabled]);
 
   if (!enabled) return null;
-  return <canvas ref={canvasRef} data-starfield="" aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 h-full w-full" />;
+  return (
+    // El contenedor recorta: el cielo nunca puede ensanchar la página.
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <canvas ref={canvasRef} data-starfield="" className="block" />
+    </div>
+  );
 }

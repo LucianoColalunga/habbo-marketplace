@@ -84,7 +84,7 @@ async function Results({
         {results.length === 60 ? s.first60 : s.results(results.length)}
         {s.forQ(q)}
       </p>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {results.map((r) => (
           <li key={r.k}>
             <Link

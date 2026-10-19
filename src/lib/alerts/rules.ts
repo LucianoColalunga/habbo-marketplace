@@ -124,3 +124,44 @@ export function describeRule(rule: WatchRule): string {
     ? `${rule.value} % o más por debajo del promedio`
     : `a ${rule.value} créditos o menos`;
 }
+
+/** Regla guardada (en el navegador o en la cuenta), con los datos del furni para mostrarla. */
+export interface StoredRule extends WatchRule {
+  name: string;
+  t: "r" | "w";
+  r: number;
+  createdAt: number;
+}
+
+/** Cuántas alertas puede tener una lista. */
+export const MAX_RULES = 100;
+
+/** Valida una regla guardada que viene de un lugar no confiable. */
+export function parseStoredRule(raw: unknown): StoredRule | null {
+  const rule = parseRule(raw);
+  if (!rule) return null;
+  const extra = raw as Partial<StoredRule>;
+  return {
+    ...rule,
+    // Sin caracteres de control: el nombre solo se muestra como texto.
+    name: typeof extra.name === "string" ? extra.name.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 120) : rule.item,
+    t: extra.t === "w" ? "w" : "r",
+    r: Number.isFinite(extra.r) ? Math.max(0, Math.trunc(Number(extra.r))) : 0,
+    createdAt: Number.isFinite(extra.createdAt) ? Number(extra.createdAt) : Date.now(),
+  };
+}
+
+export function parseStoredRules(raw: unknown): StoredRule[] {
+  if (!Array.isArray(raw)) return [];
+  const out: StoredRule[] = [];
+  const ids = new Set<string>();
+  for (const r of raw) {
+    const rule = parseStoredRule(r);
+    if (rule && !ids.has(rule.id)) {
+      ids.add(rule.id);
+      out.push(rule);
+    }
+    if (out.length >= MAX_RULES) break;
+  }
+  return out;
+}

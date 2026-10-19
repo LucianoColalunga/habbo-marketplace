@@ -2,20 +2,15 @@
 
 import { useSyncExternalStore } from "react";
 import { isHotelCode } from "@/lib/hotels";
-import { parseRule, type NotifyState, type WatchRule } from "./rules";
+import { parseStoredRules, type NotifyState, type StoredRule } from "./rules";
 
 /**
- * Lista de vigilancia guardada en el navegador (localStorage). No sale del
- * equipo del usuario: no hay cuentas ni contraseñas.
+ * Lista de vigilancia guardada en el navegador (localStorage). Queda aunque se
+ * cierre la pestaña o se apague la PC. Con una cuenta, además se sincroniza
+ * con el servidor (ver lib/accounts/client.ts).
  */
 
-export interface LocalRule extends WatchRule {
-  /** Nombre y datos del furni para mostrar sin volver a buscarlos. */
-  name: string;
-  t: "r" | "w";
-  r: number;
-  createdAt: number;
-}
+export type LocalRule = StoredRule;
 
 export interface Detection {
   id: string;
@@ -75,26 +70,17 @@ function write(key: string, value: unknown) {
 }
 
 export function loadRules(): LocalRule[] {
-  const raw = read<unknown[]>(KEYS.rules, []);
-  if (!Array.isArray(raw)) return [];
-  const out: LocalRule[] = [];
-  for (const r of raw) {
-    const rule = parseRule(r);
-    if (!rule) continue;
-    const extra = r as Partial<LocalRule>;
-    out.push({
-      ...rule,
-      name: typeof extra.name === "string" ? extra.name.slice(0, 120) : rule.item,
-      t: extra.t === "w" ? "w" : "r",
-      r: Number.isFinite(extra.r) ? Number(extra.r) : 0,
-      createdAt: Number.isFinite(extra.createdAt) ? Number(extra.createdAt) : Date.now(),
-    });
-  }
-  return out;
+  return parseStoredRules(read<unknown>(KEYS.rules, []));
 }
 
-export function saveRules(rules: LocalRule[]) {
-  write(KEYS.rules, rules);
+/** Guarda la lista. `fromAccount` indica que viene de la cuenta (no hay que volver a subirla). */
+export function saveRules(rules: LocalRule[], fromAccount = false) {
+  try {
+    localStorage.setItem(KEYS.rules, JSON.stringify(rules));
+  } catch {
+    // almacenamiento lleno o bloqueado: no se guarda
+  }
+  window.dispatchEvent(new CustomEvent(EVENT, { detail: { rules: true, fromAccount } }));
 }
 
 export function addRule(rule: LocalRule) {

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AccountButton } from "@/components/account/AccountButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 import { NftNav } from "@/components/nft/NftNav";
 import { SearchBox } from "@/components/SearchBox";
 import { SectionSwitch } from "@/components/SectionSwitch";
+import { SocialLink } from "@/components/SocialLink";
 import { CookieSettingsButton } from "@/components/CookieBanner";
 import { StarsToggle } from "@/components/StarsToggle";
 import { homeHotel } from "@/lib/i18n/config";
@@ -33,8 +35,9 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
           <div className="order-3 w-full md:order-2 md:w-auto md:flex-1">
             <SearchBox nft />
           </div>
-          <div className="order-2 ml-auto md:order-3">
+          <div className="order-2 ml-auto flex items-center gap-2 md:order-3">
             <LanguageSwitcher />
+            <AccountButton />
           </div>
         </div>
         <NftNav />
@@ -54,6 +57,7 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
           <p>{p.nft.footerData}</p>
           <p className="text-muted">{p.nft.footerRisk}</p>
           <p className="flex flex-wrap gap-x-4">
+            <SocialLink label={p.footer.linkX} />
             <Link prefetch={false} className="hover:text-text" href={href(`/${homeHotel(lang)}/privacidad`)}>
               {p.footer.linkPrivacy}
             </Link>

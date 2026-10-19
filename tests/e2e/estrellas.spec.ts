@@ -7,7 +7,7 @@ async function litPixels(page: Page, x = 0, y = 0, radius = 0): Promise<number> 
       const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-starfield]");
       const ctx = canvas?.getContext("2d");
       if (!canvas || !ctx || canvas.width === 0) return -1;
-      const scale = canvas.width / window.innerWidth;
+      const scale = canvas.width / (document.documentElement.clientWidth || window.innerWidth);
       const r = Math.round(radius * scale);
       const data = radius
         ? ctx.getImageData(Math.round(x * scale) - r, Math.round(y * scale) - r, r * 2, r * 2).data
