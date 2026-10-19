@@ -59,6 +59,17 @@ hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se
 - Los textos están en `src/lib/i18n/ui/` (los que usa el navegador) y `src/lib/i18n/pages/` (los de cada página). Una
   prueba verifica que los tres idiomas tengan exactamente las mismas claves.
 
+## SEO
+
+- Cada página tiene título y descripción propios (con el hotel y el idioma), dirección canónica, sus versiones en los
+  otros idiomas (`hreflang`) y tarjeta para compartir (Open Graph). Todo sale de `pageMeta()` en `src/lib/i18n/seo.ts`.
+- Imágenes para compartir en `public/og/` (Marketplace y NFT, en los 3 idiomas). Se regeneran con `npm run og-images`.
+- `/sitemap.xml`: páginas principales y los 500 furnis y 200 NFT más activos, en los 3 idiomas (unas 5.300 direcciones).
+  No van todos los furnis a propósito: Google encuentra el resto siguiendo enlaces, sin gastar de golpe el plan gratis.
+- `/robots.txt`: todo indexable menos `/api/`, las búsquedas internas y la página del dueño.
+- Para Google Search Console: verificá el sitio con la etiqueta HTML y cargá su código en `GOOGLE_SITE_VERIFICATION`;
+  después enviá `https://<tu-dominio>/sitemap.xml`.
+
 ## Qué datos son reales (y qué no)
 
 Todo sale de la **API pública y documentada de Habbo** y del **furnidata** público. No se usan cuentas, contraseñas ni
