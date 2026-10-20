@@ -300,7 +300,7 @@ export const pt: Pages = {
     metaTitle: "Privacidade e cookies",
     metaDesc: "O que o Bomhams Market guarda, onde e como apagar. Sem publicidade nem rastreamento.",
     title: "Privacidade e cookies",
-    intro: "O Bomhams Market não tem publicidade nem rastreamento, não vende dados e não pede seu e-mail. Isto é tudo o que fica salvo e onde.",
+    intro: "O Bomhams Market não tem publicidade nem rastreamento, não vende dados e só pede seu e-mail se você criar uma conta. Isto é tudo o que fica salvo e onde.",
     sections: [
       {
         title: "No seu navegador (necessário)",
@@ -320,10 +320,11 @@ export const pt: Pages = {
       {
         title: "Se você criar uma conta",
         items: [
-          "Guardamos seu nome de usuário, sua senha criptografada (ninguém consegue lê-la, nem quem administra o site), sua lista de alertas e a data de criação. Nada mais.",
+          "Guardamos seu nome de usuário, seu e-mail, sua senha criptografada (ninguém consegue lê-la, nem quem administra o site), sua lista de alertas e as datas de criação e do último acesso. Nada mais.",
           "O cookie de sessão bm_session, necessário para você continuar conectado. Não pode ser lido pela página e dura 30 dias ou até você sair.",
           "Você pode apagar sua conta e todos os dados quando quiser em «Minha conta».",
-          "Não use a mesma senha do Habbo nem de outro site. Como não pedimos e-mail, se você esquecer a senha ela não pode ser recuperada: será preciso criar outra conta.",
+          "O e-mail é usado só para confirmar que é seu e para enviar seu usuário e um link se você esquecer a senha. Não enviamos publicidade nem o compartilhamos com ninguém. Quem administra o site vê só uma parte (por exemplo lu***@gmail.com).",
+          "Não use a mesma senha do Habbo nem de outro site.",
         ],
       },
       {
@@ -331,6 +332,7 @@ export const pt: Pages = {
         items: [
           "A Vercel hospeda o site: como qualquer servidor, recebe seu endereço IP e registra os pedidos por segurança durante pouco tempo.",
           "A Upstash guarda as contas (banco de dados conectado pela Vercel).",
+          "Os e-mails da conta (confirmar o e-mail e recuperar a conta) saem pelo serviço de e-mail do site, que recebe seu e-mail só para entregá-los.",
           "Seu navegador consulta os preços ao vivo direto no Habbo e na Immutable, sem enviar cookies. As imagens dos mobis vêm dos servidores do Habbo.",
         ],
       },

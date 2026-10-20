@@ -310,7 +310,7 @@ export const es = {
     metaDesc: "Qué guarda Bomhams Market, dónde y cómo borrarlo. Sin publicidad ni seguimiento.",
     title: "Privacidad y cookies",
     intro:
-      "Bomhams Market no tiene publicidad ni seguimiento, no vende datos y no pide tu email. Esto es todo lo que se guarda y dónde.",
+      "Bomhams Market no tiene publicidad ni seguimiento, no vende datos y solo pide tu email si creás una cuenta. Esto es todo lo que se guarda y dónde.",
     sections: [
       {
         title: "En tu navegador (necesario)",
@@ -330,10 +330,11 @@ export const es = {
       {
         title: "Si creás una cuenta",
         items: [
-          "Guardamos tu nombre de usuario, tu contraseña cifrada (nadie puede leerla, ni siquiera quien administra el sitio), tu lista de alertas y la fecha de creación. Nada más.",
+          "Guardamos tu nombre de usuario, tu email, tu contraseña cifrada (nadie puede leerla, ni siquiera quien administra el sitio), tu lista de alertas y las fechas de creación y último ingreso. Nada más.",
           "La cookie de sesión bm_session, necesaria para que sigas conectado. No se puede leer desde la página y dura 30 días o hasta que cierres sesión.",
           "Podés borrar tu cuenta y todos sus datos cuando quieras desde «Mi cuenta».",
-          "No uses la misma contraseña que en Habbo ni en otro sitio. Como no pedimos email, si te olvidás la contraseña no se puede recuperar: vas a tener que crear otra cuenta.",
+          "El email se usa solo para confirmar que es tuyo y para mandarte tu usuario y un enlace si te olvidás la contraseña. No mandamos publicidad ni lo compartimos con nadie. Quien administra el sitio solo ve una parte (por ejemplo lu***@gmail.com).",
+          "No uses la misma contraseña que en Habbo ni en otro sitio.",
         ],
       },
       {
@@ -341,6 +342,7 @@ export const es = {
         items: [
           "Vercel aloja el sitio: como cualquier servidor, recibe tu dirección IP y registra los pedidos por seguridad durante poco tiempo.",
           "Upstash guarda las cuentas (base de datos conectada a través de Vercel).",
+          "Los correos de la cuenta (confirmar el email y recuperar la cuenta) salen por el servicio de correo del sitio, que recibe tu email solo para entregarlos.",
           "Tu navegador consulta los precios en vivo directo a Habbo e Immutable, sin enviarles cookies. Las imágenes de los furnis vienen de los servidores de Habbo.",
         ],
       },

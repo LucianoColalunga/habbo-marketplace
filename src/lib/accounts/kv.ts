@@ -16,6 +16,19 @@ export interface KV {
   del(...keys: string[]): Promise<void>;
   /** Suma 1 y devuelve el valor; la clave vence a los `exSeconds` del primer aumento. */
   incr(key: string, exSeconds: number): Promise<number>;
+  /** Lee y borra en un solo paso (para enlaces de un solo uso). */
+  getdel(key: string): Promise<string | null>;
+  /** Conjunto ordenado (lista de cuentas por fecha). */
+  zadd(key: string, score: number, member: string): Promise<void>;
+  zrem(key: string, member: string): Promise<void>;
+  zcard(key: string): Promise<number>;
+  /** Del más alto al más bajo, posiciones `start`..`stop` (incluidas). */
+  zrevrange(key: string, start: number, stop: number): Promise<string[]>;
+  /** Lista acotada (registro de acciones): agrega adelante y deja solo `max`. */
+  lpush(key: string, value: string, max: number): Promise<void>;
+  lrange(key: string, start: number, stop: number): Promise<string[]>;
+  /** Claves que empiezan con `prefix` (para reconstruir índices). */
+  keys(prefix: string, limit: number): Promise<string[]>;
 }
 
 type Env = Record<string, string | undefined>;
@@ -91,6 +104,54 @@ export class UpstashKV implements KV {
     ]);
     return Number(n);
   }
+
+  async getdel(key: string) {
+    const [r] = await this.pipeline([["GETDEL", key]]);
+    return typeof r === "string" ? r : null;
+  }
+
+  async zadd(key: string, score: number, member: string) {
+    await this.pipeline([["ZADD", key, score, member]]);
+  }
+
+  async zrem(key: string, member: string) {
+    await this.pipeline([["ZREM", key, member]]);
+  }
+
+  async zcard(key: string) {
+    const [n] = await this.pipeline([["ZCARD", key]]);
+    return Number(n) || 0;
+  }
+
+  async zrevrange(key: string, start: number, stop: number) {
+    const [r] = await this.pipeline([["ZRANGE", key, start, stop, "REV"]]);
+    return Array.isArray(r) ? r.map(String) : [];
+  }
+
+  async lpush(key: string, value: string, max: number) {
+    await this.pipeline([
+      ["LPUSH", key, value],
+      ["LTRIM", key, 0, max - 1],
+    ]);
+  }
+
+  async lrange(key: string, start: number, stop: number) {
+    const [r] = await this.pipeline([["LRANGE", key, start, stop]]);
+    return Array.isArray(r) ? r.map(String) : [];
+  }
+
+  async keys(prefix: string, limit: number) {
+    const out: string[] = [];
+    let cursor = "0";
+    // SCAN de a partes (nunca KEYS, que bloquea la base).
+    do {
+      const [r] = await this.pipeline([["SCAN", cursor, "MATCH", `${prefix}*`, "COUNT", 200]]);
+      const [next, found] = r as [string, string[]];
+      cursor = String(next);
+      out.push(...found);
+    } while (cursor !== "0" && out.length < limit);
+    return out.slice(0, limit);
+  }
 }
 
 /** Solo para probar en la PC: guarda todo en un archivo. */
@@ -153,6 +214,68 @@ export class FileKV implements KV {
       d[key] = { v: String(n), exp: d[key]?.exp ?? Date.now() + exSeconds * 1000 };
       return n;
     }, true);
+  }
+
+  getdel(key: string) {
+    return this.run((d) => {
+      const v = d[key]?.v ?? null;
+      delete d[key];
+      return v;
+    }, true);
+  }
+
+  private zset(d: Record<string, { v: string; exp?: number }>, key: string): Record<string, number> {
+    try {
+      return JSON.parse(d[key]?.v ?? "{}") as Record<string, number>;
+    } catch {
+      return {};
+    }
+  }
+
+  zadd(key: string, score: number, member: string) {
+    return this.run((d) => {
+      const z = this.zset(d, key);
+      z[member] = score;
+      d[key] = { v: JSON.stringify(z) };
+    }, true);
+  }
+
+  zrem(key: string, member: string) {
+    return this.run((d) => {
+      const z = this.zset(d, key);
+      delete z[member];
+      d[key] = { v: JSON.stringify(z) };
+    }, true);
+  }
+
+  zcard(key: string) {
+    return this.run((d) => Object.keys(this.zset(d, key)).length, false);
+  }
+
+  zrevrange(key: string, start: number, stop: number) {
+    return this.run(
+      (d) =>
+        Object.entries(this.zset(d, key))
+          .sort((a, b) => b[1] - a[1])
+          .slice(start, stop + 1)
+          .map(([m]) => m),
+      false,
+    );
+  }
+
+  lpush(key: string, value: string, max: number) {
+    return this.run((d) => {
+      const list = JSON.parse(d[key]?.v ?? "[]") as string[];
+      d[key] = { v: JSON.stringify([value, ...list].slice(0, max)) };
+    }, true);
+  }
+
+  lrange(key: string, start: number, stop: number) {
+    return this.run((d) => (JSON.parse(d[key]?.v ?? "[]") as string[]).slice(start, stop + 1), false);
+  }
+
+  keys(prefix: string, limit: number) {
+    return this.run((d) => Object.keys(d).filter((k) => k.startsWith(prefix)).slice(0, limit), false);
   }
 }
 

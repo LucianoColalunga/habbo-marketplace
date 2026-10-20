@@ -81,16 +81,27 @@ hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se
 Con una cuenta, la lista de alertas se guarda también en el servidor y aparece en cualquier dispositivo. Sin cuentas
 configuradas, la web funciona igual (la lista queda en el navegador) y el botón "Entrar" no aparece.
 
-- **Usuario y contraseña**, sin email. Contraseñas cifradas con scrypt (sal propia por cuenta), sesión en una cookie
-  firmada `HttpOnly`/`SameSite=Lax` de 30 días, bloqueo de 15 minutos tras 10 intentos fallidos, límite de registros por
-  conexión, protección contra CSRF (solo pedidos del propio sitio) y nombres reservados (admin, bomhams, habbo...).
-  Cambiar la contraseña cierra las otras sesiones; la cuenta se puede borrar desde "Mi cuenta".
+- **Usuario, email y contraseña.** El email se confirma con un enlace (vence en 24 h) y sirve para recuperar la cuenta:
+  "¿Te olvidaste el usuario o la contraseña?" manda el usuario y un enlace de un solo uso (vence en 1 hora) para elegir
+  una contraseña nueva. Cambiar el email pide la contraseña.
+- Contraseñas cifradas con scrypt (sal propia por cuenta), sesión en una cookie firmada `HttpOnly`/`SameSite=Lax` de
+  30 días, bloqueo por intentos fallidos (por conexión y por cuenta), límite de registros y de correos, protección
+  contra CSRF (solo pedidos del propio sitio) y nombres reservados (admin, bomhams, habbo...). Cambiar o recuperar la
+  contraseña cierra las otras sesiones; la cuenta se puede borrar desde "Mi cuenta".
 - **Base de datos**: Upstash Redis, gratis (500.000 operaciones y 250 MB por mes). En Vercel: *Storage → Create
   Database → Upstash for Redis* (plan gratis) y conectarla al proyecto: agrega `KV_REST_API_URL` y `KV_REST_API_TOKEN`.
-  Después, volver a desplegar.
+  Después, volver a desplegar. Quien entra a la web sin haber usado nunca una cuenta no gasta operaciones de la base.
+- **Correos**: por SMTP, con cualquier servicio gratis. Lo más simple: una cuenta de Gmail solo para el sitio, con
+  verificación en dos pasos y una "contraseña de aplicación" (hasta ~500 correos por día):
+  `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER`, `SMTP_PASS` y `MAIL_FROM`. Sin esto, las cuentas funcionan
+  pero no se puede confirmar el email ni recuperar la cuenta.
+- **Panel de administración** (`/admin`): estado de los escaneos, configuración (sin mostrar secretos), cuentas (con el
+  email oculto en parte), bloquear, destrabar o borrar cuentas, actualizar páginas, probar los canales y un registro de
+  acciones. Solo lo ven las cuentas de `ADMIN_USERS` (separadas por coma) y, con los correos activos, con el email
+  confirmado. Primero creá tu cuenta y después poné tu usuario en `ADMIN_USERS`.
 - Opcional: `SESSION_SECRET` (32 caracteres o más) para firmar las sesiones; si no está, se deriva del token de la base.
-- Para probar en la PC sin base: `ACCOUNTS_DEV_STORE=1` guarda las cuentas en `.data/accounts-dev.json` (nunca se usa en
-  Vercel).
+- Para probar en la PC sin base: `ACCOUNTS_DEV_STORE=1` guarda las cuentas en `.data/accounts-dev.json` y los correos en
+  `.data/mail-outbox.json` (nunca se usa en Vercel).
 
 ## Qué datos son reales (y qué no)
 
@@ -227,8 +238,9 @@ guardar las suscripciones en el servidor.
 
 ## Seguridad
 
-- **Cuentas mínimas:** solo usuario, contraseña cifrada (scrypt) y la lista de alertas; sin email ni datos personales.
-  Sesión firmada `HttpOnly`, bloqueo por intentos fallidos, protección CSRF y borrado de cuenta (ver "Cuentas").
+- **Cuentas mínimas:** usuario, email, contraseña cifrada (scrypt) y la lista de alertas. Sesión firmada `HttpOnly`,
+  bloqueo por intentos fallidos, enlaces de un solo uso, protección CSRF y borrado de cuenta (ver "Cuentas"). La
+  auditoría completa está en [docs/SEGURIDAD.md](docs/SEGURIDAD.md).
 - **Secretos solo en el servidor:** `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET` y los de Discord/Telegram nunca llegan al
   navegador (solo las variables `NEXT_PUBLIC_*` se publican). `.env*` está fuera de git y de los despliegues
   (`.gitignore` y `.vercelignore`).
@@ -236,7 +248,7 @@ guardar las suscripciones en el servidor.
   tiempo constante); en producción, sin secreto configurado, responden 401.
 - **Encabezados:** CSP que solo permite el propio sitio, la API de Habbo y su CDN de imágenes; `frame-ancestors 'none'`
   y `X-Frame-Options: DENY` (no se puede embeber en otro sitio), `nosniff`, `Referrer-Policy`, `Permissions-Policy` y
-  HTTPS forzado (HSTS de Vercel). No se anuncia el framework (`X-Powered-By`).
+  HTTPS forzado (HSTS de 2 años). No se anuncia el framework (`X-Powered-By`).
 - **Entradas validadas:** hoteles contra una lista fija, búsquedas recortadas a 60 caracteres, classnames con formato
   estricto (sin `__proto__` ni caracteres raros), reglas de alerta validadas. React escapa todo el texto; no hay HTML
   sin escapar.

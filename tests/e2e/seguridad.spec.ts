@@ -10,7 +10,11 @@ test("las respuestas traen los encabezados de seguridad", async ({ request }) =>
     expect(h["x-content-type-options"], path).toBe("nosniff");
     expect(h["referrer-policy"], path).toBe("strict-origin-when-cross-origin");
     expect(h["x-powered-by"], path).toBeUndefined();
+    expect(h["strict-transport-security"], path).toContain("max-age=63072000");
   }
+  // Las páginas que abren los enlaces de los correos no mandan la dirección (con el código) a otros sitios.
+  const reset = await request.get("/es/cuenta/restablecer");
+  expect(await reset.text()).toContain('name="referrer" content="no-referrer"');
 });
 
 test("la política de contenido no bloquea nada que use el sitio", async ({ page }) => {

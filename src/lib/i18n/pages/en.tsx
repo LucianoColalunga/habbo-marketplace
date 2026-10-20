@@ -294,7 +294,7 @@ export const en: Pages = {
     metaTitle: "Privacy & cookies",
     metaDesc: "What Bomhams Market stores, where, and how to delete it. No ads, no tracking.",
     title: "Privacy & cookies",
-    intro: "Bomhams Market has no ads or tracking, doesn't sell data and doesn't ask for your email. This is everything that gets stored and where.",
+    intro: "Bomhams Market has no ads or tracking, doesn't sell data and only asks for your email if you create an account. This is everything that gets stored and where.",
     sections: [
       {
         title: "In your browser (necessary)",
@@ -314,10 +314,11 @@ export const en: Pages = {
       {
         title: "If you create an account",
         items: [
-          "We store your username, your encrypted password (nobody can read it, not even the site admin), your alert list and the creation date. Nothing else.",
+          "We store your username, your email, your encrypted password (nobody can read it, not even the site admin), your alert list and the creation and last sign-in dates. Nothing else.",
           "The bm_session session cookie, needed to keep you signed in. The page can't read it, and it lasts 30 days or until you sign out.",
           "You can delete your account and all its data at any time from «My account».",
-          "Don't reuse your Habbo password or any other site's password. Since we don't ask for an email, a forgotten password can't be recovered: you'll need to create a new account.",
+          "Your email is only used to confirm it's yours and to send you your username and a link if you forget your password. We don't send ads or share it with anyone. The site admin only sees part of it (for example lu***@gmail.com).",
+          "Don't reuse your Habbo password or any other site's password.",
         ],
       },
       {
@@ -325,6 +326,7 @@ export const en: Pages = {
         items: [
           "Vercel hosts the site: like any server, it receives your IP address and logs requests for security for a short time.",
           "Upstash stores the accounts (a database connected through Vercel).",
+          "Account emails (confirming your email and recovering your account) go out through the site's email service, which receives your address only to deliver them.",
           "Your browser checks live prices directly with Habbo and Immutable, without sending them cookies. Furni images come from Habbo's servers.",
         ],
       },

@@ -15,20 +15,40 @@ export type AccountStatus = "loading" | "disabled" | "anon" | "user" | "error";
 export interface AccountState {
   status: AccountStatus;
   name: string | null;
+  email: string | null;
+  emailVerified: boolean;
+  admin: boolean;
+  /** Si el sitio puede mandar correos (confirmar y recuperar). */
+  mail: boolean;
+}
+
+interface PublicUser {
+  name: string;
+  email: string | null;
+  emailVerified: boolean;
+  admin: boolean;
 }
 
 const MARKER = "bm:account";
 const DIRTY = "bm:rules-dirty";
-const SERVER_STATE: AccountState = { status: "loading", name: null };
+const SERVER_STATE: AccountState = { status: "loading", name: null, email: null, emailVerified: false, admin: false, mail: false };
 
 let state: AccountState = SERVER_STATE;
 const listeners = new Set<() => void>();
 let started = false;
 let uploadTimer: ReturnType<typeof setTimeout> | null = null;
 
-function setState(next: AccountState) {
-  state = next;
+function setState(next: Partial<AccountState>) {
+  state = { ...state, ...next };
   for (const l of listeners) l();
+}
+
+const SIGNED_OUT = { name: null, email: null, emailVerified: false, admin: false } as const;
+
+function asUser(raw: unknown): PublicUser | null {
+  const u = raw as Partial<PublicUser> | null | undefined;
+  if (!u || typeof u.name !== "string") return null;
+  return { name: u.name, email: typeof u.email === "string" ? u.email : null, emailVerified: u.emailVerified === true, admin: u.admin === true };
 }
 
 function storage(key: string, value?: string | null): string | null {
@@ -52,7 +72,7 @@ async function call(method: "POST" | "PUT", action: string, body: unknown): Prom
       cache: "no-store",
     });
     const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-    if (res.status === 401) setState({ status: "anon", name: null });
+    if (res.status === 401) setState({ status: "anon", ...SIGNED_OUT });
     return res.ok ? { ok: true, data } : { ok: false, error: typeof data.error === "string" ? data.error : "server" };
   } catch {
     return { ok: false, error: "server" };
@@ -98,15 +118,22 @@ async function start() {
     uploadTimer = setTimeout(() => void upload(loadRules()), 800);
   });
   try {
+    // Si nunca se entró a una cuenta en este navegador, alcanza con saber si hay
+    // cuentas (respuesta igual para todos, guardada en el CDN: no gasta la base).
+    if (!storage(MARKER)) {
+      const cfg = (await (await fetch("/api/account/config", { credentials: "omit" })).json()) as { enabled?: boolean; mail?: boolean };
+      return setState({ status: cfg.enabled ? "anon" : "disabled", mail: cfg.mail === true, ...SIGNED_OUT });
+    }
     const res = await fetch("/api/account/me", { credentials: "same-origin", cache: "no-store" });
-    const body = (await res.json()) as { enabled?: boolean; user?: { name?: string } | null; rules?: unknown };
-    if (!body.enabled) return setState({ status: "disabled", name: null });
-    const name = body.user?.name;
-    if (!name) return setState({ status: "anon", name: null });
-    applyAccountRules(name, body.rules);
-    setState({ status: "user", name });
+    const body = (await res.json()) as { enabled?: boolean; mail?: boolean; user?: unknown; rules?: unknown };
+    if (!body.enabled) return setState({ status: "disabled", ...SIGNED_OUT });
+    const mail = body.mail === true;
+    const user = asUser(body.user);
+    if (!user) return setState({ status: "anon", mail, ...SIGNED_OUT });
+    applyAccountRules(user.name, body.rules);
+    setState({ status: "user", mail, ...user });
   } catch {
-    setState({ status: "error", name: null });
+    setState({ status: "error", ...SIGNED_OUT });
   }
 }
 
@@ -121,34 +148,50 @@ export function useAccount(): AccountState {
   return value;
 }
 
-async function enter(action: "login" | "register", username: string, password: string) {
-  const res = await call("POST", action, { username, password });
-  if (res.ok && res.data?.user && typeof (res.data.user as { name?: unknown }).name === "string") {
-    const name = (res.data.user as { name: string }).name;
-    applyAccountRules(name, res.data.rules);
-    setState({ status: "user", name });
+/** Respuesta que deja la sesión abierta (entrar, crear cuenta o contraseña nueva por email). */
+async function enter(action: "login" | "register" | "reset", body: Record<string, unknown>) {
+  const res = await call("POST", action, body);
+  const user = res.ok ? asUser(res.data?.user) : null;
+  if (user) {
+    applyAccountRules(user.name, res.data?.rules);
+    setState({ status: "user", ...user });
   }
   return res;
 }
 
+function signedOut() {
+  storage(MARKER, null);
+  storage(DIRTY, null);
+  setState({ status: "anon", ...SIGNED_OUT });
+}
+
 export const account = {
-  login: (username: string, password: string) => enter("login", username, password),
-  register: (username: string, password: string) => enter("register", username, password),
+  login: (username: string, password: string) => enter("login", { username, password }),
+  register: (username: string, email: string, password: string, lang: string) => enter("register", { username, email, password, lang }),
+  /** Contraseña nueva con el enlace del correo; deja la sesión abierta. */
+  reset: (token: string, password: string) => enter("reset", { token, password }),
+  forgot: (email: string, lang: string) => call("POST", "forgot", { email, lang }),
+  async verify(token: string) {
+    const res = await call("POST", "verify", { token });
+    if (res.ok && state.status === "user") setState({ emailVerified: true });
+    return res;
+  },
+  resend: (lang: string) => call("POST", "resend", { lang }),
+  async changeEmail(password: string, email: string, lang: string) {
+    const res = await call("POST", "email", { password, email, lang });
+    const user = res.ok ? asUser(res.data?.user) : null;
+    if (user) setState(user);
+    return res;
+  },
   async logout() {
     const res = await call("POST", "logout", {});
-    storage(MARKER, null);
-    storage(DIRTY, null);
-    setState({ status: "anon", name: null });
+    signedOut();
     return res;
   },
   changePassword: (current: string, next: string) => call("POST", "password", { current, next }),
   async remove(password: string) {
     const res = await call("POST", "delete", { password });
-    if (res.ok) {
-      storage(MARKER, null);
-      storage(DIRTY, null);
-      setState({ status: "anon", name: null });
-    }
+    if (res.ok) signedOut();
     return res;
   },
 };

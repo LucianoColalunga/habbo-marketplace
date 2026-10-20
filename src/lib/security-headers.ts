@@ -38,5 +38,7 @@ export function securityHeaders(dev: boolean) {
     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
     { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+    // Solo HTTPS durante 2 años (los navegadores lo ignoran en http://localhost).
+    ...(dev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }]),
   ];
 }

@@ -4,3 +4,5 @@
 .data
 test-results
 playwright-report
+# Respaldos de otros proyectos que quedan en la carpeta (nunca se suben).
+*.bundle
