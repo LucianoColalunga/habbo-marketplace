@@ -43,6 +43,18 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
           </li>
         </ul>
       </div>
+      <FooterCredit label={p.footer.builtBy} />
     </footer>
+  );
+}
+
+/** Última línea del pie: quién hizo el sitio. */
+export function FooterCredit({ label }: { label: string }) {
+  return (
+    <div className="border-t border-line">
+      <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted">
+        {label} <span className="font-display font-bold uppercase tracking-widest text-accent">Luky Dev</span>
+      </p>
+    </div>
   );
 }

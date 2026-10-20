@@ -8,6 +8,7 @@ import { SearchBox } from "@/components/SearchBox";
 import { SectionSwitch } from "@/components/SectionSwitch";
 import { SocialLink } from "@/components/SocialLink";
 import { CookieSettingsButton } from "@/components/CookieBanner";
+import { FooterCredit } from "@/components/SiteFooter";
 import { StarsToggle } from "@/components/StarsToggle";
 import { homeHotel } from "@/lib/i18n/config";
 import { ogImage } from "@/lib/i18n/seo";
@@ -65,6 +66,7 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
             <StarsToggle />
           </p>
         </div>
+        <FooterCredit label={p.footer.builtBy} />
       </footer>
     </div>
   );

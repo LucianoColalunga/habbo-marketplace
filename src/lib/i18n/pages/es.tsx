@@ -48,7 +48,8 @@ export const es = {
   footer: {
     about: (
       <>
-        <strong className="text-text">Bomhams Market</strong> es un sitio de fans, sin fines comerciales. No es oficial y no está
+        <strong className="text-text">Bomhams Market</strong> es un sitio de fans creado por la comunidad{" "}
+        <strong className="text-text">BOMHAMS</strong>, sin fines comerciales. No es oficial y no está
         afiliado, patrocinado ni aprobado por Sulake Oy ni por Azerion. Habbo es una marca registrada de Sulake Oy.
       </>
     ),
@@ -58,6 +59,7 @@ export const es = {
     linkSource: "Código fuente",
     linkPrivacy: "Privacidad y cookies",
     linkX: "Bomhams en X",
+    builtBy: "Desarrollado por",
   },
   notFound: {
     title: "No encontramos esa página",

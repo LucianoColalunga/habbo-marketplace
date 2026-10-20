@@ -12,6 +12,10 @@ test("ninguna página se corre hacia los costados (sobre todo en el celular)", a
 test("el pie de página enlaza a la comunidad en X", async ({ page }) => {
   await page.goto("/es");
   await expect(page.getByRole("link", { name: "Bomhams en X" })).toHaveAttribute("href", "https://x.com/bomhams");
+  const footer = page.locator("footer");
+  await expect(footer).toContainText("creado por la comunidad BOMHAMS");
+  await expect(footer).toContainText(/Desarrollado por\s+Luky Dev/i);
   await page.goto("/en/nft");
   await expect(page.getByRole("link", { name: "Bomhams on X" })).toHaveAttribute("href", "https://x.com/bomhams");
+  await expect(page.locator("footer")).toContainText(/Built by\s+Luky Dev/i);
 });

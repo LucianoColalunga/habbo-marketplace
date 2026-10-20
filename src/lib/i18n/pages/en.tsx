@@ -42,7 +42,8 @@ export const en: Pages = {
   footer: {
     about: (
       <>
-        <strong className="text-text">Bomhams Market</strong> is a non-commercial fan site. It is not official and is not affiliated
+        <strong className="text-text">Bomhams Market</strong> is a non-commercial fan site created by the{" "}
+        <strong className="text-text">BOMHAMS</strong> community. It is not official and is not affiliated
         with, sponsored or endorsed by Sulake Oy or Azerion. Habbo is a registered trademark of Sulake Oy.
       </>
     ),
@@ -52,6 +53,7 @@ export const en: Pages = {
     linkSource: "Source code",
     linkPrivacy: "Privacy & cookies",
     linkX: "Bomhams on X",
+    builtBy: "Built by",
   },
   notFound: {
     title: "We couldn't find that page",
