@@ -180,6 +180,8 @@ export interface CategoryRow {
   oo: number;
   s30: number;
   a7: number | null;
+  /** Grupo que se muestra arriba del nombre: la subcategoría (o la categoría, en "Todos"). */
+  g?: string;
 }
 
 /** Como mucho, cuántos furnis se muestran en la página de una categoría. */
@@ -198,14 +200,22 @@ async function categoriesOf(hotel: HotelCode): Promise<{ index: CategoryIndex; c
   return { index, catalog };
 }
 
-function rowsFor(keys: string[], catalog: CatalogIndex, summary: MarketSummary | null): CategoryRow[] {
+function rowsFor(keys: string[], catalog: CatalogIndex, summary: MarketSummary | null, groups?: Map<string, string>): CategoryRow[] {
   return keys
     .map((k) => {
       const item = catalog.byKey.get(k);
       const s = summary?.items[k];
-      return { k, n: item?.n ?? k, r: item?.r ?? 0, cp: s?.cp ?? 0, oo: s?.oo ?? 0, s30: s?.s30 ?? 0, a7: s?.a7 ?? null };
+      const g = groups?.get(k);
+      return { k, n: item?.n ?? k, r: item?.r ?? 0, cp: s?.cp ?? 0, oo: s?.oo ?? 0, s30: s?.s30 ?? 0, a7: s?.a7 ?? null, ...(g ? { g } : {}) };
     })
     .sort((a, b) => b.s30 - a.s30 || b.oo - a.oo || a.n.localeCompare(b.n));
+}
+
+/** A qué grupo pertenece cada furni: el primero de la lista en el que aparece. */
+function groupsOf(index: CategoryIndex, ids: { id: string; key: string }[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const { id, key } of ids) for (const k of index.members[key] ?? []) if (!out.has(k)) out.set(k, id);
+  return out;
 }
 
 export interface CategoryCard {
@@ -253,10 +263,34 @@ export async function getCategoryView(hotel: HotelCode, cat: string, sub: string
   if (!data) return { total: 0, rows: [], subs: [], generatedAt: summary?.generatedAt ?? null };
   const keys = data.index.members[sub ? `${cat}/${sub}` : cat];
   if (!keys) return sub ? null : { total: 0, rows: [], subs: [], generatedAt: summary?.generatedAt ?? null };
+  const subs = subcategoriesOf(data.index, def);
+  const groups = groupsOf(
+    data.index,
+    (sub ? subs.filter((s) => s.slug === sub) : subs).map((s) => ({ id: s.slug, key: `${cat}/${s.slug}` })),
+  );
   return {
     total: keys.length,
-    rows: rowsFor(keys, data.catalog, summary).slice(0, CATEGORY_LIMIT),
-    subs: subcategoriesOf(data.index, def),
+    rows: rowsFor(keys, data.catalog, summary, groups).slice(0, CATEGORY_LIMIT),
+    subs,
+    generatedAt: summary?.generatedAt ?? null,
+  };
+}
+
+/** Todo el catálogo (los más vendidos primero), para la portada del catálogo. */
+export async function getCatalogAll(hotel: HotelCode): Promise<Omit<CategoryView, "subs">> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const [data, summary] = await Promise.all([categoriesOf(hotel), loadSummary(hotel)]);
+  if (!data) return { total: 0, rows: [], generatedAt: summary?.generatedAt ?? null };
+  const keys = [...data.catalog.byKey.keys()];
+  const groups = groupsOf(
+    data.index,
+    CATEGORIES.map((c) => ({ id: c.slug, key: c.slug })),
+  );
+  return {
+    total: keys.length,
+    rows: rowsFor(keys, data.catalog, summary, groups).slice(0, CATEGORY_LIMIT),
     generatedAt: summary?.generatedAt ?? null,
   };
 }

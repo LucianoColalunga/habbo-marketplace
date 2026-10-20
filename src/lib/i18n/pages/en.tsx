@@ -308,7 +308,7 @@ export const en: Pages = {
         title: "Preferences (only if you accept)",
         items: [
           "The fm_lang cookie, with the language you picked, so the home page opens in that language. It lasts 1 year.",
-          "If you turn off the star background, it's remembered for your next visit.",
+          "If you turn off the star background or pick the catalog image size, it's remembered for your next visit.",
         ],
       },
       {

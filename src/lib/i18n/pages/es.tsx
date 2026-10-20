@@ -324,7 +324,7 @@ export const es = {
         title: "Preferencias (solo si aceptás)",
         items: [
           "La cookie fm_lang, con el idioma que elegiste, para abrir la portada en ese idioma. Dura 1 año.",
-          "Si apagás el fondo de estrellas, se recuerda para la próxima visita.",
+          "Si apagás el fondo de estrellas o elegís el tamaño de las imágenes del catálogo, se recuerda para la próxima visita.",
         ],
       },
       {

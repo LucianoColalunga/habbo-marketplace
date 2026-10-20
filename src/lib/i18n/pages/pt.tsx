@@ -314,7 +314,7 @@ export const pt: Pages = {
         title: "Preferências (só se você aceitar)",
         items: [
           "O cookie fm_lang, com o idioma que você escolheu, para abrir a página inicial nesse idioma. Dura 1 ano.",
-          "Se você desligar o fundo de estrelas, isso fica lembrado para a próxima visita.",
+          "Se você desligar o fundo de estrelas ou escolher o tamanho das imagens do catálogo, isso fica lembrado para a próxima visita.",
         ],
       },
       {

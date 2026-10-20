@@ -1,75 +1,103 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CATEGORY_LIMIT, getCategoryView } from "@/lib/data/views";
+import { CATEGORY_LIMIT, getCatalogAll, getCategoryOverview, getCategoryView } from "@/lib/data/views";
 import { HOTELS, type HotelCode } from "@/lib/hotels";
 import { getI18n } from "@/lib/i18n/server";
 import { categoryBySlug, subLabel } from "@/lib/market/categories";
-import { CategoryList } from "./CategoryList";
+import { Catalog, type CatalogNode } from "./catalog/Catalog";
 import { Notice } from "./ui";
 
-/** Página de una categoría o subcategoría: chips de subcategorías y la lista de furnis. */
-export async function CategoryPage({ hotel, cat, sub }: { hotel: HotelCode; cat: string; sub: string | null }) {
-  const def = categoryBySlug(cat);
-  if (!def) notFound();
-  const [view, { lang, p, f, href }] = await Promise.all([getCategoryView(hotel, cat, sub), getI18n()]);
+/**
+ * Catálogo: todos los furnis (sin `cat`), una categoría o una subcategoría.
+ * El menú de la izquierda tiene todas las categorías con sus subcategorías.
+ */
+export async function CategoryPage({ hotel, cat, sub }: { hotel: HotelCode; cat: string | null; sub: string | null }) {
+  const def = cat ? categoryBySlug(cat) : null;
+  if (cat && !def) notFound();
+  const [view, overview, { lang, p, f, href, t }] = await Promise.all([
+    cat ? getCategoryView(hotel, cat, sub) : getCatalogAll(hotel),
+    getCategoryOverview(hotel),
+    getI18n(),
+  ]);
   if (!view) notFound();
   const c = p.categories;
-  const catLabel = def.label[lang];
-  const label = sub ? (subLabel(def, sub, lang) ?? sub) : catLabel;
-  const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1.5 text-sm ${active ? "border-accent bg-accent/15 text-text" : "border-line text-text-2 hover:bg-surface"}`;
+
+  const tree: CatalogNode[] = overview.map((card) => {
+    const d = categoryBySlug(card.slug)!;
+    return {
+      slug: card.slug,
+      label: d.label[lang],
+      count: card.count,
+      subs: card.subs.map((s) => ({ slug: s.slug, label: subLabel(d, s.slug, lang) ?? s.slug, count: s.count })),
+    };
+  });
+  const node = tree.find((n) => n.slug === cat);
+  // Lo que se ve arriba de cada nombre: la subcategoría o, en "Todos", la categoría.
+  const groups = Object.fromEntries(node ? node.subs.map((s) => [s.slug, s.label]) : tree.map((n) => [n.slug, n.label]));
+  const catLabel = def?.label[lang] ?? "";
+  const label = !def ? c.title(HOTELS[hotel].label) : sub ? (subLabel(def, sub, lang) ?? sub) : catLabel;
 
   return (
     <div className="space-y-5">
       <nav className="text-sm text-text-2" aria-label={c.breadcrumb}>
-        <Link prefetch={false} href={href(`/${hotel}/categorias`)} className="hover:text-text">
-          {c.index}
+        <Link prefetch={false} href={href(`/${hotel}`)} className="hover:text-text">
+          {t.nav.home}
         </Link>
-        {sub && (
+        {" » "}
+        {def ? (
+          <Link prefetch={false} href={href(`/${hotel}/categorias`)} className="hover:text-text">
+            {c.index}
+          </Link>
+        ) : (
+          <span className="text-text">{c.index}</span>
+        )}
+        {def && sub && (
           <>
-            {" / "}
+            {" » "}
             <Link prefetch={false} href={href(`/${hotel}/categorias/${cat}`)} className="hover:text-text">
               {catLabel}
             </Link>
           </>
         )}
-        {" / "}
-        <span className="text-text">{label}</span>
+        {def && (
+          <>
+            {" » "}
+            <span className="text-text">{label}</span>
+          </>
+        )}
       </nav>
       <header>
         <h1 className="font-display text-3xl font-bold text-text">{label}</h1>
-        <p className="mt-1 text-text-2">
-          {c.count(f.int(view.total))} · Habbo {HOTELS[hotel].label}
-          {cat === "colecciones" && !sub ? ` · ${c.collectionsHint}` : ""}
+        <p className="mt-1 max-w-3xl text-text-2">
+          {def ? (
+            <>
+              {c.count(f.int(view.total))} · Habbo {HOTELS[hotel].label}
+              {cat === "colecciones" && !sub ? ` · ${c.collectionsHint}` : ""}
+            </>
+          ) : (
+            c.intro
+          )}
         </p>
       </header>
 
-      {view.subs.length > 0 && (
-        <nav aria-label={c.subsAria} className="flex flex-wrap gap-2">
-          <Link prefetch={false} href={href(`/${hotel}/categorias/${cat}`)} aria-current={!sub ? "page" : undefined} className={chip(!sub)}>
-            {c.all}
-          </Link>
-          {view.subs.map((s) => (
-            <Link
-              key={s.slug}
-              prefetch={false}
-              href={href(`/${hotel}/categorias/${cat}/${s.slug}`)}
-              aria-current={sub === s.slug ? "page" : undefined}
-              className={chip(sub === s.slug)}
-            >
-              {subLabel(def, s.slug, lang) ?? s.slug} <span className="tnum text-muted">{f.int(s.count)}</span>
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      {view.total === 0 ? (
-        <Notice>{c.empty}</Notice>
+      {tree.length === 0 ? (
+        <Notice tone="warn">{c.pending}</Notice>
       ) : (
-        <>
-          {view.total > CATEGORY_LIMIT && <Notice>{c.limited(f.int(view.rows.length), f.int(view.total))}</Notice>}
-          <CategoryList hotel={hotel} rows={view.rows} />
-        </>
+        <Catalog
+          hotel={hotel}
+          rows={view.rows}
+          groups={groups}
+          tree={tree}
+          cat={cat}
+          sub={sub}
+          before={
+            view.total === 0 ? (
+              <Notice>{c.empty}</Notice>
+            ) : view.total > CATEGORY_LIMIT ? (
+              <Notice>{c.limited(f.int(view.rows.length), f.int(view.total))}</Notice>
+            ) : null
+          }
+        />
       )}
     </div>
   );
