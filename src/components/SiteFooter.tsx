@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/i18n/server";
 import { CookieSettingsButton } from "./CookieBanner";
-import { SocialLink } from "./SocialLink";
 import { StarsToggle } from "./StarsToggle";
 
 export async function SiteFooter({ hotel }: { hotel: string }) {
@@ -28,9 +27,6 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
             <a className="hover:text-text" href="https://github.com/LucianoColalunga/habbo-marketplace" rel="noopener">
               {p.footer.linkSource}
             </a>
-          </li>
-          <li>
-            <SocialLink label={p.footer.linkX} />
           </li>
           <li>
             <Link prefetch={false} className="hover:text-text" href={href(`/${hotel}/privacidad`)}>

@@ -47,25 +47,3 @@ export function communityLinks(
   }
   return out;
 }
-
-/**
- * Red social de la comunidad (perfil público de Bomhams en X). Se puede cambiar
- * con NEXT_PUBLIC_X_URL; solo se aceptan perfiles de x.com o twitter.com.
- */
-export const DEFAULT_X_URL = "https://x.com/bomhams";
-
-export function safeXUrl(raw: string | undefined | null): string | null {
-  if (!raw) return null;
-  try {
-    const url = new URL(raw.trim());
-    if (url.protocol !== "https:" || !["x.com", "www.x.com", "twitter.com", "www.twitter.com"].includes(url.hostname)) return null;
-    if (!/^\/[A-Za-z0-9_]{1,15}\/?$/.test(url.pathname)) return null;
-    return `https://x.com${url.pathname.replace(/\/$/, "")}`;
-  } catch {
-    return null;
-  }
-}
-
-export function communityX(raw: string | undefined = process.env.NEXT_PUBLIC_X_URL): string {
-  return safeXUrl(raw) ?? DEFAULT_X_URL;
-}

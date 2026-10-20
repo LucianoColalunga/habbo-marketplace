@@ -111,14 +111,3 @@ describe("enlaces a los canales", () => {
     expect(communityLinks({})).toEqual([]);
   });
 });
-
-describe("red social de la comunidad", () => {
-  it("usa el perfil de Bomhams en X y solo acepta perfiles de x.com", async () => {
-    const { communityX, safeXUrl } = await import("@/lib/community");
-    expect(communityX(undefined)).toBe("https://x.com/bomhams");
-    expect(safeXUrl("https://twitter.com/bomhams/")).toBe("https://x.com/bomhams");
-    expect(safeXUrl("https://x.com.evil.com/bomhams")).toBeNull();
-    expect(safeXUrl("javascript:alert(1)")).toBeNull();
-    expect(communityX("https://evil.com/x")).toBe("https://x.com/bomhams");
-  });
-});

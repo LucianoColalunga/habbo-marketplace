@@ -56,7 +56,6 @@ export const pt: Pages = {
     linkAlerts: "Alertas de preço",
     linkSource: "Código-fonte",
     linkPrivacy: "Privacidade e cookies",
-    linkX: "Bomhams no X",
     builtBy: "Desenvolvido por",
   },
   notFound: {

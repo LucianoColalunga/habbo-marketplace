@@ -9,10 +9,11 @@ test("ninguna página se corre hacia los costados (sobre todo en el celular)", a
   }
 });
 
-test("el pie de página enlaza a la comunidad en X", async ({ page }) => {
+test("el pie de página: en construcción, sin la comunidad ni X, y el crédito de Luciano Dev", async ({ page }) => {
   await page.goto("/es");
-  await expect(page.getByRole("link", { name: "Bomhams en X" })).toHaveAttribute("href", "https://x.com/bomhams");
   const footer = page.locator("footer");
+  await expect(footer.locator('a[href*="x.com"]')).toHaveCount(0);
+  await expect(footer).not.toContainText("Bomhams");
   await expect(footer.getByText("En construcción", { exact: true })).toBeVisible();
   await expect(footer).not.toContainText("comunidad BOMHAMS");
   await expect(footer).not.toContainText("de fans");
@@ -20,6 +21,6 @@ test("el pie de página enlaza a la comunidad en X", async ({ page }) => {
   await expect(footer).toContainText(/Desarrollado por\s+Luciano Dev/i);
   await expect(footer.getByRole("link", { name: "Luciano Dev" })).toHaveAttribute("href", "https://lucianocolalungadev.com.ar/");
   await page.goto("/en/nft");
-  await expect(page.getByRole("link", { name: "Bomhams on X" })).toHaveAttribute("href", "https://x.com/bomhams");
+  await expect(page.locator("footer a[href*='x.com']")).toHaveCount(0);
   await expect(page.locator("footer")).toContainText(/Built by\s+Luciano Dev/i);
 });

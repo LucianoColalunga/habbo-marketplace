@@ -6,7 +6,6 @@ import { Logo } from "@/components/Logo";
 import { NftNav } from "@/components/nft/NftNav";
 import { SearchBox } from "@/components/SearchBox";
 import { SectionSwitch } from "@/components/SectionSwitch";
-import { SocialLink } from "@/components/SocialLink";
 import { CookieSettingsButton } from "@/components/CookieBanner";
 import { FooterCredit } from "@/components/SiteFooter";
 import { StarsToggle } from "@/components/StarsToggle";
@@ -58,7 +57,6 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
           <p>{p.nft.footerData}</p>
           <p className="text-muted">{p.nft.footerRisk}</p>
           <p className="flex flex-wrap gap-x-4">
-            <SocialLink label={p.footer.linkX} />
             <Link prefetch={false} className="hover:text-text" href={href(`/${homeHotel(lang)}/privacidad`)}>
               {p.footer.linkPrivacy}
             </Link>

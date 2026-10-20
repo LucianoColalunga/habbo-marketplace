@@ -60,7 +60,6 @@ export const es = {
     linkAlerts: "Alertas de precio",
     linkSource: "Código fuente",
     linkPrivacy: "Privacidad y cookies",
-    linkX: "Bomhams en X",
     builtBy: "Desarrollado por",
   },
   notFound: {

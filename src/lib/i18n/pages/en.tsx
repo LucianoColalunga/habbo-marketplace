@@ -54,7 +54,6 @@ export const en: Pages = {
     linkAlerts: "Price alerts",
     linkSource: "Source code",
     linkPrivacy: "Privacy & cookies",
-    linkX: "Bomhams on X",
     builtBy: "Built by",
   },
   notFound: {

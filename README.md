@@ -28,7 +28,6 @@ aparece por debajo de su precio normal.
 - **Cielo de estrellas** de fondo: titilan, se unen al mouse con líneas y **explotan al tocarlas**. Se puede apagar desde
   el pie de página y respeta la opción "reducir movimiento" del sistema.
 - **Aviso de cookies** y página de privacidad: lo necesario siempre, las preferencias solo si la persona acepta.
-- Comunidad: enlace al perfil de Bomhams en X (<https://x.com/bomhams>).
 - Tema oscuro (créditos en violeta, NFT en dorado), responsive, identidad propia.
 - **Gratis:** todo entra en los planes gratuitos; ver [docs/COSTOS.md](docs/COSTOS.md) (cuánta gente aguanta y qué pasa
   si se pasa).
