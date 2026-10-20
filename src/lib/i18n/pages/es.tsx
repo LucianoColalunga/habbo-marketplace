@@ -46,11 +46,9 @@ export const es = {
   },
   header: { homeAria: "Stats, inicio", nftHomeAria: "Stats NFT, inicio" },
   footer: {
+    building: "En construcción",
     about: (
       <>
-        <span className="mr-2 inline-flex items-center rounded-md border border-accent/50 bg-accent/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-accent">
-          En construcción
-        </span>
         <strong className="text-text">Stats</strong> no tiene fines comerciales, no es oficial y no está afiliado, patrocinado ni
         aprobado por Sulake Oy ni por Azerion. Habbo es una marca registrada de Sulake Oy.
       </>

@@ -7,7 +7,7 @@ import { NftNav } from "@/components/nft/NftNav";
 import { SearchBox } from "@/components/SearchBox";
 import { SectionSwitch } from "@/components/SectionSwitch";
 import { CookieSettingsButton } from "@/components/CookieBanner";
-import { FooterCredit } from "@/components/SiteFooter";
+import { ConstructionBadge, FooterCredit } from "@/components/SiteFooter";
 import { StarsToggle } from "@/components/StarsToggle";
 import { homeHotel } from "@/lib/i18n/config";
 import { ogImage } from "@/lib/i18n/seo";
@@ -54,7 +54,10 @@ export default async function NftLayout({ children }: LayoutProps<"/[lang]/nft">
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6">{children}</main>
       <footer className="mt-16 border-t border-line bg-bg/80">
         <div className="mx-auto max-w-6xl space-y-2 px-4 py-8 text-sm text-text-2">
-          <p>{p.nft.footerData}</p>
+          <p>
+            <ConstructionBadge label={p.footer.building} />
+            {p.nft.footerData}
+          </p>
           <p className="text-muted">{p.nft.footerRisk}</p>
           <p className="flex flex-wrap gap-x-4">
             <Link prefetch={false} className="hover:text-text" href={href(`/${homeHotel(lang)}/privacidad`)}>

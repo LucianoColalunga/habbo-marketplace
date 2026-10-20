@@ -9,7 +9,10 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
     <footer className="mt-16 border-t border-line bg-bg/80">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm text-text-2 md:grid-cols-[2fr_1fr]">
         <div className="space-y-2">
-          <p>{p.footer.about}</p>
+          <p>
+            <ConstructionBadge label={p.footer.building} />
+            {p.footer.about}
+          </p>
           <p className="text-muted">{p.footer.data}</p>
         </div>
         <ul className="space-y-1 md:text-right">
@@ -41,6 +44,15 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
       </div>
       <FooterCredit label={p.footer.builtBy} />
     </footer>
+  );
+}
+
+/** Etiqueta "En construcción" del pie. */
+export function ConstructionBadge({ label }: { label: string }) {
+  return (
+    <span className="mr-2 inline-flex items-center rounded-md border border-accent/50 bg-accent/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-accent">
+      {label}
+    </span>
   );
 }
 

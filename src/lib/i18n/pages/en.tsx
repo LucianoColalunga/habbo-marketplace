@@ -40,11 +40,9 @@ export const en: Pages = {
   },
   header: { homeAria: "Stats, home", nftHomeAria: "Stats NFT, home" },
   footer: {
+    building: "Under construction",
     about: (
       <>
-        <span className="mr-2 inline-flex items-center rounded-md border border-accent/50 bg-accent/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-accent">
-          Under construction
-        </span>
         <strong className="text-text">Stats</strong> is non-commercial, not official and not affiliated with, sponsored or
         endorsed by Sulake Oy or Azerion. Habbo is a registered trademark of Sulake Oy.
       </>

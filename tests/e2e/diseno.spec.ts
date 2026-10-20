@@ -22,5 +22,6 @@ test("el pie de página: en construcción, sin la comunidad ni X, y el crédito 
   await expect(footer.getByRole("link", { name: "Luciano Dev" })).toHaveAttribute("href", "https://lucianocolalungadev.com.ar/");
   await page.goto("/en/nft");
   await expect(page.locator("footer a[href*='x.com']")).toHaveCount(0);
+  await expect(page.locator("footer").getByText("Under construction", { exact: true })).toBeVisible();
   await expect(page.locator("footer")).toContainText(/Built by\s+Luciano Dev/i);
 });
