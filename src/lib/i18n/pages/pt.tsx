@@ -5,7 +5,7 @@ export const pt: Pages = {
     title: "Bomhams Market — preços do Marketplace",
     template: "%s · Bomhams Market",
     description:
-      "Preços, ofertas abertas, médias e histórico do Marketplace de mobis, com dados da API pública do Habbo. Site de fãs não oficial.",
+      "Preços, ofertas abertas, médias e histórico do Marketplace de mobis, com dados da API pública do Habbo. Criado pela comunidade BOMHAMS; não oficial.",
     nftTitle: "NFT do Habbo — preços e vendas",
     nftTemplate: "%s · NFT · Bomhams Market",
     nftDescription:
@@ -44,9 +44,9 @@ export const pt: Pages = {
   footer: {
     about: (
       <>
-        <strong className="text-text">Bomhams Market</strong> é um site de fãs criado pela comunidade{" "}
-        <strong className="text-text">BOMHAMS</strong>, sem fins comerciais. Não é oficial e não é afiliado,
-        patrocinado nem aprovado pela Sulake Oy nem pela Azerion. Habbo é uma marca registrada da Sulake Oy.
+        Criado pela comunidade <strong className="text-text">BOMHAMS</strong>, sem fins comerciais.{" "}
+        <strong className="text-text">Bomhams Market</strong> não é oficial e não é afiliado, patrocinado nem aprovado pela
+        Sulake Oy nem pela Azerion. Habbo é uma marca registrada da Sulake Oy.
       </>
     ),
     data: "Preços e estatísticas: API pública do Habbo. Ícones dos mobis: servidos diretamente pelo CDN do Habbo. Os dados podem ter atrasos ou erros; não use como única referência para comprar ou vender.",
@@ -298,7 +298,7 @@ export const pt: Pages = {
       "Sua lista de alertas fica salva no seu navegador e, se você criar uma conta, também na conta. Não usamos publicidade nem cookies de rastreamento. As consultas ao vivo vão do seu navegador direto para a API do Habbo, sem enviar cookies. Os detalhes estão em «Privacidade e cookies».",
     legalTitle: "Aviso legal",
     legal:
-      "Bomhams Market é um site de fãs, gratuito e sem fins comerciais. Não é oficial e não é afiliado, patrocinado nem aprovado pela Sulake Oy nem pela Azerion. Habbo e os nomes e imagens dos mobis são propriedade da Sulake Oy. Se a Sulake pedir para retirar algum conteúdo, ele será retirado.",
+      "Bomhams Market foi criado pela comunidade BOMHAMS, é gratuito e sem fins comerciais. Não é oficial e não é afiliado, patrocinado nem aprovado pela Sulake Oy nem pela Azerion. Habbo e os nomes e imagens dos mobis são propriedade da Sulake Oy. Se a Sulake pedir para retirar algum conteúdo, ele será retirado.",
   },
   privacy: {
     metaTitle: "Privacidade e cookies",

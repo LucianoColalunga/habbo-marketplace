@@ -6,7 +6,7 @@ aparece por debajo de su precio normal.
 
 **Sitio publicado:** <https://habbo-marketplace-three.vercel.app>
 
-> Sitio de fans, gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por
+> Creado por la comunidad BOMHAMS, gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por
 > Sulake Oy ni Azerion. Habbo es una marca registrada de Sulake Oy.
 
 ## Qué hace

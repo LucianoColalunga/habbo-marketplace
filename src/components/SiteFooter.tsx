@@ -48,12 +48,23 @@ export async function SiteFooter({ hotel }: { hotel: string }) {
   );
 }
 
-/** Última línea del pie: quién hizo el sitio. */
+/** Página del desarrollador del sitio. */
+export const DEVELOPER_URL = "https://lucianocolalungadev.com.ar/";
+
+/** Última línea del pie: quién hizo el sitio, con enlace a su página. */
 export function FooterCredit({ label }: { label: string }) {
   return (
     <div className="border-t border-line">
       <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted">
-        {label} <span className="font-display font-bold uppercase tracking-widest text-accent">Luky Dev</span>
+        {label}{" "}
+        <a
+          href={DEVELOPER_URL}
+          target="_blank"
+          rel="noopener"
+          className="font-display font-bold uppercase tracking-widest text-accent underline-offset-4 hover:underline"
+        >
+          Luciano Dev
+        </a>
       </p>
     </div>
   );

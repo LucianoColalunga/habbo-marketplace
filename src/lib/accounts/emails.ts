@@ -19,7 +19,7 @@ const T = {
     resetButton: "Elegir una contraseña nueva",
     resetExpires: "Cada enlace vence en 1 hora y sirve una sola vez.",
     notYou: "Si no fuiste vos, ignorá este correo: no cambia nada.",
-    footer: "Bomhams Market · sitio de fans no oficial de Habbo. Nunca te vamos a pedir tu contraseña por correo.",
+    footer: "Bomhams Market · creado por la comunidad BOMHAMS, no oficial de Habbo. Nunca te vamos a pedir tu contraseña por correo.",
   },
   pt: {
     verifySubject: "Confirme seu e-mail no Bomhams Market",
@@ -32,7 +32,7 @@ const T = {
     resetButton: "Escolher uma nova senha",
     resetExpires: "Cada link vence em 1 hora e só pode ser usado uma vez.",
     notYou: "Se não foi você, ignore este e-mail: nada muda.",
-    footer: "Bomhams Market · site de fãs não oficial do Habbo. Nunca vamos pedir sua senha por e-mail.",
+    footer: "Bomhams Market · criado pela comunidade BOMHAMS, não oficial do Habbo. Nunca vamos pedir sua senha por e-mail.",
   },
   en: {
     verifySubject: "Confirm your email on Bomhams Market",
@@ -45,7 +45,7 @@ const T = {
     resetButton: "Choose a new password",
     resetExpires: "Each link expires in 1 hour and works only once.",
     notYou: "If this wasn't you, ignore this email: nothing changes.",
-    footer: "Bomhams Market · unofficial Habbo fan site. We will never ask for your password by email.",
+    footer: "Bomhams Market · created by the BOMHAMS community, not an official Habbo site. We will never ask for your password by email.",
   },
 } satisfies Record<Lang, unknown>;
 
