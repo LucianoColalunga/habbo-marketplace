@@ -9,43 +9,43 @@ function esc(s: string): string {
 
 const T = {
   es: {
-    verifySubject: "Confirmá tu email en Bomhams Market",
+    verifySubject: "Confirmá tu email en Stats",
     verifyIntro: (name: string) => `Hola ${name}: confirmá que este email es tuyo. Así vas a poder recuperar tu cuenta si te olvidás la contraseña.`,
     verifyButton: "Confirmar mi email",
     verifyExpires: "El enlace vence en 24 horas.",
-    resetSubject: "Recuperar tu cuenta de Bomhams Market",
+    resetSubject: "Recuperar tu cuenta de Stats",
     resetIntro: "Pediste recuperar tu cuenta. Estas son las cuentas con este email:",
     resetUser: (name: string) => `Usuario: ${name}`,
     resetButton: "Elegir una contraseña nueva",
     resetExpires: "Cada enlace vence en 1 hora y sirve una sola vez.",
     notYou: "Si no fuiste vos, ignorá este correo: no cambia nada.",
-    footer: "Bomhams Market · creado por la comunidad BOMHAMS, no oficial de Habbo. Nunca te vamos a pedir tu contraseña por correo.",
+    footer: "Stats · no es un sitio oficial de Habbo. Nunca te vamos a pedir tu contraseña por correo.",
   },
   pt: {
-    verifySubject: "Confirme seu e-mail no Bomhams Market",
+    verifySubject: "Confirme seu e-mail no Stats",
     verifyIntro: (name: string) => `Olá ${name}: confirme que este e-mail é seu. Assim você poderá recuperar sua conta se esquecer a senha.`,
     verifyButton: "Confirmar meu e-mail",
     verifyExpires: "O link vence em 24 horas.",
-    resetSubject: "Recuperar sua conta do Bomhams Market",
+    resetSubject: "Recuperar sua conta do Stats",
     resetIntro: "Você pediu para recuperar sua conta. Estas são as contas com este e-mail:",
     resetUser: (name: string) => `Usuário: ${name}`,
     resetButton: "Escolher uma nova senha",
     resetExpires: "Cada link vence em 1 hora e só pode ser usado uma vez.",
     notYou: "Se não foi você, ignore este e-mail: nada muda.",
-    footer: "Bomhams Market · criado pela comunidade BOMHAMS, não oficial do Habbo. Nunca vamos pedir sua senha por e-mail.",
+    footer: "Stats · não é um site oficial do Habbo. Nunca vamos pedir sua senha por e-mail.",
   },
   en: {
-    verifySubject: "Confirm your email on Bomhams Market",
+    verifySubject: "Confirm your email on Stats",
     verifyIntro: (name: string) => `Hi ${name}: confirm this email is yours, so you can recover your account if you forget your password.`,
     verifyButton: "Confirm my email",
     verifyExpires: "The link expires in 24 hours.",
-    resetSubject: "Recover your Bomhams Market account",
+    resetSubject: "Recover your Stats account",
     resetIntro: "You asked to recover your account. These are the accounts with this email:",
     resetUser: (name: string) => `Username: ${name}`,
     resetButton: "Choose a new password",
     resetExpires: "Each link expires in 1 hour and works only once.",
     notYou: "If this wasn't you, ignore this email: nothing changes.",
-    footer: "Bomhams Market · created by the BOMHAMS community, not an official Habbo site. We will never ask for your password by email.",
+    footer: "Stats · not an official Habbo site. We will never ask for your password by email.",
   },
 } satisfies Record<Lang, unknown>;
 
@@ -53,7 +53,7 @@ function layout(body: string, footer: string): string {
   return `<!doctype html><html><body style="margin:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;color:#1c2030">
 <div style="max-width:520px;margin:0 auto;padding:24px">
 <div style="background:#ffffff;border-radius:12px;padding:24px">
-<p style="margin:0 0 16px;font-size:20px;font-weight:bold">Bomhams <span style="color:#6d4fd8">Market</span></p>
+<p style="margin:0 0 16px;font-size:20px;font-weight:bold"><span style="color:#6d4fd8">Stats</span></p>
 ${body}
 </div>
 <p style="font-size:12px;color:#6b7080;margin:16px 4px 0">${esc(footer)}</p>

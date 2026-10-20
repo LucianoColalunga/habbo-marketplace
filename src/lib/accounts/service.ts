@@ -37,7 +37,7 @@ type Result<T> = { ok: true; value: T } | { ok: false; error: AccountError };
 
 const USERNAME = /^[A-Za-z0-9_.-]{3,20}$/;
 /** Nombres que se podrían usar para hacerse pasar por el sitio o por el equipo. */
-const RESERVED = /^(admin|administrador|administrator|root|staff|mod|moderador|moderator|bomhams|bomhamsmarket|habbo|sulake|soporte|support|system|sistema)$/;
+const RESERVED = /^(admin|administrador|administrator|root|staff|mod|moderador|moderator|bomhams|bomhamsmarket|stats|habbo|sulake|soporte|support|system|sistema)$/;
 
 const LIMITS = {
   /** Intentos fallidos de una cuenta desde una misma conexión. */

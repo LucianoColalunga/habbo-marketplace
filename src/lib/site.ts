@@ -14,4 +14,4 @@ export function siteUrl(env: Record<string, string | undefined> = process.env): 
   return "http://localhost:3000";
 }
 
-export const SITE_NAME = "Bomhams Market";
+export const SITE_NAME = "Stats";

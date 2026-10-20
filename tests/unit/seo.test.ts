@@ -30,7 +30,7 @@ describe("metadata de cada página", () => {
     expect(meta.openGraph).toMatchObject({
       url: "/pt/nft",
       locale: "pt_BR",
-      title: "NFT · NFT · Bomhams Market",
+      title: "NFT · NFT · Stats",
       images: [{ url: "/og/nft-pt.png", width: 1200, height: 630 }],
     });
     expect(meta.robots).toBeUndefined();

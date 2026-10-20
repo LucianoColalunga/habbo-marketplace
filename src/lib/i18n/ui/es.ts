@@ -161,7 +161,7 @@ export const es = {
     howTitle: "Para que te lleguen los avisos",
     step1: "Activá las notificaciones. El navegador te va a preguntar si das permiso: elegí",
     allow: "Permitir",
-    step2: "Dejá abierta una pestaña de Bomhams Market. Puede estar minimizada; si la cerrás, no llegan avisos.",
+    step2: "Dejá abierta una pestaña de Stats. Puede estar minimizada; si la cerrás, no llegan avisos.",
     step3: "Tu lista queda guardada en este navegador aunque cierres la pestaña o apagues la PC.",
     showNotifs: "Mostrar notificaciones del navegador",
     unsupported: "Este navegador no muestra notificaciones: los avisos van a aparecer dentro de la página.",

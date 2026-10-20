@@ -23,7 +23,7 @@ export function Logo() {
     <span className="flex items-center gap-2">
       <LogoMark />
       <span className="whitespace-nowrap font-display text-lg font-bold tracking-tight text-text">
-        Bomhams <span className="text-accent">Market</span>
+        Stats
       </span>
     </span>
   );

@@ -30,7 +30,7 @@ test("cada página dice su dirección canónica, sus idiomas y su imagen para co
   expect(png.status()).toBe(200);
   expect(png.headers()["content-type"]).toBe("image/png");
   expect((await png.body()).length).toBeGreaterThan(10_000);
-  await expect(page).toHaveTitle("Best sellers on the Habbo .es Marketplace · Bomhams Market");
+  await expect(page).toHaveTitle("Best sellers on the Habbo .es Marketplace · Stats");
 });
 
 test("las búsquedas internas no se indexan", async ({ page }) => {

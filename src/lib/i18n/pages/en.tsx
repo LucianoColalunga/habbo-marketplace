@@ -2,18 +2,18 @@ import type { Pages } from "./es";
 
 export const en: Pages = {
   meta: {
-    title: "Bomhams Market — Marketplace prices",
-    template: "%s · Bomhams Market",
+    title: "Stats — Marketplace prices",
+    template: "%s · Stats",
     description:
-      "Prices, open offers, averages and history of the furni Marketplace, using data from Habbo's public API. Created by the BOMHAMS community; unofficial.",
+      "Prices, open offers, averages and history of the furni Marketplace, using data from Habbo's public API. Unofficial site.",
     nftTitle: "Habbo NFTs — prices and sales",
-    nftTemplate: "%s · NFT · Bomhams Market",
+    nftTemplate: "%s · NFT · Stats",
     nftDescription:
       "Floor prices, sales and trends of Habbo's official NFT collectibles on the Immutable blockchain. A section separate from the credits Marketplace.",
   },
   seo: {
-    ogAltMarket: "Bomhams Market: Habbo Marketplace prices",
-    ogAltNft: "Bomhams Market: prices of Habbo's official NFTs",
+    ogAltMarket: "Stats: Habbo Marketplace prices",
+    ogAltNft: "Stats: prices of Habbo's official NFTs",
     home: (label) => `Habbo ${label} Marketplace prices`,
     homeDesc: (label, region) =>
       `Lowest price, open offers, averages and history for every furni on the Habbo ${label} Marketplace (${region}). Daily rankings and deals.`,
@@ -38,12 +38,14 @@ export const en: Pages = {
     nftRankingDesc: (hint) => `${hint} Habbo's official NFTs on the Immutable blockchain.`,
     nftAboutDesc: "Where Habbo NFT prices come from (Immutable's public API), how fresh they are and what their limits are.",
   },
-  header: { homeAria: "Bomhams Market, home", nftHomeAria: "Bomhams Market NFT, home" },
+  header: { homeAria: "Stats, home", nftHomeAria: "Stats NFT, home" },
   footer: {
     about: (
       <>
-        Created by the <strong className="text-text">BOMHAMS</strong> community, non-commercial.{" "}
-        <strong className="text-text">Bomhams Market</strong> is not official and is not affiliated with, sponsored or
+        <span className="mr-2 inline-flex items-center rounded-md border border-accent/50 bg-accent/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-accent">
+          Under construction
+        </span>
+        <strong className="text-text">Stats</strong> is non-commercial, not official and not affiliated with, sponsored or
         endorsed by Sulake Oy or Azerion. Habbo is a registered trademark of Sulake Oy.
       </>
     ),
@@ -292,13 +294,13 @@ export const en: Pages = {
       "Your alert list is saved in your browser and, if you create an account, in your account too. No ads and no tracking cookies. Live lookups go from your browser straight to the Habbo API, without sending cookies. Details in «Privacy & cookies».",
     legalTitle: "Legal notice",
     legal:
-      "Bomhams Market was created by the BOMHAMS community and is free and non-commercial. It is not official and is not affiliated with, sponsored or endorsed by Sulake Oy or Azerion. Habbo and the furni names and images are property of Sulake Oy. If Sulake asks for any content to be removed, it will be removed.",
+      "Stats is free and non-commercial. It is not official and is not affiliated with, sponsored or endorsed by Sulake Oy or Azerion. Habbo and the furni names and images are property of Sulake Oy. If Sulake asks for any content to be removed, it will be removed.",
   },
   privacy: {
     metaTitle: "Privacy & cookies",
-    metaDesc: "What Bomhams Market stores, where, and how to delete it. No ads, no tracking.",
+    metaDesc: "What Stats stores, where, and how to delete it. No ads, no tracking.",
     title: "Privacy & cookies",
-    intro: "Bomhams Market has no ads or tracking, doesn't sell data and only asks for your email if you create an account. This is everything that gets stored and where.",
+    intro: "Stats has no ads or tracking, doesn't sell data and only asks for your email if you create an account. This is everything that gets stored and where.",
     sections: [
       {
         title: "In your browser (necessary)",
@@ -347,7 +349,7 @@ export const en: Pages = {
     ),
     marketLink: "Marketplace (credits)",
     footerData:
-      "Data from the public Immutable zkEVM API; images served by Habbo (nft-tokens.habbo.com). Bomhams Market is not official or affiliated with Sulake Oy, Azerion or Immutable.",
+      "Data from the public Immutable zkEVM API; images served by Habbo (nft-tokens.habbo.com). Stats is not official or affiliated with Sulake Oy, Azerion or Immutable.",
     footerRisk:
       "This is not financial advice. NFT prices change fast and can drop to zero; dollar amounts are approximate, based on the exchange rate at the time.",
     collections: {
@@ -499,7 +501,7 @@ export const en: Pages = {
       ),
       noticeTitle: "Notice",
       notice:
-        "This is not financial advice. NFTs are volatile assets: their price can change a lot or drop to zero. Bomhams Market doesn't sell, buy or hold anything; it only shows public data. It is not an official site of Habbo, Sulake, Azerion or Immutable.",
+        "This is not financial advice. NFTs are volatile assets: their price can change a lot or drop to zero. Stats doesn't sell, buy or hold anything; it only shows public data. It is not an official site of Habbo, Sulake, Azerion or Immutable.",
     },
   },
 };

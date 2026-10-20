@@ -159,7 +159,7 @@ export const en: Ui = {
     howTitle: "To get the alerts",
     step1: "Turn on notifications. Your browser will ask for permission: choose",
     allow: "Allow",
-    step2: "Keep a Bomhams Market tab open. It can be minimized; if you close it, alerts won't arrive.",
+    step2: "Keep a Stats tab open. It can be minimized; if you close it, alerts won't arrive.",
     step3: "Your list stays saved in this browser even if you close the tab or turn off your computer.",
     showNotifs: "Show browser notifications",
     unsupported: "This browser doesn't show notifications: alerts will appear inside the page.",

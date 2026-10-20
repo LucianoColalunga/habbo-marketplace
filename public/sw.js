@@ -1,4 +1,4 @@
-// Service worker mínimo de Bomhams Market: abre la ficha al tocar una notificación.
+// Service worker mínimo de Stats: abre la ficha al tocar una notificación.
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
@@ -37,7 +37,7 @@ self.addEventListener("push", (event) => {
     data = { body: event.data ? event.data.text() : "" };
   }
   const url = safeUrl(data.url);
-  const title = typeof data.title === "string" ? data.title.slice(0, 120) : "Bomhams Market";
+  const title = typeof data.title === "string" ? data.title.slice(0, 120) : "Stats";
   const body = typeof data.body === "string" ? data.body.slice(0, 300) : "";
   event.waitUntil(
     self.registration.showNotification(title, { body, icon: "/icon.svg", tag: url, data: { url } }),

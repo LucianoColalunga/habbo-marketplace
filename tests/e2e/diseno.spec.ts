@@ -13,8 +13,10 @@ test("el pie de página enlaza a la comunidad en X", async ({ page }) => {
   await page.goto("/es");
   await expect(page.getByRole("link", { name: "Bomhams en X" })).toHaveAttribute("href", "https://x.com/bomhams");
   const footer = page.locator("footer");
-  await expect(footer).toContainText("Creado por la comunidad BOMHAMS");
+  await expect(footer.getByText("En construcción", { exact: true })).toBeVisible();
+  await expect(footer).not.toContainText("comunidad BOMHAMS");
   await expect(footer).not.toContainText("de fans");
+  await expect(page.getByRole("banner")).toContainText("Stats");
   await expect(footer).toContainText(/Desarrollado por\s+Luciano Dev/i);
   await expect(footer.getByRole("link", { name: "Luciano Dev" })).toHaveAttribute("href", "https://lucianocolalungadev.com.ar/");
   await page.goto("/en/nft");

@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
  * Envío de correos (verificar el email y recuperar la cuenta) por SMTP. Sirve
  * con cualquier servicio: una cuenta de Gmail del sitio con "contraseña de
  * aplicación" (smtp.gmail.com, 465), Brevo (smtp-relay.brevo.com, 587), etc.
- *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS y MAIL_FROM ("Bomhams Market <cuenta@gmail.com>").
+ *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS y MAIL_FROM ("Stats <cuenta@gmail.com>").
  * Para probar en la PC (ACCOUNTS_DEV_STORE=1, fuera de Vercel) los correos se
  * guardan en .data/mail-outbox.json en vez de enviarse.
  */

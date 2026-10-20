@@ -3,19 +3,19 @@ import type { ReactNode } from "react";
 /** Textos de las páginas (solo se usan en el servidor). */
 export const es = {
   meta: {
-    title: "Bomhams Market — precios del Marketplace",
-    template: "%s · Bomhams Market",
+    title: "Stats — precios del Marketplace",
+    template: "%s · Stats",
     description:
-      "Precios, ofertas abiertas, promedios e historial del Marketplace de furnis, con datos de la API pública de Habbo. Creado por la comunidad BOMHAMS; no oficial.",
+      "Precios, ofertas abiertas, promedios e historial del Marketplace de furnis, con datos de la API pública de Habbo. Sitio no oficial.",
     nftTitle: "NFT de Habbo — precios y ventas",
-    nftTemplate: "%s · NFT · Bomhams Market",
+    nftTemplate: "%s · NFT · Stats",
     nftDescription:
       "Precios piso, ventas y tendencias de los coleccionables NFT oficiales de Habbo en la blockchain Immutable. Sección separada del Marketplace de créditos.",
   },
   /** Títulos y descripciones para buscadores y para la vista previa al compartir. */
   seo: {
-    ogAltMarket: "Bomhams Market: precios del Marketplace de Habbo",
-    ogAltNft: "Bomhams Market: precios de los NFT oficiales de Habbo",
+    ogAltMarket: "Stats: precios del Marketplace de Habbo",
+    ogAltNft: "Stats: precios de los NFT oficiales de Habbo",
     home: (label: string) => `Precios del Marketplace de Habbo ${label}`,
     homeDesc: (label: string, region: string) =>
       `Precio mínimo, ofertas abiertas, promedios e historial de los furnis del Marketplace de Habbo ${label} (${region}). Rankings y ofertas detectadas cada día.`,
@@ -44,13 +44,15 @@ export const es = {
     nftRankingDesc: (hint: string) => `${hint} NFT oficiales de Habbo en la blockchain Immutable.`,
     nftAboutDesc: "De dónde salen los precios de los NFT de Habbo (API pública de Immutable), qué tan actuales son y qué límites tienen.",
   },
-  header: { homeAria: "Bomhams Market, inicio", nftHomeAria: "Bomhams Market NFT, inicio" },
+  header: { homeAria: "Stats, inicio", nftHomeAria: "Stats NFT, inicio" },
   footer: {
     about: (
       <>
-        Creado por la comunidad <strong className="text-text">BOMHAMS</strong>, sin fines comerciales.{" "}
-        <strong className="text-text">Bomhams Market</strong> no es oficial y no está afiliado, patrocinado ni aprobado por
-        Sulake Oy ni por Azerion. Habbo es una marca registrada de Sulake Oy.
+        <span className="mr-2 inline-flex items-center rounded-md border border-accent/50 bg-accent/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-accent">
+          En construcción
+        </span>
+        <strong className="text-text">Stats</strong> no tiene fines comerciales, no es oficial y no está afiliado, patrocinado ni
+        aprobado por Sulake Oy ni por Azerion. Habbo es una marca registrada de Sulake Oy.
       </>
     ),
     data: "Precios y estadísticas: API pública de Habbo. Íconos de furnis: servidos directamente por el CDN de Habbo. Los datos pueden tener demoras o errores; no los uses como única referencia para comprar o vender.",
@@ -307,14 +309,14 @@ export const es = {
       "Tu lista de alertas se guarda en tu navegador y, si creás una cuenta, también en tu cuenta. No usamos publicidad ni cookies de seguimiento. Las consultas en vivo van desde tu navegador directo a la API de Habbo, sin enviar cookies. El detalle está en «Privacidad y cookies».",
     legalTitle: "Aviso legal",
     legal:
-      "Bomhams Market fue creado por la comunidad BOMHAMS, es gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por Sulake Oy ni por Azerion. Habbo y los nombres e imágenes de los furnis son propiedad de Sulake Oy. Si Sulake pide retirar algún contenido, se retira.",
+      "Stats es gratuito y sin fines comerciales. No es oficial y no está afiliado, patrocinado ni aprobado por Sulake Oy ni por Azerion. Habbo y los nombres e imágenes de los furnis son propiedad de Sulake Oy. Si Sulake pide retirar algún contenido, se retira.",
   },
   privacy: {
     metaTitle: "Privacidad y cookies",
-    metaDesc: "Qué guarda Bomhams Market, dónde y cómo borrarlo. Sin publicidad ni seguimiento.",
+    metaDesc: "Qué guarda Stats, dónde y cómo borrarlo. Sin publicidad ni seguimiento.",
     title: "Privacidad y cookies",
     intro:
-      "Bomhams Market no tiene publicidad ni seguimiento, no vende datos y solo pide tu email si creás una cuenta. Esto es todo lo que se guarda y dónde.",
+      "Stats no tiene publicidad ni seguimiento, no vende datos y solo pide tu email si creás una cuenta. Esto es todo lo que se guarda y dónde.",
     sections: [
       {
         title: "En tu navegador (necesario)",
@@ -362,7 +364,7 @@ export const es = {
     ),
     marketLink: "Marketplace (créditos)",
     footerData:
-      "Datos de la API pública de Immutable zkEVM; imágenes servidas por Habbo (nft-tokens.habbo.com). Bomhams Market no es oficial ni está afiliado a Sulake Oy, Azerion ni Immutable.",
+      "Datos de la API pública de Immutable zkEVM; imágenes servidas por Habbo (nft-tokens.habbo.com). Stats no es oficial ni está afiliado a Sulake Oy, Azerion ni Immutable.",
     footerRisk:
       "Esto no es asesoramiento financiero. Los precios de los NFT cambian rápido y pueden bajar a cero; los dólares son aproximados según la cotización del momento.",
     collections: {
@@ -522,7 +524,7 @@ export const es = {
       ),
       noticeTitle: "Aviso",
       notice:
-        "Esto no es asesoramiento financiero. Los NFT son activos volátiles: su precio puede cambiar mucho o llegar a cero. Bomhams Market no vende, no compra y no custodia nada; solo muestra datos públicos. No es un sitio oficial de Habbo, Sulake, Azerion ni Immutable.",
+        "Esto no es asesoramiento financiero. Los NFT son activos volátiles: su precio puede cambiar mucho o llegar a cero. Stats no vende, no compra y no custodia nada; solo muestra datos públicos. No es un sitio oficial de Habbo, Sulake, Azerion ni Immutable.",
     },
   },
 };

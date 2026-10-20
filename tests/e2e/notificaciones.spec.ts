@@ -16,5 +16,5 @@ test("notificaciones: con permiso, el aviso de prueba se muestra", async ({ page
         return reg ? (await reg.getNotifications()).map((n) => n.title) : [];
       }),
     )
-    .toContain("Bomhams Market");
+    .toContain("Stats");
 });

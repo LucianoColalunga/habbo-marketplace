@@ -37,8 +37,8 @@ async function Content({ params }: Pick<PageProps<"/[lang]/[hotel]/alertas/servi
           <li>
             <strong className="text-text">Telegram:</strong> creá un canal público, creá un bot con @BotFather y agregalo al
             canal como administrador con permiso para publicar. Variables: <code>TELEGRAM_BOT_TOKEN</code>,{" "}
-            <code>TELEGRAM_CHAT_ID</code> (por ejemplo <code>@BomhamsOfertas</code>) y{" "}
-            <code>NEXT_PUBLIC_TELEGRAM_URL</code> (<code>https://t.me/BomhamsOfertas</code>).
+            <code>TELEGRAM_CHAT_ID</code> (por ejemplo <code>@TuCanalDeOfertas</code>) y{" "}
+            <code>NEXT_PUBLIC_TELEGRAM_URL</code> (<code>https://t.me/TuCanalDeOfertas</code>).
           </li>
           <li>
             <strong className="text-text">Discord:</strong> en tu servidor, en el canal de ofertas: Editar canal →

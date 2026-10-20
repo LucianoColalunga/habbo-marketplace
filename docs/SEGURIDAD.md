@@ -1,6 +1,6 @@
 # Auditoría de seguridad — octubre de 2026
 
-Revisión completa de Bomhams Market después de sumar el email a las cuentas y el panel de administración.
+Revisión completa de Stats después de sumar el email a las cuentas y el panel de administración.
 
 **Resultado:** no se encontró ninguna falla grave. Se arreglaron 8 puntos mejorables (abajo). No hay claves filtradas
 en el código ni en el historial de git, y las dependencias que se publican no tienen vulnerabilidades conocidas.
