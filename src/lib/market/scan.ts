@@ -22,6 +22,11 @@ export interface ScanOptions {
   force?: boolean;
   /** Recorre todo el catálogo sin límite de tiempo (para correr en una PC). */
   full?: boolean;
+  /**
+   * Cada cuántos minutos se guarda el historial como mucho (por defecto 480 = 8 h).
+   * Cada escritura cuenta en el plan gratis de Vercel Blob (2.000 por mes).
+   */
+  historyEveryMinutes?: number;
   /** Tiempo máximo para consultar la API en esta corrida (ms). */
   timeBudgetMs?: number;
   /** Separación entre pedidos (ms). */
@@ -204,7 +209,14 @@ export async function runScan(hotel: HotelCode, options: ScanOptions = {}): Prom
     items: merged,
   };
 
-  await saveHistory(hotel, storage, result.results, finished);
+  const historyEvery = options.full ? 0 : (options.historyEveryMinutes ?? envNumber("SCAN_HISTORY_EVERY_MINUTES", 480));
+  const lastHistory = previous?.historyAt ? Date.parse(previous.historyAt) : 0;
+  if ((finished.getTime() - lastHistory) / 60000 >= historyEvery) {
+    await saveHistory(hotel, storage, result.results, finished, merged);
+    summary.historyAt = finished.toISOString();
+  } else if (previous?.historyAt) {
+    summary.historyAt = previous.historyAt;
+  }
   await storage.write(keys.summary(hotel), summary);
   log(
     `Listo: ${summary.scan.scanned} furnis en ${result.requests} pedidos, ${Math.round(summary.scan.durationMs / 1000)} s` +
@@ -215,7 +227,7 @@ export async function runScan(hotel: HotelCode, options: ScanOptions = {}): Prom
   return { status: "done", hotel, summary };
 }
 
-async function saveHistory(hotel: HotelCode, storage: Storage, scanned: MarketStats[], at: Date) {
+async function saveHistory(hotel: HotelCode, storage: Storage, scanned: MarketStats[], at: Date, latest: Record<string, ItemSummary>) {
   const previous = (await storage.read<MarketHistory>(keys.history(hotel)))?.data ?? emptyHistory(hotel);
-  await storage.write(keys.history(hotel), mergeHistory(previous, scanned, at));
+  await storage.write(keys.history(hotel), mergeHistory(previous, scanned, at, latest));
 }

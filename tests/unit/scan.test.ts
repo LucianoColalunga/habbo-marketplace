@@ -123,6 +123,25 @@ describe("runScan", () => {
     expect(calls.filter((c) => c.includes("marketplace")).length).toBeLessThanOrEqual(3);
   });
 
+  it("no guarda el historial en cada corrida, y cuando lo guarda no pierde los precios de las anteriores", async () => {
+    const storage = new MemoryStorage();
+    const clock = fakeClock();
+    const { fetchImpl } = fakeHabbo();
+    await runScan("es", { storage, fetchImpl, full: true, intervalMs: 1000, sleep: clock.sleep, now: clock.date });
+    storage.writes.length = 0;
+    // 3 horas después: solo el resumen (una escritura).
+    clock.advance(3 * 60 * 60_000);
+    await runScan("es", { storage, fetchImpl, intervalMs: 1000, timeBudgetMs: 2500, sleep: clock.sleep, now: clock.date });
+    expect(storage.writes).toEqual([keys.summary("es")]);
+    // Pasadas 8 horas desde el último historial: se guarda, con el precio de cada furni.
+    clock.advance(5 * 60 * 60_000);
+    storage.writes.length = 0;
+    await runScan("es", { storage, fetchImpl, intervalMs: 1000, timeBudgetMs: 2500, sleep: clock.sleep, now: clock.date });
+    expect(storage.writes).toEqual([keys.history("es"), keys.summary("es")]);
+    const summary = (await storage.read<MarketSummary>(keys.summary("es")))!.data;
+    expect(Date.parse(summary.historyAt!)).toBe(clock.date().getTime());
+  });
+
   it("falla si la API no devuelve nada", async () => {
     const storage = new MemoryStorage();
     const clock = fakeClock();

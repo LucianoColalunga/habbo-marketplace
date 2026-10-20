@@ -49,6 +49,21 @@ describe("mergeHistory", () => {
     expect(DAY_RETENTION).toBeGreaterThan(365);
   });
 
+  it("suma el último precio de los furnis consultados en corridas que no guardaron historial", () => {
+    let h = mergeHistory(emptyHistory("es"), [s("a", { currentPrice: 10, currentOpenOffers: 3 })], at("2026-10-17T00:00:00Z"));
+    const minute = (iso: string) => Math.floor(Date.parse(iso) / 60000);
+    h = mergeHistory(h, [s("a", { currentPrice: 9, currentOpenOffers: 2 })], at("2026-10-17T08:00:00Z"), {
+      a: { at: minute("2026-10-17T08:00:00Z"), cp: 9, oo: 2 },
+      // consultado a las 3 h, en una corrida que no guardó historial
+      b: { at: minute("2026-10-17T03:00:00Z"), cp: 50, oo: 1 },
+      // ya estaba antes del último historial: no se repite
+      c: { at: minute("2026-10-16T20:00:00Z"), cp: 7, oo: 1 },
+    });
+    expect(h.snaps.a.map((p) => p[1])).toEqual([10, 9]);
+    expect(h.snaps.b).toEqual([[minute("2026-10-17T03:00:00Z"), 50, 1]]);
+    expect(h.snaps.c).toBeUndefined();
+  });
+
   it("guarda el precio mínimo solo cuando cambia o pasaron muchas horas", () => {
     let h = emptyHistory("es");
     const snap = (cp: number, oo: number, iso: string) =>

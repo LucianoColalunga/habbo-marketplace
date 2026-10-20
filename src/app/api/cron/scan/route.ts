@@ -36,7 +36,9 @@ export async function GET(request: Request) {
     if (outcome.status === "skipped") return Response.json(outcome);
     forgetHotel(hotel);
     revalidateTag(`market:${hotel}`, "max");
-    const alerts = await runServerAlerts({ hotel, summary: outcome.summary });
+    // Las ofertas se publican en los canales solo en la corrida marcada con ?avisos=1
+    // (una por día por hotel), aunque haya escaneos cada pocas horas.
+    const alerts = url.searchParams.get("avisos") === "1" ? await runServerAlerts({ hotel, summary: outcome.summary }) : null;
     return Response.json({
       status: "done",
       hotel,

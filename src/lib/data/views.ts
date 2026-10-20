@@ -180,6 +180,8 @@ export interface CategoryRow {
   oo: number;
   s30: number;
   a7: number | null;
+  /** Suelo o pared (lo necesita la consulta en vivo). */
+  t: "r" | "w";
   /** Grupo que se muestra arriba del nombre: la subcategoría (o la categoría, en "Todos"). */
   g?: string;
 }
@@ -206,7 +208,8 @@ function rowsFor(keys: string[], catalog: CatalogIndex, summary: MarketSummary |
       const item = catalog.byKey.get(k);
       const s = summary?.items[k];
       const g = groups?.get(k);
-      return { k, n: item?.n ?? k, r: item?.r ?? 0, cp: s?.cp ?? 0, oo: s?.oo ?? 0, s30: s?.s30 ?? 0, a7: s?.a7 ?? null, ...(g ? { g } : {}) };
+      const t: "r" | "w" = item?.t === "w" ? "w" : "r";
+      return { k, n: item?.n ?? k, r: item?.r ?? 0, t, cp: s?.cp ?? 0, oo: s?.oo ?? 0, s30: s?.s30 ?? 0, a7: s?.a7 ?? null, ...(g ? { g } : {}) };
     })
     .sort((a, b) => b.s30 - a.s30 || b.oo - a.oo || a.n.localeCompare(b.n));
 }

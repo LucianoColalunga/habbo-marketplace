@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CATALOG_VIEWS, catalogView, DEFAULT_VIEW, setCatalogView, subscribeCatalogView, type CatalogView } from "@/lib/catalog-view";
 import type { CategoryRow } from "@/lib/data/views";
+import { useLivePrice } from "@/lib/habbo/live-prices";
+import type { HotelCode } from "@/lib/hotels";
 import { useI18n } from "@/lib/i18n/client";
 import { normalizeText } from "@/lib/text";
+import { LiveDot, LiveStatusBar } from "../live/LivePrices";
 import { Credits } from "../ui";
 import { PixelFurni } from "./PixelFurni";
 
@@ -249,23 +252,36 @@ function Badge({ pct }: { pct: number }) {
   );
 }
 
-function Price({ r, className = "" }: { r: CategoryRow; className?: string }) {
+function Price({ r, live = false, className = "" }: { r: CategoryRow; live?: boolean; className?: string }) {
   const { t } = useI18n();
   if (r.oo <= 0) return <span className={`text-muted ${className}`}>{t.common.noOffers}</span>;
   return (
     <span className={className}>
+      {live && (
+        <span className="mr-1.5 inline-flex align-middle">
+          <LiveDot />
+        </span>
+      )}
       <span className="font-normal text-text-2">{t.common.from} </span>
       <Credits value={r.cp} className="font-semibold text-text" />
     </span>
   );
 }
 
-function Card({ r, hotel, view, group }: { r: CategoryRow; hotel: string; view: Exclude<CatalogView, "list">; group?: string }) {
+/** La fila con el precio y las ofertas de Habbo en este momento, si ya llegaron. */
+function useLiveRow(hotel: string, r: CategoryRow, ref: React.RefObject<Element | null>): { row: CategoryRow; live: boolean } {
+  const live = useLivePrice(hotel as HotelCode, r.k, r.t, ref);
+  return live && live !== "missing" ? { row: { ...r, cp: live.cp, oo: live.oo }, live: true } : { row: r, live: false };
+}
+
+function Card({ r: base, hotel, view, group }: { r: CategoryRow; hotel: string; view: Exclude<CatalogView, "list">; group?: string }) {
   const { t: ui, f, href } = useI18n();
+  const ref = useRef<HTMLLIElement>(null);
+  const { row: r, live } = useLiveRow(hotel, base, ref);
   const pct = discount(r);
   const compact = view === "small";
   return (
-    <li className={`${box} group overflow-hidden`}>
+    <li ref={ref} className={`${box} group overflow-hidden`}>
       <Link prefetch={false} href={href(`/${hotel}/furni/${encodeURIComponent(r.k)}`)} className="flex h-full flex-col">
         <span className="relative block aspect-square bg-surface-2" style={TILE_BG}>
           {pct !== null && (
@@ -278,7 +294,7 @@ function Card({ r, hotel, view, group }: { r: CategoryRow; hotel: string; view: 
         <span className={`flex flex-1 flex-col gap-1 ${compact ? "p-2" : "p-3"}`}>
           {!compact && group && <span className="truncate text-xs text-text-2">{group}</span>}
           <span className={`line-clamp-2 text-text group-hover:underline ${compact ? "text-xs" : "text-sm"}`}>{r.n}</span>
-          <Price r={r} className={`mt-auto pt-1 ${compact ? "text-xs" : "text-sm"}`} />
+          <Price r={r} live={live} className={`mt-auto pt-1 ${compact ? "text-xs" : "text-sm"}`} />
           {!compact && (
             <span className="text-xs text-muted">
               {r.a7 ? (
@@ -298,11 +314,13 @@ function Card({ r, hotel, view, group }: { r: CategoryRow; hotel: string; view: 
   );
 }
 
-function Row({ r, hotel, group }: { r: CategoryRow; hotel: string; group?: string }) {
+function Row({ r: base, hotel, group }: { r: CategoryRow; hotel: string; group?: string }) {
   const { t: ui, f, href } = useI18n();
+  const ref = useRef<HTMLLIElement>(null);
+  const { row: r, live } = useLiveRow(hotel, base, ref);
   const pct = discount(r);
   return (
-    <li>
+    <li ref={ref}>
       <Link prefetch={false} href={href(`/${hotel}/furni/${encodeURIComponent(r.k)}`)} className={`${box} group flex items-center gap-3 p-2.5`}>
         <span className="relative h-16 w-16 shrink-0 rounded-lg bg-surface-2" style={TILE_BG}>
           <PixelFurni k={r.k} r={r.r} max={SCALE.list} className="absolute inset-0" />
@@ -310,9 +328,9 @@ function Row({ r, hotel, group }: { r: CategoryRow; hotel: string; group?: strin
         <span className="min-w-0 flex-1">
           {group && <span className="block truncate text-xs text-text-2">{group}</span>}
           <span className="block truncate text-sm text-text group-hover:underline">{r.n}</span>
-          <Price r={r} className="block text-sm sm:hidden" />
+          <Price r={r} live={live} className="block text-sm sm:hidden" />
         </span>
-        <Price r={r} className="hidden w-32 shrink-0 text-right text-sm sm:block" />
+        <Price r={r} live={live} className="hidden w-32 shrink-0 text-right text-sm sm:block" />
         <span className="hidden w-36 shrink-0 text-right text-xs text-muted md:block">
           {r.a7 ? (
             <>
@@ -469,6 +487,8 @@ export function Catalog({
             ))}
           </div>
         </div>
+
+        {slice.length > 0 && <LiveStatusBar />}
 
         {before}
 

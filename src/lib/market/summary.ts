@@ -33,6 +33,8 @@ export interface MarketSummary {
   hotel: HotelCode;
   /** Momento en que terminó la última corrida (ISO). */
   generatedAt: string;
+  /** Última vez que se guardó el historial (ISO); no se guarda en cada corrida. */
+  historyAt?: string;
   /** Fecha de las estadísticas según Habbo (AAAA-MM-DD). */
   statsDate: string;
   scan: ScanReport;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FurniTable, type Metric } from "@/components/FurniList";
+import { LiveStatusBar } from "@/components/live/LivePrices";
 import { TimeAgo } from "@/components/Freshness";
 import { Notice } from "@/components/ui";
 import { RANKINGS, type RankingKind } from "@/lib/data/rankings";
@@ -55,6 +56,11 @@ export async function RankingView({ hotel, kind }: { hotel: HotelCode; kind: Ran
         <h2 className="font-display text-xl font-bold text-text">{info.title}</h2>
         <p className="mb-3 text-sm text-text-2">{info.hint}</p>
         {!meta.hasData ? <Notice tone="warn">{r.noData}</Notice> : null}
+        {rows.length > 0 && (
+          <div className="mb-3">
+            <LiveStatusBar />
+          </div>
+        )}
         <FurniTable hotel={hotel} rows={rows} metric={METRIC[kind]} />
       </div>
     </div>

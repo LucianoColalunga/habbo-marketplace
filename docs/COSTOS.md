@@ -16,8 +16,8 @@ Datos de la documentación oficial de Vercel (páginas
 | Transferencia | 100 GB | el peso de esos archivos |
 | Ejecuciones de funciones | 1.000.000 | regenerar páginas, búsquedas no cacheadas, los cron |
 | CPU activa | 4 horas | lo mismo (el cron pasa casi todo el tiempo esperando a Habbo, eso no cuenta) |
-| Memoria | 360 GB-hora | lo mismo |
-| Vercel Blob | 1 GB guardado, 2.000 escrituras, 10.000 lecturas "simples", 10 GB de descarga | ~10 escrituras por día (escaneos); los archivos pesan ~0,3 MB |
+| Memoria | 360 GB-hora | sobre todo los escaneos: 24 por día de unos 4 minutos con 2 GB ≈ 100 GB-hora por mes |
+| Vercel Blob | 1 GB guardado, 2.000 escrituras, 10.000 lecturas "simples", 10 GB de descarga | ~40 escrituras por día (≈ 1.240 por mes); los archivos pesan ~0,3 MB |
 
 Las lecturas del Blob que salen de la caché del CDN **no cuentan** como lecturas "simples". Por eso los datos se
 guardan con caché de 7 días: cuando el recolector los reescribe, Vercel actualiza la caché en menos de 60 segundos, y
@@ -26,6 +26,14 @@ mientras tanto cada lectura es gratis. Además el servidor recuerda lo leído un
 
 "In most cases, if you exceed your usage limits on the Hobby plan, you will have to wait until 30 days have passed
 before you can use the feature again." — documentación de Vercel.
+
+**Escaneos cada 3 horas.** Vercel gratis deja hasta 100 cron por proyecto, cada uno una vez por día: `vercel.json`
+tiene 8 por hotel (24) más el de alertas y el de NFT. El límite que manda son las 2.000 escrituras del Blob, porque
+si se pasan el almacenamiento queda bloqueado 30 días: cada escaneo escribe solo el resumen y el historial se guarda
+como mucho cada 8 horas. `tests/unit/limits.test.ts` hace la cuenta y no deja pasar de 1.500 por mes.
+
+**Precios en vivo en las listas.** Los consulta el navegador de cada visitante directo a Habbo (solo los furnis que
+están en pantalla, como mucho 6 pedidos por minuto): no usan el servidor ni la base, así que no suman a ningún límite.
 
 Si se activan las **cuentas**, la base de datos es Upstash Redis en su plan gratis: 500.000 operaciones y 250 MB por
 mes. Cada visita de alguien con sesión usa unas 2 operaciones y guardar la lista, 2 más: alcanza para cientos de

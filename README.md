@@ -114,7 +114,8 @@ scraping. El detalle completo, con lo que se probó y lo que no se pudo verifica
 | Precio mínimo y ofertas abiertas (ficha) | API de Habbo, consultada desde el navegador | en el momento (se reutiliza 1 min) |
 | Historial diario (promedio, vendidos) | API de Habbo | hasta ayer, últimos 30 días |
 | Historial de más de 30 días y del precio mínimo | guardado por el recolector de este proyecto | desde que empezó a correr |
-| Rankings y ofertas detectadas | recolector | último escaneo de cada furni (se muestra "hace X") |
+| Precio mínimo y ofertas en categorías y rankings | API de Habbo, desde el navegador, solo lo que está en pantalla | en el momento (punto verde; se actualiza cada 90 s) |
+| Rankings y ofertas detectadas | recolector, cada 3 horas por hotel | último escaneo de cada furni (se muestra "hace X") |
 
 **Límites importantes:**
 
@@ -124,7 +125,12 @@ scraping. El detalle completo, con lo que se probó y lo que no se pudo verifica
 - La API **limita los pedidos** (medido: ~15-20 por minuto por IP, 25 + 25 furnis por pedido). Un recorrido completo
   de un hotel son ~523 pedidos (~45 min). Por eso el recolector es **rotativo**: cada corrida actualiza primero lo más
   activo y lo más desactualizado.
-- En el plan gratuito de Vercel los cron corren **una vez por día** y cada función dura como máximo 5 minutos.
+- En el plan gratuito de Vercel cada cron corre **una vez por día** (hasta 100 por proyecto) y cada función dura como
+  máximo 5 minutos. Por eso `vercel.json` tiene 24 cron de escaneo: 8 por hotel, uno cada 3 horas.
+- El límite real es el de **Vercel Blob: 2.000 escrituras por mes** (si se pasa, el almacenamiento queda bloqueado 30
+  días). Cada escaneo escribe solo el resumen; el historial se guarda como mucho cada 8 horas
+  (`SCAN_HISTORY_EVERY_MINUTES`). Con eso se usan unas 1.240 escrituras por mes; `tests/unit/limits.test.ts` hace la
+  cuenta y falla si un cambio en `vercel.json` se pasa de 1.500.
 
 ## Stack
 
@@ -188,7 +194,8 @@ Para `test:e2e` hace falta el navegador de Playwright una vez: `npx playwright i
    - `CRON_SECRET`: un texto largo al azar (protege `/api/cron/*`; Vercel lo manda solo en sus cron jobs).
    - `SITE_URL`: la URL pública (para los enlaces de los avisos).
    - Opcional: `NEXT_PUBLIC_HOTELS` (por defecto `es,com,br`).
-4. Desplegá. `vercel.json` ya trae un cron diario por hotel (`/api/cron/scan?hotel=...`) y uno de alertas. Si cambiás
+4. Desplegá. `vercel.json` ya trae 8 escaneos por día por hotel (`/api/cron/scan?hotel=...`; el marcado con
+   `&avisos=1` es el que publica las ofertas en los canales), uno de alertas y uno de NFT. Si cambiás
    `NEXT_PUBLIC_HOTELS`, ajustá también esos cron.
 5. Para no esperar días a que se llene, juntá los datos en tu PC (`npm run collect -- es --full`, etc.) y subilos al
    Blob: `vercel env pull .env.vercel` y después `npm run push-data`. (`.env.vercel` queda fuera de git.) Para la sección NFT: `npm run collect:nft -- --dias 14` y
@@ -198,8 +205,8 @@ Si desplegás con el CLI (`vercel deploy --prod`), `.vercelignore` evita que se 
 Vercel **no** respeta `.gitignore`. Para que cada push a GitHub se despliegue solo, conectá el repositorio en
 *Settings → Git* del proyecto (la app de Vercel en GitHub tiene que tener acceso al repo).
 
-Cada corrida escribe 2 archivos por hotel; con un cron por día y por hotel se usan ~200 de las 2.000 escrituras
-mensuales gratuitas de Vercel Blob. Si sumás más cron jobs o un cron externo, tenelo en cuenta.
+Cada escaneo escribe 1 archivo (y el historial, como mucho cada 8 horas): con los cron de `vercel.json` se usan unas
+1.240 de las 2.000 escrituras mensuales gratuitas de Vercel Blob. No sumes cron externos sin rehacer esa cuenta.
 
 ## Alertas
 
@@ -225,8 +232,8 @@ repetir). Los pasos están en `/es/alertas/servidor` (página sin enlaces desde 
    publica a mano.
 4. Volvé a desplegar y probá con `/api/cron/alerts?prueba=1` (encabezado `Authorization: Bearer <CRON_SECRET>`).
 
-`ALERTS_DEALS_MIN_DISCOUNT` cambia el umbral (0 desactiva la publicación). Con el plan gratuito de Vercel los escaneos, y por
-lo tanto las publicaciones, son una vez por día por hotel.
+`ALERTS_DEALS_MIN_DISCOUNT` cambia el umbral (0 desactiva la publicación). Aunque haya escaneos cada 3 horas, las
+ofertas se publican en los canales una vez por día por hotel (en el escaneo marcado con `&avisos=1`).
 
 **Tu lista personal (opcional):** armá tu lista en **Alertas**, abrí `/es/alertas/servidor`, tocá **Copiar mi lista** y
 guardala en `ALERTS_RULES`. Esos avisos salen por los mismos canales. `/api/cron/alerts` revisa solo esos furnis (1 o 2

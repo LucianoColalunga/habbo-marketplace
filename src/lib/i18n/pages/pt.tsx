@@ -258,7 +258,9 @@ export const pt: Pages = {
         </li>
         <li>
           <strong>Rankings e ofertas detectadas:</strong> vêm do coletor, que consulta o catálogo por partes. Cada mobi mostra o
-          dado da sua última varredura; os mais ativos são atualizados com mais frequência.
+          dado da sua última varredura; os mais ativos são atualizados com mais frequência. O coletor roda a cada 3 horas em
+          cada hotel e, nas listas, o menor preço e as ofertas do que está na tela são consultados ao vivo no Habbo (marcados
+          com um ponto verde).
         </li>
         <li>
           <strong>Histórico de mais de 30 dias e do menor preço anunciado:</strong> este site vai guardando desde que começou a

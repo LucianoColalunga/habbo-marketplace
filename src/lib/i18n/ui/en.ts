@@ -68,6 +68,16 @@ export const en: Ui = {
     category: "Category",
     seeCategory: (n) => `see all ${n}`,
   },
+  livePrices: {
+    loading: "Checking live prices with Habbo…",
+    ok: "Live prices from Habbo",
+    updated: (ago) => `updated ${ago}`,
+    limited: "Some prices are still from the last scan: Habbo limits live checks, and they fill in by themselves in a few seconds.",
+    failed: "Couldn't check Habbo live: showing prices from the last scan.",
+    refresh: "Refresh",
+    dot: "live price",
+    legend: "The green dot marks prices just checked with Habbo.",
+  },
   catalog: {
     filter: "Filter",
     showFilters: "Filters and categories",

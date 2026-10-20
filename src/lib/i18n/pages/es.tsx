@@ -267,7 +267,9 @@ export const es = {
         </li>
         <li>
           <strong>Rankings y ofertas detectadas:</strong> salen del recolector, que consulta el catálogo de a partes. Cada furni
-          muestra el dato de su último escaneo; los más activos se actualizan más seguido.
+          muestra el dato de su último escaneo; los más activos se actualizan más seguido. El recolector corre cada 3 horas
+          en cada hotel y, en las listas, el precio mínimo y las ofertas de lo que tenés en pantalla se consultan en vivo a
+          Habbo (los marca un punto verde).
         </li>
         <li>
           <strong>Historial de más de 30 días y del precio mínimo publicado:</strong> lo va guardando este sitio desde que

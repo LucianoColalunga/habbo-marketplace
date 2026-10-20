@@ -253,7 +253,9 @@ export const en: Pages = {
         </li>
         <li>
           <strong>Rankings and deals:</strong> they come from the collector, which goes through the catalog in parts. Each furni
-          shows the data from its latest scan; the most active ones are refreshed more often.
+          shows the data from its latest scan; the most active ones are refreshed more often. The collector runs every 3 hours
+          on each hotel and, in lists, the lowest price and offers of what&apos;s on screen are checked live with Habbo (marked
+          with a green dot).
         </li>
         <li>
           <strong>History beyond 30 days and of the lowest listed price:</strong> this site has been saving it since it started

@@ -82,7 +82,17 @@ function mergeSnap(existing: SnapPoint[] | undefined, point: SnapPoint): SnapPoi
   return list.length > SNAP_RETENTION ? list.slice(list.length - SNAP_RETENTION) : list;
 }
 
-export function mergeHistory(previous: MarketHistory, scanned: MarketStats[], now: Date): MarketHistory {
+/**
+ * Suma una corrida al historial. `latest` son los últimos valores de cada furni
+ * (del resumen): así también queda el precio de los furnis consultados en las
+ * corridas que no guardaron historial.
+ */
+export function mergeHistory(
+  previous: MarketHistory,
+  scanned: MarketStats[],
+  now: Date,
+  latest?: Record<string, { at: number; cp: number; oo: number }>,
+): MarketHistory {
   const days: Record<string, DayPoint[]> = { ...previous.days };
   const snaps: Record<string, SnapPoint[]> = { ...previous.snaps };
   const minute = Math.floor(now.getTime() / 60000);
@@ -102,6 +112,15 @@ export function mergeHistory(previous: MarketHistory, scanned: MarketStats[], no
     }
     const snap = mergeSnap(snaps[s.item], [minute, s.currentPrice, s.currentOpenOffers]);
     if (snap && snap.length > 0) snaps[s.item] = snap;
+  }
+  if (latest) {
+    const since = Math.floor(Date.parse(previous.updatedAt) / 60000);
+    const done = new Set(scanned.map((s) => s.item));
+    for (const [k, s] of Object.entries(latest)) {
+      if (done.has(k) || !(s.at > since)) continue;
+      const snap = mergeSnap(snaps[k], [s.at, s.cp, s.oo]);
+      if (snap && snap.length > 0) snaps[k] = snap;
+    }
   }
   return { v: 1, hotel: previous.hotel, updatedAt: now.toISOString(), days, snaps };
 }

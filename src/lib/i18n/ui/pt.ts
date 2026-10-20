@@ -68,6 +68,16 @@ export const pt: Ui = {
     category: "Categoria",
     seeCategory: (n) => `ver os ${n}`,
   },
+  livePrices: {
+    loading: "Consultando ao Habbo os preços ao vivo…",
+    ok: "Preços ao vivo do Habbo",
+    updated: (ago) => `atualizados ${ago}`,
+    limited: "Alguns preços ainda são da última varredura: o Habbo limita as consultas ao vivo e eles se completam sozinhos em alguns segundos.",
+    failed: "Não foi possível consultar o Habbo ao vivo: são mostrados os preços da última varredura.",
+    refresh: "Atualizar",
+    dot: "preço ao vivo",
+    legend: "O ponto verde marca os preços consultados agora no Habbo.",
+  },
   catalog: {
     filter: "Filtrar",
     showFilters: "Filtros e categorias",

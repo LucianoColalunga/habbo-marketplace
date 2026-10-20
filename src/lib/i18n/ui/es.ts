@@ -70,6 +70,16 @@ export const es = {
     category: "Categoría",
     seeCategory: (n: string) => `ver los ${n}`,
   },
+  livePrices: {
+    loading: "Consultando a Habbo los precios en vivo…",
+    ok: "Precios en vivo de Habbo",
+    updated: (ago: string) => `actualizados ${ago}`,
+    limited: "Algunos precios todavía son del último escaneo: Habbo limita las consultas en vivo y se completan solos en unos segundos.",
+    failed: "No se pudo consultar a Habbo en vivo: se muestran los precios del último escaneo.",
+    refresh: "Actualizar",
+    dot: "precio en vivo",
+    legend: "El punto verde marca los precios consultados recién a Habbo.",
+  },
   catalog: {
     filter: "Filtrar",
     showFilters: "Filtrar y categorías",

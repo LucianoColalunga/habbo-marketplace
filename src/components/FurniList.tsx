@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LivePriceCells } from "@/components/live/LivePrices";
 import type { FurniRow } from "@/lib/data/rankings";
 import type { Format } from "@/lib/format";
 import { getI18n } from "@/lib/i18n/server";
@@ -98,8 +99,7 @@ export async function FurniTable({ hotel, rows, metric }: { hotel: string; rows:
               <td className="px-3 py-2 text-right">
                 <MetricValue row={row} metric={metric} f={f} />
               </td>
-              <td className="px-3 py-2 text-right">{row.oo > 0 ? <Credits value={row.cp} /> : <span className="text-muted">—</span>}</td>
-              <td className="tnum px-3 py-2 text-right text-text-2">{f.int(row.oo)}</td>
+              <LivePriceCells hotel={hotel} k={row.k} t={row.t} cp={row.cp} oo={row.oo} />
               <td className="px-3 py-2 text-right text-text-2">
                 <Credits value={row.a7} />
               </td>

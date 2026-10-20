@@ -25,7 +25,7 @@ test("catálogo: menú de categorías al costado y filtros seleccionados", async
 
 test("catálogo: elegir el tamaño de las imágenes, lista y páginas", async ({ page }) => {
   await page.goto("/es/categorias/asientos");
-  const results = page.locator("[aria-live=polite]");
+  const results = page.locator("p[aria-live=polite]");
   const views = page.getByRole("group", { name: "Tamaño de las imágenes" });
   await expect(results).toHaveText(/^1–32 de \d/);
   await expect(views.getByRole("button", { name: "Imágenes medianas" })).toHaveAttribute("aria-pressed", "true");
@@ -62,4 +62,14 @@ test("catálogo: buscar dentro de la lista y ordenar", async ({ page, isMobile }
   await page.getByRole("combobox", { name: /Ordenar por/ }).selectOption("name");
   const sorted = await names.allTextContents();
   expect(sorted).toEqual([...sorted].sort((a, b) => a.localeCompare(b)));
+});
+
+test("catálogo y rankings: los precios en pantalla se consultan en vivo a Habbo", async ({ page }) => {
+  for (const path of ["/es/categorias/asientos", "/es/rankings"]) {
+    const habbo = page.waitForResponse((r) => r.url().includes("/api/public/marketplace/stats/batch"));
+    await page.goto(path);
+    expect((await habbo).ok(), path).toBe(true);
+    await expect(page.getByText("Precios en vivo de Habbo", { exact: false }).first(), path).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("main [title='precio en vivo']").nth(1), path).toBeVisible();
+  }
 });
