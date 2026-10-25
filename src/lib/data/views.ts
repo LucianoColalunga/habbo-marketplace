@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { CatalogItem } from "@/lib/habbo/furnidata";
 import type { HotelCode } from "@/lib/hotels";
+import { marketFlow, type MarketFlow } from "@/lib/market/flow";
 import type { DayPoint, SnapPoint } from "@/lib/market/history";
 import type { ItemSummary } from "@/lib/market/stats";
 import type { MarketSummary, ScanReport } from "@/lib/market/summary";
@@ -305,4 +306,28 @@ export async function searchCategories(hotel: HotelCode, query: string, lang: La
   cacheTag(`market:${hotel}`);
   const data = await categoriesOf(hotel);
   return data ? matchCategories(data.index, query.slice(0, 60), lang) : [];
+}
+
+/* ---------- Movimiento por día ---------- */
+
+/** Vendidas, créditos y publicaciones por día de todo el hotel. */
+export async function getMarketFlow(hotel: HotelCode): Promise<MarketFlow> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const [summary, history] = await Promise.all([loadSummary(hotel), loadHistory(hotel)]);
+  const items = summary?.items ?? {};
+  return marketFlow(Object.keys(items), history, items, Date.now());
+}
+
+/** Lo mismo, de una categoría o subcategoría (null si no existe). */
+export async function getCategoryFlow(hotel: HotelCode, cat: string, sub: string | null): Promise<MarketFlow | null> {
+  "use cache";
+  cacheLife("market");
+  cacheTag(`market:${hotel}`);
+  const [data, summary, history] = await Promise.all([categoriesOf(hotel), loadSummary(hotel), loadHistory(hotel)]);
+  if (!data) return null;
+  const keys = data.index.members[sub ? `${cat}/${sub}` : cat];
+  if (!keys) return null;
+  return marketFlow(keys, history, summary?.items ?? {}, Date.now());
 }

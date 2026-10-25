@@ -68,6 +68,8 @@ test("catálogo y rankings: los precios en pantalla se consultan en vivo a Habbo
   for (const path of ["/es/categorias/asientos", "/es/rankings"]) {
     const habbo = page.waitForResponse((r) => r.url().includes("/api/public/marketplace/stats/batch"));
     await page.goto(path);
+    // Solo se consulta lo que está en pantalla: se baja hasta la lista (en el celular queda más abajo).
+    await page.locator("main a[href*='/furni/']").first().scrollIntoViewIfNeeded();
     expect((await habbo).ok(), path).toBe(true);
     await expect(page.getByText("Precios en vivo de Habbo", { exact: false }).first(), path).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("main [title='precio en vivo']").nth(1), path).toBeVisible();

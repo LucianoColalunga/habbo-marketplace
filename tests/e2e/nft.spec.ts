@@ -35,6 +35,11 @@ test("la ficha de un NFT consulta Immutable en vivo", async ({ page }) => {
   await expect(page.locator('[aria-live="polite"]').first()).toContainText("En vivo · consultado", { timeout: 20_000 });
   await expect(page.getByRole("img", { name: /Precio promedio de venta por día y precio piso/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Publicaciones más baratas" })).toBeVisible();
+  // Qué pasa si compran la más barata: el próximo precio (o que no queda ninguna).
+  await expect(
+    page.getByText(/^(Si compran la más barata \(.+\), la próxima queda a .+ más cara\.|Hay \d+ publicadas a .+ más cara\.|Las \d+ publicaciones que muestra Immutable|Es la única publicación)/),
+  ).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Total hasta acá" })).toBeVisible();
 });
 
 test("colección: cambiar de ranking", async ({ page }) => {

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CATEGORY_LIMIT, getCatalogAll, getCategoryOverview, getCategoryView } from "@/lib/data/views";
+import { CATEGORY_LIMIT, getCatalogAll, getCategoryFlow, getCategoryOverview, getCategoryView, getMarketFlow } from "@/lib/data/views";
 import { HOTELS, type HotelCode } from "@/lib/hotels";
 import { getI18n } from "@/lib/i18n/server";
 import { categoryBySlug, subLabel } from "@/lib/market/categories";
 import { Catalog, type CatalogNode } from "./catalog/Catalog";
+import { MarketFlowCard } from "./MarketFlowCard";
 import { Notice } from "./ui";
 
 /**
@@ -14,9 +15,10 @@ import { Notice } from "./ui";
 export async function CategoryPage({ hotel, cat, sub }: { hotel: HotelCode; cat: string | null; sub: string | null }) {
   const def = cat ? categoryBySlug(cat) : null;
   if (cat && !def) notFound();
-  const [view, overview, { lang, p, f, href, t }] = await Promise.all([
+  const [view, overview, flow, { lang, p, f, href, t }] = await Promise.all([
     cat ? getCategoryView(hotel, cat, sub) : getCatalogAll(hotel),
     getCategoryOverview(hotel),
+    cat ? getCategoryFlow(hotel, cat, sub) : getMarketFlow(hotel),
     getI18n(),
   ]);
   if (!view) notFound();
@@ -79,6 +81,8 @@ export async function CategoryPage({ hotel, cat, sub }: { hotel: HotelCode; cat:
           )}
         </p>
       </header>
+
+      {tree.length > 0 && <MarketFlowCard flow={flow} title={cat ? t.marketFlow.catTitle : t.marketFlow.homeTitle} />}
 
       {tree.length === 0 ? (
         <Notice tone="warn">{c.pending}</Notice>

@@ -19,6 +19,8 @@ export interface MarketHistory {
   updatedAt: string;
   days: Record<string, DayPoint[]>;
   snaps: Record<string, SnapPoint[]>;
+  /** Minuto (desde 1970, UTC) en que se sumaron por última vez los días de cada furni. */
+  seen?: Record<string, number>;
 }
 
 export const DAY_RETENTION = 400;
@@ -95,6 +97,7 @@ export function mergeHistory(
 ): MarketHistory {
   const days: Record<string, DayPoint[]> = { ...previous.days };
   const snaps: Record<string, SnapPoint[]> = { ...previous.snaps };
+  const seen: Record<string, number> = { ...previous.seen };
   const minute = Math.floor(now.getTime() / 60000);
   let latestBase: number | null = null;
   for (const s of scanned) {
@@ -112,6 +115,7 @@ export function mergeHistory(
     }
     const snap = mergeSnap(snaps[s.item], [minute, s.currentPrice, s.currentOpenOffers]);
     if (snap && snap.length > 0) snaps[s.item] = snap;
+    seen[s.item] = minute;
   }
   if (latest) {
     const since = Math.floor(Date.parse(previous.updatedAt) / 60000);
@@ -122,5 +126,5 @@ export function mergeHistory(
       if (snap && snap.length > 0) snaps[k] = snap;
     }
   }
-  return { v: 1, hotel: previous.hotel, updatedAt: now.toISOString(), days, snaps };
+  return { v: 1, hotel: previous.hotel, updatedAt: now.toISOString(), days, snaps, seen };
 }

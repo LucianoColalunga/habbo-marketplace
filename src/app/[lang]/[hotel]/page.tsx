@@ -8,7 +8,8 @@ import { JoinChannels } from "@/components/JoinChannels";
 import { SearchBox } from "@/components/SearchBox";
 import { PageSkeleton } from "@/components/Skeletons";
 import { CoinGlyph, Notice, SectionTitle, StatTile } from "@/components/ui";
-import { getCategoryOverview, getHomeView } from "@/lib/data/views";
+import { getCategoryOverview, getHomeView, getMarketFlow } from "@/lib/data/views";
+import { MarketFlowCard } from "@/components/MarketFlowCard";
 import { HOTELS, isEnabledHotel } from "@/lib/hotels";
 import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
@@ -24,7 +25,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/[hotel]">)
 async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "params">) {
   const { hotel } = await params;
   if (!isEnabledHotel(hotel)) notFound();
-  const [view, cards, { lang, p, t, f, href }] = await Promise.all([getHomeView(hotel), getCategoryOverview(hotel), getI18n()]);
+  const [view, cards, flow, { lang, p, t, f, href }] = await Promise.all([
+    getHomeView(hotel),
+    getCategoryOverview(hotel),
+    getMarketFlow(hotel),
+    getI18n(),
+  ]);
   const h = p.home;
 
   return (
@@ -96,6 +102,8 @@ async function HotelHomeContent({ params }: Pick<PageProps<"/[lang]/[hotel]">, "
           />
         </section>
       )}
+
+      {view.meta.hasData && <MarketFlowCard flow={flow} title={t.marketFlow.homeTitle} tiles={false} />}
 
       <JoinChannels />
 

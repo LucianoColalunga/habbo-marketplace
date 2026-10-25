@@ -119,11 +119,13 @@ scraping. El detalle completo, con lo que se probó y lo que no se pudo verifica
 | Historial de más de 30 días y del precio mínimo | guardado por el recolector de este proyecto | desde que empezó a correr |
 | Precio mínimo y ofertas en categorías y rankings | API de Habbo, desde el navegador, solo lo que está en pantalla | en el momento (punto verde; se actualiza cada 90 s) |
 | Rankings y ofertas detectadas | recolector, cada 3 horas por hotel | último escaneo de cada furni (se muestra "hace X") |
+| Movimiento por día (hotel y cada categoría): vendidas, créditos y publicaciones | historial de Habbo + mediciones del recolector | un día aparece cuando los furnis que suman el 90 % de las ventas se volvieron a consultar después de que terminó |
 
 **Límites importantes:**
 
 - La API **no muestra cada publicación** (ni vendedor, ni hora): solo el precio mínimo y la cantidad de ofertas al
-  consultar. Las alertas detectan "el precio mínimo bajó del umbral en el último chequeo"; si alguien publica barato y
+  consultar. Por eso, en créditos no se puede saber a cuánto queda el próximo si compran el más barato (en NFT sí:
+  Immutable da las 10 publicaciones más baratas), ni cuántos furnis se crean, se destruyen o existen. Las alertas detectan "el precio mínimo bajó del umbral en el último chequeo"; si alguien publica barato y
   otro compra entre dos chequeos, no se ve.
 - La API **limita los pedidos** (medido: ~15-20 por minuto por IP, 25 + 25 furnis por pedido). Un recorrido completo
   de un hotel son ~523 pedidos (~45 min). Por eso el recolector es **rotativo**: cada corrida actualiza primero lo más

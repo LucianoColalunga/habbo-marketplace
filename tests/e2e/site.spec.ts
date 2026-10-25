@@ -101,3 +101,22 @@ test("las rutas del recolector piden el secreto en producción", async ({ reques
   const res = await request.get("/api/cron/scan?hotel=es");
   expect(res.status()).toBe(401);
 });
+
+test("movimiento del mercado en el inicio del hotel y en cada categoría", async ({ page }) => {
+  await page.goto("/es");
+  const home = page.getByRole("region", { name: "Movimiento del mercado" });
+  await expect(home.getByRole("heading", { name: "Movimiento del mercado" })).toBeVisible();
+  await page.goto("/es/categorias/asientos");
+  const cat = page.getByRole("region", { name: "Movimiento de la categoría" });
+  await expect(cat.getByRole("heading", { name: "Movimiento de la categoría" })).toBeVisible();
+  await expect(cat.getByText("Publicadas ahora")).toBeVisible();
+  // Con días listos se ve el gráfico y se puede cambiar de medida; si no, el aviso de que se está juntando.
+  const tabs = cat.getByRole("group", { name: "Qué mostrar en el gráfico" });
+  if (await tabs.isVisible()) {
+    await expect(cat.getByRole("img", { name: "Unidades vendidas por día" })).toBeVisible();
+    await tabs.getByRole("button", { name: "Créditos" }).click();
+    await expect(cat.getByRole("img", { name: "Créditos movidos por día" })).toBeVisible();
+  } else {
+    await expect(cat.getByText("Se está juntando", { exact: false })).toBeVisible();
+  }
+});
