@@ -23,7 +23,7 @@ test("las dos secciones están separadas y se puede ir y volver", async ({ page 
 test("inicio NFT con colecciones y rankings con datos", async ({ page }) => {
   await page.goto("/nft");
   for (const name of ["Furnis NFT", "Ropa NFT", "Mascotas NFT", "Tokens NFT", "Add-ons NFT"]) {
-    await expect(page.getByRole("link", { name: new RegExp(name) })).toBeVisible();
+    await expect(page.getByRole("link", { name: new RegExp(name) }).first()).toBeVisible();
   }
   await expect(page.locator('a[href^="/nft/item/"]').first()).toBeVisible();
   await expect(page.getByText("no es asesoramiento financiero", { exact: false })).toBeVisible();
@@ -71,4 +71,23 @@ test("un NFT inexistente muestra no encontrado y el cron pide secreto", async ({
   await page.goto("/nft/item/00000000-0000-0000-0000-000000000000");
   await expect(page.getByText("No encontramos esa página")).toBeVisible();
   expect((await request.get("/api/cron/nft")).status()).toBe(401);
+});
+
+test("movimiento de las colecciones: vendidas, acuñadas, quemadas y cuántas existen", async ({ page }) => {
+  await page.goto("/nft/coleccion/ropa");
+  const flow = page.getByRole("region", { name: "Movimiento de la colección" });
+  await expect(flow.getByRole("heading", { name: "Movimiento de la colección" })).toBeVisible();
+  await expect(flow.getByText("Existen", { exact: true }).first()).toBeVisible();
+  await expect(flow.getByText(/^Quemadas en \d+ días?$/)).toBeVisible();
+  await expect(flow.getByText(/^Acuñadas en \d+ días?$/)).toBeVisible();
+  await expect(flow.getByRole("img", { name: "Vendidas, quemadas y acuñadas por día" })).toBeVisible();
+  // Los números también se pueden leer como tabla.
+  await flow.getByText("Ver los números").click();
+  await expect(flow.getByRole("columnheader", { name: "Quemadas" })).toBeVisible();
+
+  await page.goto("/nft");
+  const table = page.getByRole("region", { name: "Movimiento de las colecciones" });
+  for (const name of ["Furnis NFT", "Ropa NFT", "Mascotas NFT", "Tokens NFT", "Add-ons NFT"]) {
+    await expect(table.getByRole("link", { name })).toBeVisible();
+  }
 });

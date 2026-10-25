@@ -2,7 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { normalize } from "@/lib/search";
 import { getStorage } from "@/lib/storage";
 import { collectionByAddress, NFT_COLLECTIONS, type NftCollectionSlug } from "./collections";
-import type { NftDayPoint, NftHistory, NftRow, NftSnapPoint, NftSummary } from "./model";
+import type { NftCollectionStats, NftDayPoint, NftHistory, NftRow, NftSnapPoint, NftSummary } from "./model";
 import { buildNftRanking, nftTotals, type NftRankingKind, type NftTotals } from "./rankings";
 import { nftKeys } from "./scan";
 
@@ -55,6 +55,8 @@ export interface NftHomeView {
   meta: NftMeta;
   totals: NftTotals | null;
   collections: NftCollectionCard[];
+  /** Movimiento de cada colección (vendidas, acuñadas, quemadas y cuántas existen). */
+  flows: { slug: NftCollectionSlug; stats: NftCollectionStats | null }[];
   vendidos: NftRow[];
   subas: NftRow[];
   bajas: NftRow[];
@@ -102,11 +104,21 @@ export async function getNftHome(): Promise<NftHomeView> {
     meta: metaOf(s),
     totals: s ? nftTotals(rows) : null,
     collections,
+    flows: NFT_COLLECTIONS.map((c) => ({ slug: c.slug, stats: s?.collections?.[c.slug] ?? null })),
     vendidos: buildNftRanking(rows, "vendidos", 6),
     subas: buildNftRanking(rows, "subas", 6),
     bajas: buildNftRanking(rows, "bajas", 6),
     ofertas: buildNftRanking(rows, "ofertas", 6),
   };
+}
+
+/** Movimiento de una colección (vendidas, acuñadas, quemadas y cuántas existen). */
+export async function getNftCollectionStats(slug: NftCollectionSlug): Promise<NftCollectionStats | null> {
+  "use cache";
+  cacheLife("market");
+  cacheTag("nft");
+  const s = await loadSummary();
+  return s?.collections?.[slug] ?? null;
 }
 
 export async function getNftRanking(kind: NftRankingKind, slug: NftCollectionSlug | null, limit = 100): Promise<NftRow[]> {

@@ -59,7 +59,7 @@ test("portugués: sección NFT separada y traducida", async ({ page }) => {
   await page.goto("/pt/nft");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Preços e vendas dos NFT oficiais do Habbo");
   await expect(page.getByText("Não são os mobis do Marketplace do jogo")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Roupas NFT/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Roupas NFT/ }).first()).toBeVisible();
   const sections = page.getByRole("navigation", { name: "Seção do site" });
   await expect(sections.getByRole("link", { name: /Marketplace/ })).toHaveAttribute("href", "/pt/br");
   expect(problems).toEqual([]);

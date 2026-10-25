@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { ImmutableClient, listSalesSince, normalizeSale, normalizeStack, saleUsd } from "@/lib/nft/api";
+import { countActivitiesSince, countSupply, ImmutableClient, listSalesSince, normalizeSale, normalizeStack, saleUsd } from "@/lib/nft/api";
 import { NFT_COLLECTIONS } from "@/lib/nft/collections";
 import { emptyNftHistory, type NftHistory, type NftRow, type NftSummary } from "@/lib/nft/model";
 import { buildNftRanking, nftDiscount, nftWeeklyChange } from "@/lib/nft/rankings";
-import { addSalesToDays, buildRows, nftKeys, runNftScan } from "@/lib/nft/scan";
+import { addFlows, addSalesToDays, buildCollectionStats, buildRows, nftKeys, runNftScan, setSupply } from "@/lib/nft/scan";
 import { fakeClock, jsonResponse, MemoryStorage } from "../helpers";
 
 const FURNI = NFT_COLLECTIONS[0].address;
@@ -213,5 +213,86 @@ describe("runNftScan", () => {
     expect(second.calls.some((u) => u.includes("/nfts?"))).toBe(false); // el token 10 ya estaba en la caché
     const saved = (await storage.read<NftSummary>(nftKeys.summary()))!.data;
     expect(saved.stacks[ID1].s7).toBe(2);
+  });
+});
+
+describe("movimiento de las colecciones", () => {
+  const day = (iso: string) => Number(iso.replaceAll("-", ""));
+
+  it("cuenta por día, recorre la página entera y corta cuando una página ya es vieja", async () => {
+    const page1 = [
+      { indexed_at: "2026-10-24T10:00:00Z" },
+      { indexed_at: "2026-10-24T10:00:01Z" }, // empate desordenado: igual cuenta
+      { indexed_at: "2026-10-23T23:00:00Z" },
+    ];
+    const page2 = [{ indexed_at: "2026-10-23T05:00:00Z" }, { indexed_at: "2026-10-22T09:00:00Z" }];
+    const calls: string[] = [];
+    const fetchImpl = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      calls.push(url);
+      return jsonResponse(url.includes("page_cursor") ? { result: page2, page: { next_cursor: "c2" } } : { result: page1, page: { next_cursor: "c1" } });
+    });
+    const client = new ImmutableClient({ fetchImpl: fetchImpl as never, intervalMs: 0, sleep: async () => {} });
+    const res = await countActivitiesSince(client, FURNI, "burn", "2026-10-23T00:00:00Z", 10);
+    expect(res).toMatchObject({ perDay: { "2026-10-24": 2, "2026-10-23": 2 }, newest: "2026-10-24T10:00:01Z", complete: true });
+    expect(calls).toHaveLength(2); // la segunda página ya tenía una vieja: no pide la tercera
+    expect(calls[0]).toContain("activity_type=burn");
+    const capped = await countActivitiesSince(client, FURNI, "burn", "2020-01-01T00:00:00Z", 1);
+    expect(capped.complete).toBe(false);
+    expect(capped.oldest).toBe("2026-10-23T23:00:00Z");
+  });
+
+  it("suma las unidades de todos los modelos", async () => {
+    const fetchImpl = vi.fn(async (input: string | URL | Request) =>
+      jsonResponse(
+        String(input).includes("page_cursor")
+          ? { result: [{ stack_count: 5 }], page: { next_cursor: null } }
+          : { result: [{ stack_count: 100 }, { stack_count: "20" }], page: { next_cursor: "x" } },
+      ),
+    );
+    const client = new ImmutableClient({ fetchImpl: fetchImpl as never, intervalMs: 0, sleep: async () => {} });
+    expect(await countSupply(client, FURNI)).toEqual({ units: 125, models: 3, complete: true });
+  });
+
+  it("arma los días completos y calcula cuántas existían al cerrar cada día", () => {
+    const h = emptyNftHistory();
+    addFlows(h.flows!, FURNI, "sale", { "2026-10-22": 10, "2026-10-23": 7, "2026-10-24": 4, "2026-10-25": 1 });
+    addFlows(h.flows!, FURNI, "mint", { "2026-10-23": 30, "2026-10-24": 20, "2026-10-25": 5 });
+    addFlows(h.flows!, FURNI, "burn", { "2026-10-23": 3, "2026-10-24": 8, "2026-10-25": 2 });
+    h.flowStart![FURNI] = day("2026-10-23"); // el 22 quedó incompleto
+    setSupply(h.supply!, FURNI, day("2026-10-25"), 1000, 40);
+    const stats = buildCollectionStats(h, new Date("2026-10-25T08:00:00Z")).furni;
+    expect(stats.units).toBe(1000);
+    expect(stats.models).toBe(40);
+    // Sin hoy (incompleto) y sin días anteriores al inicio del conteo.
+    expect(stats.days).toEqual([
+      [day("2026-10-23"), 7, 30, 3, 1000 - (5 - 2) - (20 - 8)],
+      [day("2026-10-24"), 4, 20, 8, 1000 - (5 - 2)],
+    ]);
+    // Otra colección sin datos.
+    expect(buildCollectionStats(h, new Date("2026-10-25T08:00:00Z")).ropa).toEqual({ units: null, models: null, measuredAt: null, days: [] });
+  });
+
+  it("el escaneo guarda el movimiento y cuántas existen", async () => {
+    const storage = new MemoryStorage();
+    const now = new Date();
+    const at = (h: number) => new Date(now.getTime() - h * 3600_000).toISOString();
+    const fetchImpl = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      if (url.includes("/fiat/conversion")) return jsonResponse({ ethereum: { usd: 2400 } });
+      if (url.includes("/search/stacks")) {
+        return jsonResponse({ result: url.includes(FURNI) ? [rawStack(ID1, "Plaque", "0.29")] : [], page: { next_cursor: null } });
+      }
+      if (url.includes("activity_type=mint") && url.includes(FURNI)) return jsonResponse({ result: [{ indexed_at: at(1) }, { indexed_at: at(2) }], page: {} });
+      if (url.includes("activity_type=burn") && url.includes(FURNI)) return jsonResponse({ result: [{ indexed_at: at(1) }], page: {} });
+      if (url.includes("/activities")) return jsonResponse({ result: [], page: {} });
+      return new Response("", { status: 404 });
+    });
+    const summary = await runNftScan({ storage, fetchImpl: fetchImpl as never, intervalMs: 0, sleep: async () => {}, nowDate: () => now });
+    expect(summary.collections?.furni).toMatchObject({ units: 3695, models: 1 });
+    const history = (await storage.read<NftHistory>(nftKeys.history()))!.data;
+    const totals = (history.flows![FURNI] ?? []).reduce((acc, p) => [acc[0] + p[1], acc[1] + p[2], acc[2] + p[3]], [0, 0, 0]);
+    expect(totals).toEqual([0, 2, 1]);
+    expect(history.lastActivityAt![`mint:${FURNI}`]).toBe(at(1));
   });
 });

@@ -282,6 +282,74 @@ export async function listSalesSince(
   return { sales, complete: false };
 }
 
+export type NftActivityKind = "sale" | "mint" | "burn";
+
+/**
+ * Cuántas ventas, acuñadas o quemadas hubo por día (fecha "AAAA-MM-DD", UTC)
+ * después de `untilIso`, de la más nueva hacia atrás. La API las ordena "casi"
+ * de la más nueva a la más vieja (con empates desordenados), así que cada página
+ * se recorre entera y se corta recién cuando toda una página es vieja.
+ */
+export async function countActivitiesSince(
+  client: ImmutableClient,
+  contract: string,
+  kind: NftActivityKind,
+  untilIso: string,
+  maxPages: number,
+): Promise<{ perDay: Record<string, number>; newest: string | null; oldest: string | null; complete: boolean }> {
+  const until = Date.parse(untilIso);
+  const perDay: Record<string, number> = {};
+  let newest: string | null = null;
+  let oldest: string | null = null;
+  let cursor: string | null | undefined = null;
+  for (let page = 0; page < maxPages; page++) {
+    const url =
+      `${IMX_BASE}/activities?contract_address=${contract}&activity_type=${kind}&page_size=200` +
+      (cursor ? `&page_cursor=${encodeURIComponent(cursor)}` : "");
+    const body: Page<{ indexed_at?: string }> = await client.get(url);
+    let reachedOld = false;
+    for (const raw of body.result ?? []) {
+      const at = raw?.indexed_at;
+      const t = at ? Date.parse(at) : NaN;
+      if (!at || !Number.isFinite(t)) continue;
+      if (t <= until) {
+        reachedOld = true;
+        continue;
+      }
+      if (!newest || at > newest) newest = at;
+      if (!oldest || at < oldest) oldest = at;
+      const day = at.slice(0, 10);
+      perDay[day] = (perDay[day] ?? 0) + 1;
+    }
+    cursor = body.page?.next_cursor;
+    if (reachedOld || !cursor) return { perDay, newest, oldest, complete: true };
+  }
+  return { perDay, newest, oldest, complete: false };
+}
+
+/** Cuántas unidades existen de una colección (suma de las de cada modelo) y cuántos modelos tiene. */
+export async function countSupply(
+  client: ImmutableClient,
+  contract: string,
+  maxPages = 80,
+): Promise<{ units: number; models: number; complete: boolean }> {
+  let units = 0;
+  let models = 0;
+  let cursor: string | null | undefined = null;
+  for (let page = 0; page < maxPages; page++) {
+    const url = `${IMX_BASE}/search/stacks?contract_address=${contract}&page_size=200` + (cursor ? `&page_cursor=${encodeURIComponent(cursor)}` : "");
+    const body: Page<RawStackResult> = await client.get(url);
+    for (const raw of body.result ?? []) {
+      const n = num(raw.stack_count);
+      if (n !== null && n > 0) units += Math.round(n);
+      models++;
+    }
+    cursor = body.page?.next_cursor;
+    if (!cursor) return { units, models, complete: true };
+  }
+  return { units, models, complete: false };
+}
+
 interface RawNft {
   token_id?: string;
   metadata_id?: string | null;

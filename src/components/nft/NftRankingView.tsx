@@ -4,7 +4,8 @@ import { NftTable, type NftMetric } from "@/components/nft/NftList";
 import { getI18n } from "@/lib/i18n/server";
 import type { NftCollectionSlug } from "@/lib/nft/collections";
 import { NFT_RANKINGS, type NftRankingKind } from "@/lib/nft/rankings";
-import { getNftMeta, getNftRanking } from "@/lib/nft/views";
+import { getNftCollectionStats, getNftMeta, getNftRanking } from "@/lib/nft/views";
+import { NftCollectionFlow } from "./NftCollectionFlow";
 
 const METRIC: Record<NftRankingKind, NftMetric> = {
   vendidos: "s7",
@@ -27,7 +28,12 @@ export async function NftRankingView({
   basePath: string;
   title: string;
 }) {
-  const [rows, meta, { p, href }] = await Promise.all([getNftRanking(kind, slug, 100), getNftMeta(), getI18n()]);
+  const [rows, meta, stats, { p, href }] = await Promise.all([
+    getNftRanking(kind, slug, 100),
+    getNftMeta(),
+    slug ? getNftCollectionStats(slug) : Promise.resolve(null),
+    getI18n(),
+  ]);
   const r = p.nft.rankings;
   return (
     <div className="space-y-5">
@@ -44,6 +50,7 @@ export async function NftRankingView({
           )}
         </p>
       </header>
+      {slug && <NftCollectionFlow stats={stats} />}
       <nav aria-label={r.kindAria} className="flex flex-wrap gap-2">
         {(Object.keys(NFT_RANKINGS) as NftRankingKind[]).map((k) => (
           <Link

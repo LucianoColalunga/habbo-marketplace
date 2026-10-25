@@ -7,6 +7,7 @@ import { SearchBox } from "@/components/SearchBox";
 import { Notice, SectionTitle, StatTile } from "@/components/ui";
 import { pageMeta } from "@/lib/i18n/seo";
 import { getI18n } from "@/lib/i18n/server";
+import { lastDaysTotals } from "@/lib/nft/flows";
 import { getNftHome } from "@/lib/nft/views";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NftHome() {
-  const [view, { p, f, href }] = await Promise.all([getNftHome(), getI18n()]);
+  const [view, { p, f, href, t }] = await Promise.all([getNftHome(), getI18n()]);
+  const fl = t.nftFlows;
+  const hasFlows = view.flows.some((c) => c.stats && (c.stats.units !== null || c.stats.days.length > 0));
   const h = p.nft.home;
   return (
     <div className="space-y-10">
@@ -68,6 +71,46 @@ export default async function NftHome() {
           ))}
         </ul>
       </section>
+
+      {hasFlows && (
+        <section className="card p-4" aria-label={fl.homeTitle}>
+          <SectionTitle title={fl.homeTitle} hint={fl.homeHint} />
+          <div className="relative overflow-x-auto">
+            <table className="w-full min-w-[34rem] text-right text-sm">
+              <thead className="text-text-2">
+                <tr>
+                  <th className="py-1.5 pr-3 text-left font-medium">{fl.colCollection}</th>
+                  <th className="py-1.5 pr-3 font-medium">{fl.existing}</th>
+                  <th className="py-1.5 pr-3 font-medium">{fl.sold}</th>
+                  <th className="py-1.5 pr-3 font-medium">{fl.minted}</th>
+                  <th className="py-1.5 font-medium">{fl.burned}</th>
+                </tr>
+              </thead>
+              <tbody className="tnum text-text">
+                {view.flows.map(({ slug, stats }) => {
+                  const w = lastDaysTotals(stats?.days ?? []);
+                  const has = Boolean(stats && stats.days.length > 0);
+                  return (
+                    <tr key={slug} className="border-t border-line">
+                      <td className="py-1.5 pr-3 text-left">
+                        <Link prefetch={false} href={href(`/nft/coleccion/${slug}`)} className="text-text hover:underline">
+                          {p.nft.collections[slug]}
+                        </Link>
+                        {has && !w.full && <span className="block text-xs text-muted">{fl.daysCounted(w.count)}</span>}
+                      </td>
+                      <td className="py-1.5 pr-3">{stats?.units == null ? "—" : f.int(stats.units)}</td>
+                      <td className="py-1.5 pr-3">{has ? f.int(w.sold) : "—"}</td>
+                      <td className="py-1.5 pr-3">{has ? f.int(w.minted) : "—"}</td>
+                      <td className="py-1.5">{has ? f.int(w.burned) : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted">{fl.explain}</p>
+        </section>
+      )}
 
       {view.meta.hasData && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

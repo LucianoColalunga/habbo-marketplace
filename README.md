@@ -41,6 +41,10 @@ hay un selector "Marketplace · créditos | NFT · blockchain" para que nunca se
 - Precio piso, mejor oferta de compra, última venta y publicaciones más baratas **en vivo** (desde el navegador).
 - Ventas por día y promedio en USD, rankings (más vendidos, dólares movidos, subas, bajas, ofertas, más caros) por
   colección o en total, y buscador.
+- **Movimiento de cada colección**: cuántas se venden, se acuñan (nuevas) y se queman por día, y cuántas existen
+  (suma de las unidades de todos sus modelos), con gráficos de 30 días y una tabla comparativa en el inicio NFT. Se
+  cuenta en el cron diario: la primera vez carga 7 días (con tope de páginas; en Furnis, que se mueve mucho, puede
+  quedar menos) y después suma día a día.
 - Datos: API pública de Immutable (sin clave, máx. 5 pedidos por segundo) y cotizaciones de su servicio de conversión.
   El recolector (`npm run collect:nft`, cron diario `/api/cron/nft`) guarda historial de ventas y del piso.
 - No incluye Immutable X (su API ya no responde) ni los avatares en Ethereum (requieren servicios con clave).
