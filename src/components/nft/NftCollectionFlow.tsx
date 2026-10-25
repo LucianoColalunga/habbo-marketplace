@@ -1,6 +1,7 @@
 "use client";
 
 import { TimeSeriesChart } from "@/components/charts/TimeSeriesChart";
+import { ExportCsvButton } from "@/components/ExportCsvButton";
 import { Notice, StatTile } from "@/components/ui";
 import { useI18n } from "@/lib/i18n/client";
 import { dayMs, lastDaysTotals } from "@/lib/nft/flows";
@@ -40,7 +41,16 @@ export function NftCollectionFlow({ stats }: { stats: NftCollectionStats | null 
 
       {stats.days.length > 0 && (
         <div className="card p-4">
-          <h3 className="mb-3 font-display text-lg font-bold text-text">{t.perDayTitle}</h3>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-lg font-bold text-text">{t.perDayTitle}</h3>
+            <ExportCsvButton
+              name="nft-movimiento"
+              rows={() => [
+                [t.colDate, t.sold, t.minted, t.burned, t.colExisting],
+                ...stats.days.map((d) => [new Date(x(d)).toISOString().slice(0, 10), d[1], d[2], d[3], d[4]]),
+              ]}
+            />
+          </div>
           <TimeSeriesChart
             ariaLabel={t.perDayAria}
             includeZero

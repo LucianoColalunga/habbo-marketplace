@@ -5,6 +5,7 @@ import { getI18n } from "@/lib/i18n/server";
 import type { NftCollectionSlug } from "@/lib/nft/collections";
 import { NFT_RANKINGS, type NftRankingKind } from "@/lib/nft/rankings";
 import { getNftCollectionStats, getNftMeta, getNftRanking } from "@/lib/nft/views";
+import { ExportCsvButton } from "@/components/ExportCsvButton";
 import { NftCollectionFlow } from "./NftCollectionFlow";
 
 const METRIC: Record<NftRankingKind, NftMetric> = {
@@ -68,7 +69,18 @@ export async function NftRankingView({
       </nav>
       <div>
         <h2 className="font-display text-xl font-bold text-text">{r.kinds[kind].title}</h2>
-        <p className="mb-3 text-sm text-text-2">{r.kinds[kind].hint}</p>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-text-2">{r.kinds[kind].hint}</p>
+          {rows.length > 0 && (
+            <ExportCsvButton
+              name={`nft-${slug ?? "todas"}-${kind}`}
+              rows={[
+                ["#", "NFT", "id", p.nft.list.colFloor, p.nft.list.colSold7, "USD 7 d", p.nft.list.colAvg7],
+                ...rows.map((row, i) => [i + 1, row.n, row.id, row.floorUsd, row.s7, row.v7, row.a7]),
+              ]}
+            />
+          )}
+        </div>
         <NftTable rows={rows} metric={METRIC[kind]} />
       </div>
     </div>

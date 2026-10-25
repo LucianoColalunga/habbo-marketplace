@@ -31,6 +31,14 @@ export interface UserRecord {
   emailVerified?: boolean;
   banned?: boolean;
   lastLoginAt?: number;
+  /** Plan de la cuenta: sin el campo es Standard (gratis). El VIP lo da la administración. */
+  plan?: "vip";
+}
+
+export type Plan = "standard" | "vip";
+
+export function planOf(user: Pick<UserRecord, "plan"> | null | undefined): Plan {
+  return user?.plan === "vip" ? "vip" : "standard";
 }
 
 type Result<T> = { ok: true; value: T } | { ok: false; error: AccountError };
@@ -369,6 +377,7 @@ export interface AdminUserRow {
   emailVerified: boolean;
   banned: boolean;
   rules: number;
+  plan: Plan;
 }
 
 async function adminRow(kv: KV, u: string): Promise<AdminUserRow | null> {
@@ -383,6 +392,7 @@ async function adminRow(kv: KV, u: string): Promise<AdminUserRow | null> {
     emailVerified: !!user.emailVerified,
     banned: !!user.banned,
     rules: (await getRules(kv, u)).length,
+    plan: planOf(user),
   };
 }
 
@@ -404,6 +414,17 @@ export async function adminSetBanned(kv: KV, u: string, banned: boolean): Promis
   if (!user) return false;
   // Bloquear también cierra todas sus sesiones.
   await writeUser(kv, u, { ...user, banned, ver: banned ? user.ver + 1 : user.ver });
+  return true;
+}
+
+/** Cambia el plan de una cuenta (Standard o VIP). */
+export async function adminSetPlan(kv: KV, u: string, plan: Plan): Promise<boolean> {
+  const user = await readUser(kv, u);
+  if (!user) return false;
+  const next: UserRecord = { ...user };
+  if (plan === "vip") next.plan = "vip";
+  else delete next.plan;
+  await writeUser(kv, u, next);
   return true;
 }
 

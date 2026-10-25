@@ -187,3 +187,14 @@ export async function getTopNftIds(limit: number): Promise<{ ids: string[]; gene
     .map((r) => r.id);
   return { ids, generatedAt: s.generatedAt };
 }
+
+/** Precio piso (USD) de cada modelo con publicaciones, para valuar billeteras. */
+export async function getNftFloors(): Promise<{ generatedAt: string | null; floors: Record<string, number> }> {
+  "use cache";
+  cacheLife("market");
+  cacheTag("nft");
+  const s = await loadSummary();
+  const floors: Record<string, number> = {};
+  for (const r of Object.values(s?.stacks ?? {})) if (r.floorUsd !== null) floors[r.id] = r.floorUsd;
+  return { generatedAt: s?.generatedAt ?? null, floors };
+}

@@ -96,3 +96,16 @@ test("movimiento de las colecciones: vendidas, acuñadas, quemadas y cuántas ex
     await expect(table.getByRole("link", { name })).toBeVisible();
   }
 });
+
+test("inspector de billeteras: qué NFT tiene y cuánto valen", async ({ page }) => {
+  await page.goto("/nft/billetera");
+  await page.getByLabel("Dirección de la billetera").fill("no-es-una-direccion");
+  await page.getByRole("button", { name: "Inspeccionar" }).click();
+  await expect(page.getByText("Esa dirección no es válida", { exact: false })).toBeVisible();
+  // Una billetera pública con NFT de Habbo (de los rankings de traders).
+  await page.getByLabel("Dirección de la billetera").fill("0x3bbab7ad449bdfa0abee930021c09871cf1835b8");
+  await page.getByRole("button", { name: "Inspeccionar" }).click();
+  await expect(page.getByText("Valor al precio piso").first()).toBeVisible({ timeout: 30_000 });
+  await expect(page).toHaveURL(/\?w=0x3bbab7ad449bdfa0abee930021c09871cf1835b8$/);
+  await expect(page.locator("main table tbody tr").first()).toBeVisible();
+});

@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useAccount } from "@/lib/accounts/client";
 import { useI18n } from "@/lib/i18n/client";
 import { homeHotel } from "@/lib/i18n/config";
+import { VipBadge } from "@/components/plans/YourPlan";
 
 /** "Entrar" o el nombre de la cuenta, en el encabezado. No aparece si las cuentas están apagadas. */
 export function AccountButton({ hotel }: { hotel?: string }) {
   const { lang, t, href } = useI18n();
-  const { status, name } = useAccount();
+  const { status, name, plan } = useAccount();
   if (status !== "anon" && status !== "user") return null;
   const to = href(`/${hotel ?? homeHotel(lang)}/cuenta`);
   return (
@@ -23,6 +24,7 @@ export function AccountButton({ hotel }: { hotel?: string }) {
         <path d="M3 17.5c.8-3.3 3.6-5 7-5s6.2 1.7 7 5" fill="currentColor" />
       </svg>
       <span className="truncate">{status === "user" ? name : t.account.enter}</span>
+      {status === "user" && plan === "vip" && <VipBadge />}
       {status === "user" && <span className="sr-only">({t.account.myAccount})</span>}
     </Link>
   );

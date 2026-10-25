@@ -3,22 +3,14 @@
 import { useState } from "react";
 import { ColumnChart } from "@/components/charts/ColumnChart";
 import { TimeSeriesChart } from "@/components/charts/TimeSeriesChart";
+import { ExportCsvButton } from "@/components/ExportCsvButton";
 import { Notice, StatTile } from "@/components/ui";
 import { useI18n } from "@/lib/i18n/client";
-import {
-  flowTotals,
-  type MarketFlow,
-  type MarketFlowDay,
-} from "@/lib/market/flow";
+import { flowTotals, type MarketFlow, type MarketFlowDay } from "@/lib/market/flow";
 
 type Metric = "sold" | "credits" | "offers";
 
-const dayMs = (date: number) =>
-  Date.UTC(
-    Math.floor(date / 10000),
-    (Math.floor(date / 100) % 100) - 1,
-    date % 100,
-  );
+const dayMs = (date: number) => Date.UTC(Math.floor(date / 10000), (Math.floor(date / 100) % 100) - 1, date % 100);
 
 /**
  * Movimiento de una categoría o de todo el hotel: totales de los últimos días y
@@ -29,10 +21,12 @@ export function MarketFlowCard({
   flow,
   title,
   tiles = true,
+  exportName = "movimiento",
 }: {
   flow: MarketFlow | null;
   title: string;
   tiles?: boolean;
+  exportName?: string;
 }) {
   const { t: ui, f } = useI18n();
   const t = ui.marketFlow;
@@ -40,9 +34,7 @@ export function MarketFlowCard({
   if (!flow) return null;
   const week = flowTotals(flow.days);
   const x = (d: MarketFlowDay) => dayMs(d[0]);
-  const offerDays = flow.days.filter(
-    (d): d is [number, number, number, number] => d[3] !== null,
-  );
+  const offerDays = flow.days.filter((d): d is [number, number, number, number] => d[3] !== null);
   const labels: Record<Metric, string> = {
     sold: t.sold,
     credits: t.credits,
@@ -57,21 +49,10 @@ export function MarketFlowCard({
       </div>
       {tiles && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatTile
-            label={t.soldIn(week.count || 7)}
-            value={
-              <span className="tnum">
-                {week.count ? f.int(week.sold) : "—"}
-              </span>
-            }
-          />
+          <StatTile label={t.soldIn(week.count || 7)} value={<span className="tnum">{week.count ? f.int(week.sold) : "—"}</span>} />
           <StatTile
             label={t.creditsIn(week.count || 7)}
-            value={
-              <span className="tnum">
-                {week.count ? f.compact(week.credits) : "—"}
-              </span>
-            }
+            value={<span className="tnum">{week.count ? f.compact(week.credits) : "—"}</span>}
           />
           <StatTile
             label={t.offersNow}
@@ -85,11 +66,7 @@ export function MarketFlowCard({
         <Notice>{t.warming}</Notice>
       ) : (
         <>
-          <div
-            role="group"
-            aria-label={t.tabsAria}
-            className="flex flex-wrap gap-1"
-          >
+          <div role="group" aria-label={t.tabsAria} className="flex flex-wrap gap-1">
             {(["sold", "credits", "offers"] as const).map((m) => (
               <button
                 key={m}
@@ -101,6 +78,15 @@ export function MarketFlowCard({
                 {labels[m]}
               </button>
             ))}
+            <span className="ml-auto">
+              <ExportCsvButton
+                name={exportName}
+                rows={() => [
+                  [t.colDate, t.sold, t.credits, t.colOffers],
+                  ...flow.days.map((d) => [new Date(x(d)).toISOString().slice(0, 10), d[1], d[2], d[3]]),
+                ]}
+              />
+            </span>
           </div>
           {metric === "sold" && (
             <ColumnChart
@@ -142,16 +128,12 @@ export function MarketFlowCard({
               <Notice>{t.noOffersData}</Notice>
             ))}
           <details>
-            <summary className="cursor-pointer text-sm text-text-2">
-              {t.table}
-            </summary>
+            <summary className="cursor-pointer text-sm text-text-2">{t.table}</summary>
             <div className="relative mt-3 overflow-x-auto">
               <table className="w-full min-w-[26rem] text-right text-sm">
                 <thead className="text-text-2">
                   <tr>
-                    <th className="py-1 pr-3 text-left font-medium">
-                      {t.colDate}
-                    </th>
+                    <th className="py-1 pr-3 text-left font-medium">{t.colDate}</th>
                     <th className="py-1 pr-3 font-medium">{t.sold}</th>
                     <th className="py-1 pr-3 font-medium">{t.credits}</th>
                     <th className="py-1 font-medium">{t.colOffers}</th>
@@ -163,9 +145,7 @@ export function MarketFlowCard({
                       <td className="py-1 pr-3 text-left">{f.day(x(d))}</td>
                       <td className="py-1 pr-3">{f.int(d[1])}</td>
                       <td className="py-1 pr-3">{f.int(d[2])}</td>
-                      <td className="py-1">
-                        {d[3] === null ? "—" : f.int(d[3])}
-                      </td>
+                      <td className="py-1">{d[3] === null ? "—" : f.int(d[3])}</td>
                     </tr>
                   ))}
                 </tbody>

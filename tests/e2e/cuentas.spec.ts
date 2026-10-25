@@ -213,6 +213,20 @@ test("panel de administración", async ({ page, browser, baseURL }) => {
   await expect(page.getByText(`${ADMIN} borró a ${victim}`)).toBeVisible();
   await expect(page.getByText(`${ADMIN} bloqueó a ${victim}`)).toBeVisible();
   await other.close();
+
+  // Plan VIP: sin VIP, exportar lleva a los planes; con VIP, descarga el CSV.
+  await page.goto("/es/rankings");
+  await expect(page.getByRole("link", { name: /Exportar CSV/ })).toHaveAttribute("href", "/es/planes");
+  await page.goto("/es/admin");
+  const mine = page.getByRole("row", { name: new RegExp(ADMIN) });
+  await mine.getByRole("button", { name: "Dar VIP" }).click();
+  await expect(mine).toContainText("VIP");
+  await expect(page.getByText(`${ADMIN} le dio VIP a ${ADMIN}`)).toBeVisible();
+  await page.goto("/es/rankings");
+  await expect(page.getByRole("banner").getByText("VIP", { exact: true })).toBeVisible();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Exportar CSV" }).click();
+  expect((await download).suggestedFilename()).toMatch(/^ranking-vendidos-es-\d{4}-\d{2}-\d{2}\.csv$/);
 });
 
 test("la configuración de cuentas es igual para todos y la guarda el CDN", async ({ request }) => {

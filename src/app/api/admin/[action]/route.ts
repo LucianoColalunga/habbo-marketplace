@@ -9,6 +9,7 @@ import {
   adminReadLog,
   adminRebuildIndex,
   adminSetBanned,
+  adminSetPlan,
   adminUnlock,
   normalizeUsername,
 } from "@/lib/accounts/service";
@@ -31,6 +32,7 @@ import { siteUrl } from "@/lib/site";
  *   POST /api/admin/ban      { u, banned }
  *   POST /api/admin/unlock   { u }
  *   POST /api/admin/delete   { u, confirm }  (confirm tiene que repetir el usuario)
+ *   POST /api/admin/plan     { u, plan: "vip" | "standard" }
  *   POST /api/admin/rebuild
  *   POST /api/admin/revalidate
  *   POST /api/admin/test-channels
@@ -149,6 +151,13 @@ export async function POST(request: Request, { params }: RouteContext<"/api/admi
           if (!(await adminDeleteUser(kv, target))) return json({ error: "not_found_user" }, 404);
           await log("delete", target);
         }
+        return json({ ok: true });
+      }
+      case "plan": {
+        if (!target) return json({ error: "bad_request" }, 400);
+        const plan = body.plan === "vip" ? "vip" : "standard";
+        if (!(await adminSetPlan(kv, target, plan))) return json({ error: "not_found_user" }, 404);
+        await log(plan === "vip" ? "vip-on" : "vip-off", target);
         return json({ ok: true });
       }
       case "rebuild": {

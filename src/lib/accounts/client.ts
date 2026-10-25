@@ -18,6 +18,8 @@ export interface AccountState {
   email: string | null;
   emailVerified: boolean;
   admin: boolean;
+  /** Plan de la cuenta (sin cuenta: standard). */
+  plan: "standard" | "vip";
   /** Si el sitio puede mandar correos (confirmar y recuperar). */
   mail: boolean;
 }
@@ -27,11 +29,12 @@ interface PublicUser {
   email: string | null;
   emailVerified: boolean;
   admin: boolean;
+  plan: "standard" | "vip";
 }
 
 const MARKER = "bm:account";
 const DIRTY = "bm:rules-dirty";
-const SERVER_STATE: AccountState = { status: "loading", name: null, email: null, emailVerified: false, admin: false, mail: false };
+const SERVER_STATE: AccountState = { status: "loading", name: null, email: null, emailVerified: false, admin: false, plan: "standard", mail: false };
 
 let state: AccountState = SERVER_STATE;
 const listeners = new Set<() => void>();
@@ -43,12 +46,18 @@ function setState(next: Partial<AccountState>) {
   for (const l of listeners) l();
 }
 
-const SIGNED_OUT = { name: null, email: null, emailVerified: false, admin: false } as const;
+const SIGNED_OUT = { name: null, email: null, emailVerified: false, admin: false, plan: "standard" } as const;
 
 function asUser(raw: unknown): PublicUser | null {
   const u = raw as Partial<PublicUser> | null | undefined;
   if (!u || typeof u.name !== "string") return null;
-  return { name: u.name, email: typeof u.email === "string" ? u.email : null, emailVerified: u.emailVerified === true, admin: u.admin === true };
+  return {
+    name: u.name,
+    email: typeof u.email === "string" ? u.email : null,
+    emailVerified: u.emailVerified === true,
+    admin: u.admin === true,
+    plan: u.plan === "vip" ? "vip" : "standard",
+  };
 }
 
 function storage(key: string, value?: string | null): string | null {

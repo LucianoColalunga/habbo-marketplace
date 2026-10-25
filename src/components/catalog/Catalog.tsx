@@ -8,6 +8,7 @@ import { useLivePrice } from "@/lib/habbo/live-prices";
 import type { HotelCode } from "@/lib/hotels";
 import { useI18n } from "@/lib/i18n/client";
 import { normalizeText } from "@/lib/text";
+import { ExportCsvButton } from "../ExportCsvButton";
 import { LiveDot, LiveStatusBar } from "../live/LivePrices";
 import { Credits } from "../ui";
 import { PixelFurni } from "./PixelFurni";
@@ -488,7 +489,19 @@ export function Catalog({
           </div>
         </div>
 
-        {slice.length > 0 && <LiveStatusBar />}
+        {slice.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <LiveStatusBar />
+            <ExportCsvButton
+              hotel={hotel}
+              name={`catalogo-${hotel}-${sub ?? cat ?? "todos"}`}
+              rows={() => [
+                [ui.catalog.colName, "classname", ui.catalog.colGroup, ui.catalog.colPrice, ui.catalog.colOffers, ui.catalog.avg7, ui.catalog.colSold30],
+                ...shown.map((r) => [r.n, r.k, r.g ? groups[r.g] : "", r.oo > 0 ? r.cp : null, r.oo, r.a7, r.s30]),
+              ]}
+            />
+          </div>
+        )}
 
         {before}
 

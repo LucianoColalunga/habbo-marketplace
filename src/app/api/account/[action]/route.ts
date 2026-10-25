@@ -10,6 +10,7 @@ import {
   deleteAccount,
   getRules,
   login,
+  planOf,
   register,
   requestRecovery,
   resetPassword,
@@ -60,7 +61,7 @@ async function sendVerification(kv: Parameters<typeof createVerifyToken>[0], u: 
 }
 
 function publicUser(u: string, user: UserRecord) {
-  return { name: user.name, email: user.email ?? null, emailVerified: !!user.emailVerified, admin: canAdmin(u, user) };
+  return { name: user.name, email: user.email ?? null, emailVerified: !!user.emailVerified, admin: canAdmin(u, user), plan: planOf(user) };
 }
 
 export async function GET(request: Request, { params }: RouteContext<"/api/account/[action]">) {

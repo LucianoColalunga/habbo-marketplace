@@ -45,24 +45,17 @@ async function fetchLiveStack(id: string): Promise<LiveData | null> {
   if (!res.ok) throw new Error(`Immutable ${res.status}`);
   const body = (await res.json()) as unknown[];
   const raw = Array.isArray(body) ? body[0] : null;
-  const stack = raw
-    ? normalizeStack(raw as Parameters<typeof normalizeStack>[0])
-    : null;
+  const stack = raw ? normalizeStack(raw as Parameters<typeof normalizeStack>[0]) : null;
   if (!stack) return null;
   const listings: Listing[] = ((raw as RawLive).listings ?? []).map((l) => {
     const p = l.price_details;
     const usd = Number.parseFloat(p?.converted_prices?.USD ?? "");
     const decimals = p?.token?.decimals ?? 18;
-    const amount = p?.fee_inclusive_amount
-      ? Number(p.fee_inclusive_amount) / 10 ** decimals
-      : null;
+    const amount = p?.fee_inclusive_amount ? Number(p.fee_inclusive_amount) / 10 ** decimals : null;
     return {
       tokenId: l.token_id ?? "",
       usd: Number.isFinite(usd) ? usd : null,
-      native:
-        amount !== null && Number.isFinite(amount)
-          ? { amount, symbol: p?.token?.symbol ?? "" }
-          : null,
+      native: amount !== null && Number.isFinite(amount) ? { amount, symbol: p?.token?.symbol ?? "" } : null,
     };
   });
   listings.sort((a, b) => (a.usd ?? Infinity) - (b.usd ?? Infinity));
@@ -82,10 +75,7 @@ export function ladder(listings: Listing[]) {
     return {
       l,
       rank: i + 1,
-      diff:
-        first !== null && first > 0 && l.usd !== null
-          ? (l.usd - first) / first
-          : null,
+      diff: first !== null && first > 0 && l.usd !== null ? (l.usd - first) / first : null,
       total,
     };
   });
@@ -136,9 +126,7 @@ export function NftLive({
   const query = useCallback(async () => {
     try {
       const data = await fetchLiveStack(id);
-      return data
-        ? { live: data, status: "live" as Status }
-        : { live: null, status: "error" as Status };
+      return data ? { live: data, status: "live" as Status } : { live: null, status: "error" as Status };
     } catch {
       return { live: null, status: "error" as Status };
     }
@@ -173,8 +161,7 @@ export function NftLive({
   );
   const floorPoints = useMemo(() => {
     const pts = snaps.map(([min, fl]) => ({ x: min * 60_000, y: fl }));
-    if (live?.stack.floorUsd !== null && live?.stack.floorUsd !== undefined)
-      pts.push({ x: live.at, y: live.stack.floorUsd });
+    if (live?.stack.floorUsd !== null && live?.stack.floorUsd !== undefined) pts.push({ x: live.at, y: live.stack.floorUsd });
     return pts;
   }, [snaps, live]);
   const from = now ? now - 30 * 86_400_000 : 0;
@@ -186,10 +173,7 @@ export function NftLive({
         {status === "loading" && t.querying}
         {status === "live" && live && (
           <span className="inline-flex items-center gap-2">
-            <span
-              className="inline-block h-2 w-2 rounded-full bg-up"
-              aria-hidden="true"
-            />
+            <span className="inline-block h-2 w-2 rounded-full bg-up" aria-hidden="true" />
             {ui.common.liveAt} <TimeAgo iso={new Date(live.at).toISOString()} />
           </span>
         )}
@@ -200,44 +184,25 @@ export function NftLive({
         <StatTile
           label={t.floor}
           value={f.usd(floor)}
-          sub={
-            floorNative
-              ? f.crypto(floorNative.amount, floorNative.symbol)
-              : t.noListings
-          }
+          sub={floorNative ? f.crypto(floorNative.amount, floorNative.symbol) : t.noListings}
           help={t.floorHelp}
         />
-        <StatTile
-          label={t.bestBid}
-          value={f.usd(bid)}
-          sub={bid === null ? t.none : undefined}
-        />
-        <StatTile
-          label={t.lastSale}
-          value={f.usd(lastUsd)}
-          sub={lastAt ? <TimeAgo iso={lastAt} /> : undefined}
-        />
+        <StatTile label={t.bestBid} value={f.usd(bid)} sub={bid === null ? t.none : undefined} />
+        <StatTile label={t.lastSale} value={f.usd(lastUsd)} sub={lastAt ? <TimeAgo iso={lastAt} /> : undefined} />
         <StatTile
           label={t.avg7}
           value={f.usd(stored?.a7 ?? null)}
           sub={
             <span className="inline-flex items-center gap-1">
-              <Delta value={stored ? nftWeeklyChange(stored) : null} />{" "}
-              <span className="text-muted">{ui.common.vsPrevWeek}</span>
+              <Delta value={stored ? nftWeeklyChange(stored) : null} /> <span className="text-muted">{ui.common.vsPrevWeek}</span>
             </span>
           }
         />
-        <StatTile
-          label={t.sold}
-          value={<span className="tnum">{f.int(stored?.s7 ?? 0)}</span>}
-          sub={t.in30(f.int(stored?.s30 ?? 0))}
-        />
+        <StatTile label={t.sold} value={<span className="tnum">{f.int(stored?.s7 ?? 0)}</span>} sub={t.in30(f.int(stored?.s30 ?? 0))} />
       </div>
 
       <section className="card p-4">
-        <h2 className="font-display text-lg font-bold text-text">
-          {t.chartTitle}
-        </h2>
+        <h2 className="font-display text-lg font-bold text-text">{t.chartTitle}</h2>
         <p className="mb-3 text-sm text-text-2">{t.chartHint}</p>
         <TimeSeriesChart
           ariaLabel={t.chartAria}
@@ -262,9 +227,7 @@ export function NftLive({
       </section>
 
       <section className="card p-4">
-        <h2 className="font-display text-lg font-bold text-text">
-          {t.salesTitle}
-        </h2>
+        <h2 className="font-display text-lg font-bold text-text">{t.salesTitle}</h2>
         <p className="mb-3 text-sm text-text-2">{t.salesHint}</p>
         <ColumnChart
           ariaLabel={t.salesTitle}
@@ -276,12 +239,8 @@ export function NftLive({
       </section>
 
       <section className="card p-4">
-        <h2 className="mb-2 font-display text-lg font-bold text-text">
-          {t.listingsTitle}
-        </h2>
-        {live && live.listings.length > 0 && (
-          <NextPrice listings={live.listings} />
-        )}
+        <h2 className="mb-2 font-display text-lg font-bold text-text">{t.listingsTitle}</h2>
+        {live && live.listings.length > 0 && <NextPrice listings={live.listings} />}
         {live && live.listings.length > 0 ? (
           <div className="relative overflow-x-auto">
             <table className="w-full min-w-[30rem] text-sm">
@@ -297,27 +256,12 @@ export function NftLive({
               </thead>
               <tbody className="tnum">
                 {ladder(live.listings).map(({ l, rank, diff, total }) => (
-                  <tr
-                    key={l.tokenId}
-                    className="border-b border-line/60 last:border-0"
-                  >
+                  <tr key={l.tokenId} className="border-b border-line/60 last:border-0">
                     <td className="py-1.5 pr-2 text-text-2">{rank}</td>
                     <td className="py-1.5 text-text">{f.usd(l.usd)}</td>
-                    <td className="py-1.5 text-text-2">
-                      {l.native
-                        ? f.crypto(l.native.amount, l.native.symbol)
-                        : "—"}
-                    </td>
-                    <td className="py-1.5 text-right text-text-2">
-                      {diff === null
-                        ? "—"
-                        : rank === 1
-                          ? ""
-                          : f.pct(diff, true)}
-                    </td>
-                    <td className="py-1.5 text-right text-text-2">
-                      {total === null ? "—" : f.usd(total)}
-                    </td>
+                    <td className="py-1.5 text-text-2">{l.native ? f.crypto(l.native.amount, l.native.symbol) : "—"}</td>
+                    <td className="py-1.5 text-right text-text-2">{diff === null ? "—" : rank === 1 ? "" : f.pct(diff, true)}</td>
+                    <td className="py-1.5 text-right text-text-2">{total === null ? "—" : f.usd(total)}</td>
                     <td className="py-1.5 text-right">
                       <a
                         className="text-accent hover:underline"
@@ -334,13 +278,10 @@ export function NftLive({
             </table>
           </div>
         ) : (
-          <p className="text-sm text-muted">
-            {status === "loading" ? ui.common.loading : t.noActive}
-          </p>
+          <p className="text-sm text-muted">{status === "loading" ? ui.common.loading : t.noActive}</p>
         )}
         <p className="mt-2 text-xs text-muted">
-          {t.listingsNote}{" "}
-          {live && live.listings.length > 1 ? t.ladderNote : ""}
+          {t.listingsNote} {live && live.listings.length > 1 ? t.ladderNote : ""}
         </p>
       </section>
     </div>

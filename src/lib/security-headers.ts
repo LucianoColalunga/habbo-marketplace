@@ -19,7 +19,8 @@ export function contentSecurityPolicy(dev: boolean): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://images.habbo.com https://nft-tokens.habbo.com",
     "font-src 'self'",
-    `connect-src 'self' ${hotelOrigins.join(" ")} https://api.immutable.com${dev ? " ws: wss:" : ""}`,
+    // Habbo Origins: solo su API pública de usuarios conectados.
+    `connect-src 'self' ${hotelOrigins.join(" ")} https://origins.habbo.com https://origins.habbo.es https://origins.habbo.com.br https://api.immutable.com${dev ? " ws: wss:" : ""}`,
     "worker-src 'self'",
     "manifest-src 'self'",
     "frame-src 'none'",

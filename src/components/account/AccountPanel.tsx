@@ -6,6 +6,7 @@ import { account, useAccount } from "@/lib/accounts/client";
 import { loadRules, useLocal, type LocalRule } from "@/lib/alerts/local";
 import { useI18n } from "@/lib/i18n/client";
 import { Notice } from "@/components/ui";
+import { VipBadge } from "@/components/plans/YourPlan";
 
 const NO_RULES: LocalRule[] = [];
 export const input = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-text";
@@ -68,7 +69,7 @@ const field = (form: FormData, name: string) => String(form.get(name) ?? "");
 export function AccountPanel({ hotel }: { hotel: string }) {
   const { t: ui, href, lang } = useI18n();
   const t = ui.account;
-  const { status, name, email, emailVerified, admin, mail } = useAccount();
+  const { status, name, email, emailVerified, admin, mail, plan } = useAccount();
   const rules = useLocal(loadRules, NO_RULES);
   const [tab, setTab] = useState<"login" | "register" | "forgot">("login");
   const { busy, error, notice, setError, setNotice, run } = useRunner();
@@ -184,7 +185,16 @@ export function AccountPanel({ hotel }: { hotel: string }) {
   return (
     <div className="max-w-xl space-y-6">
       <section className="card space-y-3 p-4">
-        <h2 className="font-display text-xl font-bold text-text">{t.signedInAs(name ?? "")}</h2>
+        <h2 className="flex flex-wrap items-center gap-2 font-display text-xl font-bold text-text">
+          {t.signedInAs(name ?? "")}
+          {plan === "vip" && <VipBadge />}
+        </h2>
+        <p className="text-sm text-text-2">
+          {ui.plan.yours(plan === "vip" ? ui.plan.vip : ui.plan.standard)} ·{" "}
+          <Link prefetch={false} href={href(`/${hotel}/planes`)} className="text-accent hover:underline">
+            {ui.plan.see}
+          </Link>
+        </p>
         <p className="text-sm text-text-2">{t.synced(rules.length)}</p>
         <div className="flex flex-wrap gap-2">
           <Link prefetch={false} href={href(`/${hotel}/alertas`)} className={primary}>

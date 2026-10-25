@@ -120,3 +120,23 @@ test("movimiento del mercado en el inicio del hotel y en cada categoría", async
     await expect(cat.getByText("Se está juntando", { exact: false })).toBeVisible();
   }
 });
+
+test("planes Standard y VIP, y la comparación con SecureHabbo", async ({ page }) => {
+  await page.goto("/es/planes");
+  await expect(page.getByRole("heading", { level: 1, name: "Planes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Standard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "VIP" })).toBeVisible();
+  const compare = page.getByRole("region", { name: "Stats frente a SecureHabbo" });
+  await expect(compare.getByRole("cell", { name: "Inspector de billeteras" })).toBeVisible();
+  await expect(compare.getByRole("cell", { name: "Comprar y vender con billetera" })).toBeVisible();
+  await expect(compare.getByText("No, a propósito").first()).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Secciones" }).getByRole("link", { name: "Planes" })).toBeVisible();
+});
+
+test("usuarios conectados en Habbo Origins, en vivo", async ({ page }) => {
+  const origins = page.waitForResponse((r) => r.url().includes("/api/public/origins/users"));
+  await page.goto("/es/conectados");
+  expect((await origins).ok()).toBe(true);
+  await expect(page.getByText("Total en Origins")).toBeVisible();
+  await expect(page.getByText(/^Actualizado /)).toBeVisible({ timeout: 15_000 });
+});

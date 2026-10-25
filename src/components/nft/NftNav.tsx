@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/nft/coleccion/tokens", key: "tokens" },
   { href: "/nft/coleccion/addons", key: "addons" },
   { href: "/nft/rankings", key: "rankings" },
+  { href: "/nft/billetera", key: "wallet" },
   { href: "/nft/acerca", key: "about" },
 ] as const;
 

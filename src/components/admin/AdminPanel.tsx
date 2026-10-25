@@ -42,6 +42,7 @@ interface UserRow {
   emailVerified: boolean;
   banned: boolean;
   rules: number;
+  plan: "standard" | "vip";
 }
 interface LogEntry {
   at: number;
@@ -289,6 +290,7 @@ function AdminContent({ me }: { me: string }) {
                   <th className="py-1 pr-3 font-medium">{t.colLast}</th>
                   <th className="py-1 pr-3 font-medium">{t.colAlerts}</th>
                   <th className="py-1 pr-3 font-medium">{t.colState}</th>
+                  <th className="py-1 pr-3 font-medium">{t.colPlan}</th>
                   <th className="py-1 font-medium">{t.colActions}</th>
                 </tr>
               </thead>
@@ -306,6 +308,7 @@ function AdminContent({ me }: { me: string }) {
                     <td className="py-1.5 pr-3">{ms(r.lastLoginAt)}</td>
                     <td className="py-1.5 pr-3">{f.int(r.rules)}</td>
                     <td className={`py-1.5 pr-3 ${r.banned ? "text-down" : "text-up"}`}>{r.banned ? t.banned : t.active}</td>
+                    <td className={`py-1.5 pr-3 ${r.plan === "vip" ? "font-bold text-accent" : "text-text-2"}`}>{r.plan === "vip" ? "VIP" : "Standard"}</td>
                     <td className="py-1.5">
                       {confirming === r.u ? (
                         <form
@@ -335,6 +338,14 @@ function AdminContent({ me }: { me: string }) {
                               {r.banned ? t.unban : t.ban}
                             </button>
                           )}
+                          <button
+                            type="button"
+                            disabled={busy}
+                            className={btn}
+                            onClick={() => void act("plan", { u: r.u, plan: r.plan === "vip" ? "standard" : "vip" }, () => t.done)}
+                          >
+                            {r.plan === "vip" ? t.removeVip : t.giveVip}
+                          </button>
                           <button type="button" disabled={busy} className={btn} title={t.unlockHint} onClick={() => void act("unlock", { u: r.u }, () => t.done)}>
                             {t.unlock}
                           </button>

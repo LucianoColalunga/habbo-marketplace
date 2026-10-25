@@ -11,6 +11,8 @@ const LINKS = [
   { href: "/rankings", key: "rankings" },
   { href: "/ofertas", key: "deals" },
   { href: "/alertas", key: "alerts" },
+  { href: "/conectados", key: "online" },
+  { href: "/planes", key: "plans" },
   { href: "/acerca", key: "about" },
 ] as const;
 
