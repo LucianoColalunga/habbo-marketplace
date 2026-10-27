@@ -106,7 +106,7 @@ test("los nueve hoteles: selector, inicio, rankings y catálogo con datos", asyn
     ["tr", ".com.tr"],
   ]) {
     await page.goto(`/${hotel}`);
-    await expect(page.getByText(label, { exact: false }).first(), hotel).toBeVisible();
+    await expect(page.locator("main").getByText(label, { exact: false }).first(), hotel).toBeVisible();
     await expect(page.getByRole("heading", { name: "Más vendidos" }), hotel).toBeVisible();
     await expect(page.locator(`main a[href^="/${hotel}/furni/"]`).first(), hotel).toBeVisible();
     await page.goto(`/${hotel}/rankings`);
