@@ -121,15 +121,14 @@ test("movimiento del mercado en el inicio del hotel y en cada categoría", async
   }
 });
 
-test("planes Standard y VIP, y la comparación con SecureHabbo", async ({ page }) => {
+test("planes Standard y VIP", async ({ page }) => {
   await page.goto("/es/planes");
   await expect(page.getByRole("heading", { level: 1, name: "Planes" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Standard" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "VIP" })).toBeVisible();
-  const compare = page.getByRole("region", { name: "Stats frente a SecureHabbo" });
-  await expect(compare.getByRole("cell", { name: "Inspector de billeteras" })).toBeVisible();
-  await expect(compare.getByRole("cell", { name: "Comprar y vender con billetera" })).toBeVisible();
-  await expect(compare.getByText("No, a propósito").first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Exportar a CSV (rankings, catálogo, historiales y movimiento)" })).toBeVisible();
+  // La comparación con otros sitios no se muestra.
+  await expect(page.locator("main")).not.toContainText("SecureHabbo");
   await expect(page.getByRole("navigation", { name: "Secciones" }).getByRole("link", { name: "Planes" })).toBeVisible();
 });
 

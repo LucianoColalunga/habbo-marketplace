@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { csvName, toCsv } from "@/lib/csv";
-import { COMPARISON, PLAN_FEATURES, PLANS_TEXT } from "@/lib/i18n/plans";
+import { PLAN_FEATURES, PLANS_TEXT } from "@/lib/i18n/plans";
 import { planOf } from "@/lib/accounts/service";
 
 function shape(value: unknown): unknown {
@@ -9,14 +9,13 @@ function shape(value: unknown): unknown {
   return typeof value;
 }
 
-describe("planes y comparación", () => {
+describe("planes", () => {
   it("los tres idiomas tienen los mismos textos", () => {
     expect(shape(PLANS_TEXT.pt)).toEqual(shape(PLANS_TEXT.es));
     expect(shape(PLANS_TEXT.en)).toEqual(shape(PLANS_TEXT.es));
   });
 
-  it("cada fila tiene su texto y lo que es VIP no está en Standard", () => {
-    for (const row of COMPARISON) expect(PLANS_TEXT.es.rows[row.key][0]).toBeTruthy();
+  it("todo lo de Standard está en VIP, y el VIP suma lo suyo", () => {
     for (const f of PLAN_FEATURES) expect(f.vip).toBe(true);
     expect(PLAN_FEATURES.filter((f) => !f.standard).map((f) => f.key)).toEqual(["csv", "badge", "early"]);
   });
