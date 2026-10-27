@@ -140,9 +140,15 @@ En una PC se puede correr el recorrido completo: `npm run collect -- es --full`.
 
 ## 7. Hoteles
 
-Se soportan los 9 hoteles (la API responde en todos). Por defecto se muestran y escanean **.es** (España, en español),
-**.com** (internacional, en inglés) y **.com.br** (Brasil). Se cambia con `NEXT_PUBLIC_HOTELS`. Cada hotel suma ~523
-pedidos por recorrido completo.
+Se muestran y escanean los 9 hoteles. El 25/10/2026 se verificó en .de, .fr, .it, .nl, .fi y .com.tr lo mismo que en
+los otros tres: `hashes2` y el furnidata responden (13.740 a 13.750 furnis intercambiables, con los mismos classnames y
+el nombre en el idioma del hotel), el endpoint del Marketplace devuelve el mismo formato y CORS acepta pedidos desde
+el navegador. Se cambia con `NEXT_PUBLIC_HOTELS`. Cada hotel suma ~523 pedidos por recorrido completo.
+
+Por el límite de escrituras de Vercel Blob, **.es**, **.com** y **.com.br** (los de los tres idiomas del sitio) se
+escanean 6 veces por día y los otros seis, 1 vez. Las categorías de los hoteles en otros idiomas suman el nombre en
+inglés del mismo furni (del catálogo de .com), porque las palabras de respaldo de las reglas están en español,
+portugués e inglés.
 
 ## Lo que no se pudo verificar
 

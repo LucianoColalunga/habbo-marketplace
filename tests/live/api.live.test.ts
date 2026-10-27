@@ -3,7 +3,7 @@ import { fetchBatch, HabboApiError } from "@/lib/habbo/api";
 import { fetchFurnidataHash } from "@/lib/habbo/furnidata";
 
 /**
- * Contrato con la API real (4 pedidos en total, espaciados). Si Habbo cambia
+ * Contrato con la API real (16 pedidos en total, espaciados). Si Habbo cambia
  * el formato, estas pruebas lo detectan.
  */
 const pause = () => new Promise((r) => setTimeout(r, 5000));
@@ -42,5 +42,14 @@ describe("API pública de Habbo (real)", () => {
   it("publica el hash del furnidata", async () => {
     const hash = await fetchFurnidataHash("br");
     expect(hash).toMatch(/^[0-9a-f]{20,}$/);
+  });
+
+  it("responde igual en los otros seis hoteles", { timeout: 120_000 }, async () => {
+    for (const hotel of ["de", "fr", "it", "nl", "fi", "tr"] as const) {
+      await pause();
+      const out = await fetchBatch(hotel, { room: ["throne", "club_sofa"], wall: [] }, { retries: 1 });
+      expect(out.find((o) => o.item === "club_sofa")?.statsDate, hotel).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(await fetchFurnidataHash(hotel), hotel).toMatch(/^[0-9a-f]{20,}$/);
+    }
   });
 });

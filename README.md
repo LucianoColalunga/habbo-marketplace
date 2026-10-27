@@ -23,7 +23,8 @@ aparece por debajo de su precio normal.
 - **Alertas**: lista de furnis a vigilar con un umbral (% bajo el promedio o precio máximo). Avisa con notificaciones
   del navegador, y opcionalmente por **Discord** o **Telegram** desde el servidor. La lista queda guardada en el
   navegador y, con una **cuenta** (usuario y contraseña), en cualquier dispositivo.
-- Hoteles **.es**, **.com** y **.com.br** por defecto (se pueden sumar .de, .fr, .it, .nl, .fi y .com.tr).
+- Los **9 hoteles**: **.es**, **.com**, **.com.br**, **.de**, **.fr**, **.it**, **.nl**, **.fi** y **.com.tr**, cada uno
+  con su economía (precios, rankings, ofertas y catálogo propios).
 - **Tres idiomas:** español, portugués e inglés; cada visitante elige con el selector ES · PT · EN.
 - **Cielo de estrellas** de fondo: titilan, se unen al mouse con líneas y **explotan al tocarlas**. Se puede apagar desde
   el pie de página y respeta la opción "reducir movimiento" del sistema.
@@ -118,7 +119,7 @@ scraping. El detalle completo, con lo que se probó y lo que no se pudo verifica
 | Historial diario (promedio, vendidos) | API de Habbo | hasta ayer, últimos 30 días |
 | Historial de más de 30 días y del precio mínimo | guardado por el recolector de este proyecto | desde que empezó a correr |
 | Precio mínimo y ofertas en categorías y rankings | API de Habbo, desde el navegador, solo lo que está en pantalla | en el momento (punto verde; se actualiza cada 90 s) |
-| Rankings y ofertas detectadas | recolector, cada 3 horas por hotel | último escaneo de cada furni (se muestra "hace X") |
+| Rankings y ofertas detectadas | recolector: 6 veces por día en .es, .com y .com.br; 1 vez por día en los demás | último escaneo de cada furni (se muestra "hace X") |
 | Movimiento por día (hotel y cada categoría): vendidas, créditos y publicaciones | historial de Habbo + mediciones del recolector | un día aparece cuando los furnis que suman el 90 % de las ventas se volvieron a consultar después de que terminó |
 
 **Límites importantes:**
@@ -130,12 +131,19 @@ scraping. El detalle completo, con lo que se probó y lo que no se pudo verifica
 - La API **limita los pedidos** (medido: ~15-20 por minuto por IP, 25 + 25 furnis por pedido). Un recorrido completo
   de un hotel son ~523 pedidos (~45 min). Por eso el recolector es **rotativo**: cada corrida actualiza primero lo más
   activo y lo más desactualizado.
-- En el plan gratuito de Vercel cada cron corre **una vez por día** (hasta 100 por proyecto) y cada función dura como
-  máximo 5 minutos. Por eso `vercel.json` tiene 24 cron de escaneo: 8 por hotel, uno cada 3 horas.
+- En el plan gratuito de Vercel cada cron corre **una vez por día** (hasta 100 por proyecto), arranca en cualquier
+  minuto de su hora y cada función dura como máximo 5 minutos. Por eso `vercel.json` tiene 24 cron de escaneo, uno
+  por hora (así nunca coinciden dos contra la API): 6 para cada hotel principal (.es, .com y .com.br, de los tres
+  idiomas del sitio) y 1 para cada uno de los otros seis.
 - El límite real es el de **Vercel Blob: 2.000 escrituras por mes** (si se pasa, el almacenamiento queda bloqueado 30
   días). Cada escaneo escribe solo el resumen; el historial se guarda como mucho cada 8 horas
-  (`SCAN_HISTORY_EVERY_MINUTES`). Con eso se usan unas 1.240 escrituras por mes; `tests/unit/limits.test.ts` hace la
-  cuenta y falla si un cambio en `vercel.json` se pasa de 1.500.
+  (`SCAN_HISTORY_EVERY_MINUTES`), y los horarios están elegidos para que eso sea 2 veces por día en los hoteles
+  principales y 1 en los demás. Las ofertas se publican en los canales solo desde los tres principales. Con eso se usan
+  unas 1.300 escrituras por mes (más los catálogos que cambian); `tests/unit/limits.test.ts` hace la cuenta y falla si
+  un cambio en `vercel.json` se pasa de 1.500.
+- Con un escaneo por día, un hotel chico tarda ~7 días en recorrer todo su catálogo la primera vez (después se
+  actualiza primero lo que se mueve). Para arrancar con todo, se puede juntar el catálogo completo en una PC y subirlo
+  (ver "Publicar en Vercel", paso 5).
 
 ## Stack
 
@@ -172,7 +180,7 @@ npm run dev
 ```
 
 Abrí <http://localhost:3000> (redirige según tu idioma: `/es`, `/pt/br` o `/en/com`). Los datos quedan en `.data/` (comprimidos). Para otros hoteles:
-`npm run collect -- com br`.
+`npm run collect -- com br de` (códigos: es, com, br, de, fr, it, nl, fi, tr). Sin hoteles, corre los nueve.
 
 Si querés que se actualice solo en tu PC, podés programar `npm run collect` en el Programador de tareas de Windows
 (por ejemplo, cada 2 horas).
@@ -181,7 +189,7 @@ Si querés que se actualice solo en tu PC, podés programar `npm run collect` en
 
 ```bash
 npm test               # unitarias (lógica, API simulada)
-npm run test:live      # contrato con la API real de Habbo (4 pedidos)
+npm run test:live      # contrato con la API real de Habbo (16 pedidos, en los 9 hoteles)
 npm run typecheck
 npm run lint
 npm run build
@@ -198,10 +206,10 @@ Para `test:e2e` hace falta el navegador de Playwright una vez: `npx playwright i
 3. En **Settings → Environment Variables** agregá:
    - `CRON_SECRET`: un texto largo al azar (protege `/api/cron/*`; Vercel lo manda solo en sus cron jobs).
    - `SITE_URL`: la URL pública (para los enlaces de los avisos).
-   - Opcional: `NEXT_PUBLIC_HOTELS` (por defecto `es,com,br`).
-4. Desplegá. `vercel.json` ya trae 8 escaneos por día por hotel (`/api/cron/scan?hotel=...`; el marcado con
-   `&avisos=1` es el que publica las ofertas en los canales), uno de alertas y uno de NFT. Si cambiás
-   `NEXT_PUBLIC_HOTELS`, ajustá también esos cron.
+   - Opcional: `NEXT_PUBLIC_HOTELS` (por defecto los nueve: `es,com,br,de,fr,it,nl,fi,tr`).
+4. Desplegá. `vercel.json` ya trae 24 escaneos por día (`/api/cron/scan?hotel=...`; el marcado con `&avisos=1` es el
+   que publica las ofertas en los canales), uno de alertas y uno de NFT. Si cambiás `NEXT_PUBLIC_HOTELS`, ajustá
+   también esos cron.
 5. Para no esperar días a que se llene, juntá los datos en tu PC (`npm run collect -- es --full`, etc.) y subilos al
    Blob: `vercel env pull .env.vercel` y después `npm run push-data`. (`.env.vercel` queda fuera de git.) Para la sección NFT: `npm run collect:nft -- --dias 14` y
    `npm run push-data -- nft`.
@@ -211,7 +219,8 @@ Vercel **no** respeta `.gitignore`. Para que cada push a GitHub se despliegue so
 *Settings → Git* del proyecto (la app de Vercel en GitHub tiene que tener acceso al repo).
 
 Cada escaneo escribe 1 archivo (y el historial, como mucho cada 8 horas): con los cron de `vercel.json` se usan unas
-1.240 de las 2.000 escrituras mensuales gratuitas de Vercel Blob. No sumes cron externos sin rehacer esa cuenta.
+1.300 de las 2.000 escrituras mensuales gratuitas de Vercel Blob. No sumes cron externos sin rehacer esa cuenta.
+`npm run push-data` sin hoteles sube los nueve: cada archivo es una escritura (3 por hotel).
 
 ## Alertas
 
@@ -237,8 +246,9 @@ repetir). Los pasos están en `/es/alertas/servidor` (página sin enlaces desde 
    publica a mano.
 4. Volvé a desplegar y probá con `/api/cron/alerts?prueba=1` (encabezado `Authorization: Bearer <CRON_SECRET>`).
 
-`ALERTS_DEALS_MIN_DISCOUNT` cambia el umbral (0 desactiva la publicación). Aunque haya escaneos cada 3 horas, las
-ofertas se publican en los canales una vez por día por hotel (en el escaneo marcado con `&avisos=1`).
+`ALERTS_DEALS_MIN_DISCOUNT` cambia el umbral (0 desactiva la publicación). Aunque haya varios escaneos por día, las
+ofertas se publican en los canales una vez por día por hotel (en el escaneo marcado con `&avisos=1`), y solo de .es,
+.com y .com.br.
 
 **Tu lista personal (opcional):** armá tu lista en **Alertas**, abrí `/es/alertas/servidor`, tocá **Copiar mi lista** y
 guardala en `ALERTS_RULES`. Esos avisos salen por los mismos canales. `/api/cron/alerts` revisa solo esos furnis (1 o 2

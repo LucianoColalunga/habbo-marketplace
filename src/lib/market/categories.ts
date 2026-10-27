@@ -361,8 +361,8 @@ export function categoryBySlug(slug: string): CategoryDef | undefined {
   return CATEGORIES.find((c) => c.slug === slug);
 }
 
-function prepare(i: CatalogItem): Item {
-  return { ...i, key: i.k.toLowerCase().replace(/\*\d+$/, ""), name: normalizeText(i.n) };
+function prepare(i: CatalogItem, otherName?: string): Item {
+  return { ...i, key: i.k.toLowerCase().replace(/\*\d+$/, ""), name: normalizeText(otherName ? `${i.n} ${otherName}` : i.n) };
 }
 
 /** Furnis de prueba que Habbo deja en el catálogo: no van a ninguna categoría. */
@@ -375,12 +375,16 @@ export interface CategoryIndex {
   members: Record<string, string[]>;
 }
 
-/** Clasifica todo el catálogo de un hotel. */
-export function buildCategoryIndex(items: CatalogItem[]): CategoryIndex {
+/**
+ * Clasifica todo el catálogo de un hotel. `otherName` da el nombre del mismo
+ * furni en otro hotel: sirve para los hoteles en alemán, francés, italiano,
+ * neerlandés, finés o turco, cuyas palabras no están en las reglas de respaldo.
+ */
+export function buildCategoryIndex(items: CatalogItem[], otherName?: (k: string) => string | undefined): CategoryIndex {
   const members: Record<string, string[]> = {};
   const add = (path: string, k: string) => (members[path] ??= []).push(k);
   for (const raw of items) {
-    const i = prepare(raw);
+    const i = prepare(raw, otherName?.(raw.k));
     if (isTestItem(i)) continue;
     for (const c of CATEGORIES) {
       if (!c.match(i)) continue;

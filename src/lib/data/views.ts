@@ -1,13 +1,13 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { CatalogItem } from "@/lib/habbo/furnidata";
-import type { HotelCode } from "@/lib/hotels";
+import { HOTELS, type HotelCode } from "@/lib/hotels";
 import { marketFlow, type MarketFlow } from "@/lib/market/flow";
 import type { DayPoint, SnapPoint } from "@/lib/market/history";
 import type { ItemSummary } from "@/lib/market/stats";
 import type { MarketSummary, ScanReport } from "@/lib/market/summary";
 import { isSafeClassname } from "@/lib/habbo/api";
 import { rankMatches } from "@/lib/search";
-import type { Lang } from "@/lib/i18n/config";
+import { LANGS, type Lang } from "@/lib/i18n/config";
 import {
   buildCategoryIndex,
   categoryBySlug,
@@ -194,12 +194,16 @@ const categoryMemo = new Map<string, { hash: string; index: CategoryIndex }>();
 
 /** Clasificación del catálogo de un hotel (se calcula una vez por versión del catálogo). */
 async function categoriesOf(hotel: HotelCode): Promise<{ index: CategoryIndex; catalog: CatalogIndex } | null> {
-  const catalog = await loadCatalog(hotel);
+  // En los hoteles con nombres en otro idioma (.de, .fr, .it, .nl, .fi, .com.tr) se
+  // suma el nombre en inglés del mismo furni, que es el que conocen las reglas.
+  const otherLang = !(LANGS as readonly string[]).includes(HOTELS[hotel].lang);
+  const [catalog, english] = await Promise.all([loadCatalog(hotel), otherLang ? loadCatalog("com") : null]);
   if (!catalog) return null;
+  const hash = `${catalog.catalog.hash}:${english?.catalog.hash ?? ""}`;
   const hit = categoryMemo.get(hotel);
-  if (hit && hit.hash === catalog.catalog.hash) return { index: hit.index, catalog };
-  const index = buildCategoryIndex(catalog.catalog.items);
-  categoryMemo.set(hotel, { hash: catalog.catalog.hash, index });
+  if (hit && hit.hash === hash) return { index: hit.index, catalog };
+  const index = buildCategoryIndex(catalog.catalog.items, english ? (k) => english.byKey.get(k)?.n : undefined);
+  categoryMemo.set(hotel, { hash, index });
   return { index, catalog };
 }
 

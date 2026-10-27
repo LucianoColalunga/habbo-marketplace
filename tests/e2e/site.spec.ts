@@ -84,6 +84,49 @@ test("cambiar de hotel mantiene la sección", async ({ page }) => {
   await expect(page).toHaveURL(/\/com\/ofertas$/);
 });
 
+test("los nueve hoteles: selector, inicio, rankings y catálogo con datos", async ({ page }) => {
+  await page.goto("/es");
+  await expect(page.getByLabel("Elegir hotel").locator("option")).toHaveText([
+    ".es · España",
+    ".com · Internacional",
+    ".com.br · Brasil",
+    ".de · Alemania",
+    ".fr · Francia",
+    ".it · Italia",
+    ".nl · Países Bajos",
+    ".fi · Finlandia",
+    ".com.tr · Turquía",
+  ]);
+  for (const [hotel, label] of [
+    ["de", ".de"],
+    ["fr", ".fr"],
+    ["it", ".it"],
+    ["nl", ".nl"],
+    ["fi", ".fi"],
+    ["tr", ".com.tr"],
+  ]) {
+    await page.goto(`/${hotel}`);
+    await expect(page.getByText(label, { exact: false }).first(), hotel).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Más vendidos" }), hotel).toBeVisible();
+    await expect(page.locator(`main a[href^="/${hotel}/furni/"]`).first(), hotel).toBeVisible();
+    await page.goto(`/${hotel}/rankings`);
+    await expect(page.getByRole("heading", { name: "Más vendidos", level: 2 }), hotel).toBeVisible();
+    await expect(page.locator(`main a[href^="/${hotel}/furni/"]`).first(), hotel).toBeVisible();
+    // Las categorías también funcionan con los nombres en el idioma del hotel.
+    await page.goto(`/${hotel}/categorias/asientos`);
+    await expect(page.getByRole("heading", { level: 1, name: "Asientos" }), hotel).toBeVisible();
+    await expect(page.locator("p[aria-live=polite]"), hotel).toHaveText(/^1–32 de \d/);
+  }
+});
+
+test("la ficha de un furni de .de viene en alemán y consulta ese hotel en vivo", async ({ page }) => {
+  const habbo = page.waitForResponse((r) => r.url().startsWith("https://www.habbo.de/api/public/marketplace/stats/batch"));
+  await page.goto("/de/furni/throne");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Thron");
+  expect((await habbo).ok()).toBe(true);
+  await expect(page.locator('[aria-live="polite"]').first()).toContainText("En vivo · consultado", { timeout: 20_000 });
+});
+
 test("un furni que no existe muestra la página de no encontrado (sin indexar)", async ({ page }) => {
   // La ficha se transmite por partes: el "no encontrado" llega después del primer envío,
   // así que Next.js responde 200 y agrega noindex (comportamiento documentado de Next 16).

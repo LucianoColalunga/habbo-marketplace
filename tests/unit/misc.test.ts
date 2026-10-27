@@ -12,6 +12,8 @@ import { FsStorage } from "@/lib/storage/fs";
 describe("búsqueda", () => {
   it("ignora acentos y mayúsculas", () => {
     expect(normalize("Dragón  de FUEGO")).toBe("dragon de fuego");
+    expect(normalize("Kırmızı İpek Kanepe")).toBe("kirmizi ipek kanepe");
+    expect(normalize("Große Straßenlampe Äpfel")).toBe("grosse strassenlampe apfel");
   });
 
   it("ordena exacto > empieza con > contiene, y desempata por actividad", () => {
@@ -48,7 +50,8 @@ describe("formatos", () => {
 describe("hoteles", () => {
   it("lee la lista de la configuración", () => {
     expect(parseHotelList("es, com,br,xx,es")).toEqual(["es", "com", "br"]);
-    expect(parseHotelList("")).toEqual(["es", "com", "br"]);
+    expect(parseHotelList("")).toEqual(["es", "com", "br", "de", "fr", "it", "nl", "fi", "tr"]);
+    expect(parseHotelList("tr,fi")).toEqual(["tr", "fi"]);
   });
 });
 

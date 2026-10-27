@@ -15,10 +15,6 @@
     },
     {
       "path": "/api/cron/scan?hotel=es",
-      "schedule": "0 11 * * *"
-    },
-    {
-      "path": "/api/cron/scan?hotel=es",
       "schedule": "0 14 * * *"
     },
     {
@@ -28,10 +24,6 @@
     {
       "path": "/api/cron/scan?hotel=es",
       "schedule": "0 20 * * *"
-    },
-    {
-      "path": "/api/cron/scan?hotel=es",
-      "schedule": "0 23 * * *"
     },
     {
       "path": "/api/cron/scan?hotel=com",
@@ -47,10 +39,6 @@
     },
     {
       "path": "/api/cron/scan?hotel=com",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/scan?hotel=com",
       "schedule": "0 12 * * *"
     },
     {
@@ -60,10 +48,6 @@
     {
       "path": "/api/cron/scan?hotel=com",
       "schedule": "0 18 * * *"
-    },
-    {
-      "path": "/api/cron/scan?hotel=com",
-      "schedule": "0 21 * * *"
     },
     {
       "path": "/api/cron/scan?hotel=br",
@@ -79,10 +63,6 @@
     },
     {
       "path": "/api/cron/scan?hotel=br",
-      "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/scan?hotel=br",
       "schedule": "0 13 * * *"
     },
     {
@@ -94,8 +74,28 @@
       "schedule": "0 19 * * *"
     },
     {
-      "path": "/api/cron/scan?hotel=br",
+      "path": "/api/cron/scan?hotel=de",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=fr",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=it",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=nl",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=fi",
       "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/cron/scan?hotel=tr",
+      "schedule": "0 23 * * *"
     },
     {
       "path": "/api/cron/alerts",

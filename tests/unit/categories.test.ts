@@ -42,6 +42,18 @@ describe("categorías de furnis", () => {
     expect(members("pared/cuadros")).toEqual(["poster_12"]);
   });
 
+  it("en los hoteles en otros idiomas también usa el nombre en inglés", () => {
+    const de = [item("ads_glow_c26", "Leuchtende Drachenstatue"), item("ads_glow_c27", "Kleiner Tisch")];
+    expect(buildCategoryIndex(de).members.iluminacion).toBeUndefined();
+    const english = new Map([
+      ["ads_glow_c26", "Glowing Dragon Lamp"],
+      ["ads_glow_c27", "Small Table"],
+    ]);
+    const withEnglish = buildCategoryIndex(de, (k) => english.get(k));
+    expect(withEnglish.members.iluminacion).toEqual(["ads_glow_c26"]);
+    expect(withEnglish.members["mesas/mesas"]).toEqual(["ads_glow_c27"]);
+  });
+
   it("deja afuera los rollers de los pisos y los furnis de prueba", () => {
     expect(members("pisos")).not.toContain("queue_tile1*3");
     expect(Object.values(index.members).flat()).not.toContain("test_thing");

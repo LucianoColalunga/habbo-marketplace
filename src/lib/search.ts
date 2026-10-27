@@ -1,9 +1,11 @@
-/** Normaliza texto para buscar: minúsculas y sin acentos. */
+/** Normaliza texto para buscar: minúsculas y sin acentos (la "ı" turca como "i" y la "ß" como "ss"). */
 export function normalize(text: string): string {
   return text
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
+    .replace(/ı/g, "i")
+    .replace(/ß/g, "ss")
     .replace(/[_*]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();

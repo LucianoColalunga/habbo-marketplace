@@ -17,7 +17,14 @@ export const HOTELS = {
 export type HotelCode = keyof typeof HOTELS;
 export type Hotel = (typeof HOTELS)[HotelCode];
 
-export const DEFAULT_HOTELS: HotelCode[] = ["es", "com", "br"];
+/** Los nueve hoteles, en el orden del selector. */
+export const DEFAULT_HOTELS: HotelCode[] = ["es", "com", "br", "de", "fr", "it", "nl", "fi", "tr"];
+
+/**
+ * Hoteles principales (los de los tres idiomas del sitio): se escanean más
+ * seguido y son los únicos que publican ofertas en los canales.
+ */
+export const MAIN_HOTELS: HotelCode[] = ["es", "com", "br"];
 
 export function isHotelCode(value: unknown): value is HotelCode {
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(HOTELS, value);

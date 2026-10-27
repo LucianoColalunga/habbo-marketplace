@@ -39,6 +39,9 @@ export interface ScanOptions {
   log?: (message: string) => void;
 }
 
+/** Cada cuántos minutos se guarda el historial como mucho, si no se indica otra cosa (8 h). */
+export const HISTORY_EVERY_MINUTES = 480;
+
 export type ScanOutcome =
   | { status: "skipped"; hotel: HotelCode; reason: string; lastScan: string }
   | { status: "done"; hotel: HotelCode; summary: MarketSummary };
@@ -209,7 +212,7 @@ export async function runScan(hotel: HotelCode, options: ScanOptions = {}): Prom
     items: merged,
   };
 
-  const historyEvery = options.full ? 0 : (options.historyEveryMinutes ?? envNumber("SCAN_HISTORY_EVERY_MINUTES", 480));
+  const historyEvery = options.full ? 0 : (options.historyEveryMinutes ?? envNumber("SCAN_HISTORY_EVERY_MINUTES", HISTORY_EVERY_MINUTES));
   const lastHistory = previous?.historyAt ? Date.parse(previous.historyAt) : 0;
   if ((finished.getTime() - lastHistory) / 60000 >= historyEvery) {
     await saveHistory(hotel, storage, result.results, finished, merged);
